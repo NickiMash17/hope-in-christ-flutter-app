@@ -7,6 +7,8 @@ import {
   Pressable,
   Platform,
 } from 'react-native';
+import { Image } from 'expo-image';
+import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
@@ -16,11 +18,11 @@ import { fontFamily } from '@/lib/fonts';
 import { useTheme } from '@/lib/useTheme';
 import { EVENTS, Event } from '@/lib/data';
 
-const categoryIcons: Record<string, string> = {
-  Conference: 'people',
-  Youth: 'flash',
-  Fellowship: 'heart',
-  Service: 'musical-notes',
+const eventImages: Record<string, any> = {
+  Conference: require('@/assets/images/event-conference.png'),
+  Youth: require('@/assets/images/event-youth.png'),
+  Fellowship: require('@/assets/images/event-fellowship.png'),
+  Service: require('@/assets/images/event-easter.png'),
 };
 
 const categoryColors: Record<string, string> = {
@@ -45,33 +47,36 @@ function EventCard({ event, isDark, colors }: { event: Event; isDark: boolean; c
       style={({ pressed }) => [
         styles.eventCard,
         {
-          backgroundColor: isDark ? Colors.dark.card : '#fff',
           transform: [{ scale: pressed ? 0.98 : 1 }],
         },
       ]}
     >
-      <View style={[styles.dateBlock, { backgroundColor: color + '15' }]}>
-        <Text style={[styles.dateDay, { color }]}>{day}</Text>
-        <Text style={[styles.dateMonth, { color }]}>{month}</Text>
-      </View>
-      <View style={styles.eventInfo}>
-        <Text style={[styles.eventTitle, { color: colors.text }]} numberOfLines={2}>{event.title}</Text>
-        <View style={styles.eventMeta}>
-          <View style={styles.metaRow}>
-            <Ionicons name="time-outline" size={13} color={colors.textSecondary} />
-            <Text style={[styles.metaText, { color: colors.textSecondary }]}>{event.time}</Text>
+      <Image
+        source={eventImages[event.category]}
+        style={styles.eventImage}
+        contentFit="cover"
+      />
+      <LinearGradient
+        colors={['transparent', 'rgba(0,0,0,0.85)']}
+        style={styles.eventOverlay}
+      >
+        <View style={[styles.datePill]}>
+          <Text style={[styles.dateDay, { color: '#fff' }]}>{day}</Text>
+          <Text style={[styles.dateMonth, { color: 'rgba(255,255,255,0.8)' }]}>{month}</Text>
+        </View>
+        <View style={styles.eventBottom}>
+          <View style={[styles.categoryBadge, { backgroundColor: color }]}>
+            <Text style={styles.categoryText}>{event.category}</Text>
           </View>
+          <Text style={styles.eventTitle} numberOfLines={2}>{event.title}</Text>
           <View style={styles.metaRow}>
-            <Ionicons name="location-outline" size={13} color={colors.textSecondary} />
-            <Text style={[styles.metaText, { color: colors.textSecondary }]} numberOfLines={1}>{event.location}</Text>
+            <Ionicons name="time-outline" size={12} color="rgba(255,255,255,0.7)" />
+            <Text style={styles.metaText}>{event.time}</Text>
+            <Ionicons name="location-outline" size={12} color="rgba(255,255,255,0.7)" style={{ marginLeft: 8 }} />
+            <Text style={styles.metaText} numberOfLines={1}>{event.location}</Text>
           </View>
         </View>
-        <View style={[styles.categoryBadge, { backgroundColor: color + '18' }]}>
-          <Ionicons name={(categoryIcons[event.category] || 'star') as any} size={12} color={color} />
-          <Text style={[styles.categoryText, { color }]}>{event.category}</Text>
-        </View>
-      </View>
-      <Ionicons name="chevron-forward" size={18} color={colors.textSecondary} />
+      </LinearGradient>
     </Pressable>
   );
 }
@@ -125,26 +130,33 @@ const styles = StyleSheet.create({
   list: {
     paddingHorizontal: 16,
     paddingTop: 4,
-    gap: 10,
+    gap: 14,
   },
   eventCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 14,
-    borderRadius: 14,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 3,
-    elevation: 1,
-    gap: 12,
+    height: 200,
+    borderRadius: 18,
+    overflow: 'hidden',
   },
-  dateBlock: {
-    width: 52,
-    height: 56,
-    borderRadius: 14,
+  eventImage: {
+    width: '100%',
+    height: '100%',
+  },
+  eventOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    padding: 14,
+    justifyContent: 'space-between',
+  },
+  datePill: {
+    backgroundColor: 'rgba(91,44,142,0.85)',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 10,
+    alignSelf: 'flex-end',
     alignItems: 'center',
-    justifyContent: 'center',
   },
   dateDay: {
     fontSize: 20,
@@ -155,17 +167,25 @@ const styles = StyleSheet.create({
     fontFamily: fontFamily.bold,
     letterSpacing: 1,
   },
-  eventInfo: {
-    flex: 1,
+  eventBottom: {
     gap: 4,
   },
-  eventTitle: {
-    fontSize: 15,
-    fontFamily: fontFamily.bold,
-    lineHeight: 20,
+  categoryBadge: {
+    paddingHorizontal: 10,
+    paddingVertical: 3,
+    borderRadius: 8,
+    alignSelf: 'flex-start',
   },
-  eventMeta: {
-    gap: 2,
+  categoryText: {
+    fontSize: 10,
+    fontFamily: fontFamily.bold,
+    color: '#fff',
+  },
+  eventTitle: {
+    fontSize: 18,
+    fontFamily: fontFamily.bold,
+    color: '#fff',
+    lineHeight: 22,
   },
   metaRow: {
     flexDirection: 'row',
@@ -175,21 +195,8 @@ const styles = StyleSheet.create({
   metaText: {
     fontSize: 11,
     fontFamily: fontFamily.regular,
-    flex: 1,
-  },
-  categoryBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 6,
-    alignSelf: 'flex-start',
-    marginTop: 2,
-  },
-  categoryText: {
-    fontSize: 10,
-    fontFamily: fontFamily.semiBold,
+    color: 'rgba(255,255,255,0.7)',
+    flex: 0,
   },
   emptyState: {
     alignItems: 'center',

@@ -8,6 +8,7 @@ import {
   TextInput,
   Platform,
 } from 'react-native';
+import { Image } from 'expo-image';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
@@ -18,6 +19,12 @@ import { useTheme } from '@/lib/useTheme';
 import { SERMONS, Sermon } from '@/lib/data';
 
 const CATEGORIES = ['All', 'Word', 'Teaching', 'Prayer'] as const;
+
+const sermonImages: Record<string, any> = {
+  Word: require('@/assets/images/sermon-word.png'),
+  Teaching: require('@/assets/images/sermon-teaching.png'),
+  Prayer: require('@/assets/images/sermon-prayer.png'),
+};
 
 function SermonCard({ sermon, isDark, colors }: { sermon: Sermon; isDark: boolean; colors: any }) {
   const categoryColors: Record<string, string> = {
@@ -40,13 +47,11 @@ function SermonCard({ sermon, isDark, colors }: { sermon: Sermon; isDark: boolea
         },
       ]}
     >
-      <View style={[styles.sermonIconWrap, { backgroundColor: (categoryColors[sermon.category] || Colors.primary) + '15' }]}>
-        <Ionicons
-          name={sermon.videoUrl ? 'play-circle' : 'musical-notes'}
-          size={24}
-          color={categoryColors[sermon.category] || Colors.primary}
-        />
-      </View>
+      <Image
+        source={sermonImages[sermon.category]}
+        style={styles.sermonImage}
+        contentFit="cover"
+      />
       <View style={styles.sermonInfo}>
         <Text style={[styles.sermonTitle, { color: colors.text }]} numberOfLines={2}>{sermon.title}</Text>
         <Text style={[styles.sermonSpeaker, { color: colors.textSecondary }]} numberOfLines={1}>{sermon.speaker}</Text>
@@ -188,7 +193,7 @@ const styles = StyleSheet.create({
   sermonCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 14,
+    padding: 10,
     borderRadius: 14,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
@@ -197,12 +202,10 @@ const styles = StyleSheet.create({
     elevation: 1,
     gap: 12,
   },
-  sermonIconWrap: {
-    width: 48,
-    height: 48,
-    borderRadius: 14,
-    alignItems: 'center',
-    justifyContent: 'center',
+  sermonImage: {
+    width: 64,
+    height: 64,
+    borderRadius: 12,
   },
   sermonInfo: {
     flex: 1,

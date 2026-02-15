@@ -8,6 +8,8 @@ import {
   Platform,
   Linking,
 } from 'react-native';
+import { Image } from 'expo-image';
+import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useLocalSearchParams, router } from 'expo-router';
@@ -16,6 +18,12 @@ import Colors from '@/constants/colors';
 import { fontFamily } from '@/lib/fonts';
 import { useTheme } from '@/lib/useTheme';
 import { SERMONS } from '@/lib/data';
+
+const sermonImages: Record<string, any> = {
+  Word: require('@/assets/images/sermon-word.png'),
+  Teaching: require('@/assets/images/sermon-teaching.png'),
+  Prayer: require('@/assets/images/sermon-prayer.png'),
+};
 
 export default function SermonDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -49,25 +57,44 @@ export default function SermonDetailScreen() {
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <View style={[styles.navBar, { paddingTop: (Platform.OS === 'web' ? webTopInset : insets.top) + 4 }]}>
-        <Pressable onPress={() => router.back()} style={styles.backButton}>
-          <Ionicons name="chevron-back" size={24} color={colors.text} />
-        </Pressable>
-        <Text style={[styles.navTitle, { color: colors.text }]} numberOfLines={1}>Sermon</Text>
-        <View style={{ width: 36 }} />
-      </View>
-
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 40 }}
       >
-        <View style={[styles.heroSection, { backgroundColor: catColor + '12' }]}>
-          <View style={[styles.heroIcon, { backgroundColor: catColor + '20' }]}>
-            <Ionicons name={sermon.videoUrl ? 'play-circle' : 'musical-notes'} size={40} color={catColor} />
-          </View>
-          <View style={[styles.categoryBadge, { backgroundColor: catColor + '20' }]}>
-            <Text style={[styles.categoryText, { color: catColor }]}>{sermon.category}</Text>
-          </View>
+        <View style={styles.heroContainer}>
+          <Image
+            source={sermonImages[sermon.category]}
+            style={styles.heroImage}
+            contentFit="cover"
+          />
+          <LinearGradient
+            colors={['rgba(0,0,0,0.3)', 'rgba(0,0,0,0.7)']}
+            style={styles.heroOverlay}
+          >
+            <Pressable
+              onPress={() => router.back()}
+              style={[styles.floatingBack, { top: (Platform.OS === 'web' ? webTopInset : insets.top) + 8 }]}
+            >
+              <Ionicons name="chevron-back" size={22} color="#fff" />
+            </Pressable>
+
+            <View style={styles.heroBottom}>
+              <View style={[styles.categoryBadge, { backgroundColor: catColor }]}>
+                <Text style={styles.categoryText}>{sermon.category}</Text>
+              </View>
+              {sermon.videoUrl && (
+                <Pressable
+                  onPress={() => {
+                    if (Platform.OS !== 'web') Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                    Linking.openURL(sermon.videoUrl!);
+                  }}
+                  style={styles.playButton}
+                >
+                  <Ionicons name="play" size={28} color="#fff" />
+                </Pressable>
+              )}
+            </View>
+          </LinearGradient>
         </View>
 
         <View style={styles.content}>
@@ -129,51 +156,59 @@ export default function SermonDetailScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  navBar: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 12,
-    paddingBottom: 8,
+  heroContainer: {
+    height: 240,
+    position: 'relative',
   },
-  backButton: {
+  heroImage: {
+    width: '100%',
+    height: '100%',
+  },
+  heroOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    justifyContent: 'flex-end',
+    padding: 16,
+  },
+  floatingBack: {
+    position: 'absolute',
+    left: 12,
     width: 36,
     height: 36,
+    borderRadius: 18,
+    backgroundColor: 'rgba(0,0,0,0.4)',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  navTitle: {
-    fontSize: 16,
-    fontFamily: fontFamily.semiBold,
-    flex: 1,
-    textAlign: 'center',
-  },
-  heroSection: {
-    alignItems: 'center',
-    paddingVertical: 32,
-    marginHorizontal: 16,
-    borderRadius: 20,
-    marginBottom: 16,
-    gap: 12,
-  },
-  heroIcon: {
-    width: 80,
-    height: 80,
-    borderRadius: 24,
-    alignItems: 'center',
-    justifyContent: 'center',
+  heroBottom: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    justifyContent: 'space-between',
   },
   categoryBadge: {
     paddingHorizontal: 14,
-    paddingVertical: 4,
+    paddingVertical: 5,
     borderRadius: 10,
   },
   categoryText: {
     fontSize: 12,
     fontFamily: fontFamily.bold,
+    color: '#fff',
+  },
+  playButton: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: 'rgba(91,44,142,0.85)',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   content: {
     paddingHorizontal: 20,
+    paddingTop: 16,
     gap: 10,
   },
   title: {
@@ -235,6 +270,19 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontFamily: fontFamily.regular,
     lineHeight: 20,
+  },
+  navBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 12,
+    paddingBottom: 8,
+  },
+  backButton: {
+    width: 36,
+    height: 36,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   emptyState: {
     flex: 1,

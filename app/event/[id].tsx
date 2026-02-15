@@ -7,6 +7,8 @@ import {
   Pressable,
   Platform,
 } from 'react-native';
+import { Image } from 'expo-image';
+import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useLocalSearchParams, router } from 'expo-router';
@@ -15,6 +17,13 @@ import Colors from '@/constants/colors';
 import { fontFamily } from '@/lib/fonts';
 import { useTheme } from '@/lib/useTheme';
 import { EVENTS } from '@/lib/data';
+
+const eventImages: Record<string, any> = {
+  Conference: require('@/assets/images/event-conference.png'),
+  Youth: require('@/assets/images/event-youth.png'),
+  Fellowship: require('@/assets/images/event-fellowship.png'),
+  Service: require('@/assets/images/event-easter.png'),
+};
 
 const categoryColors: Record<string, string> = {
   Conference: Colors.primary,
@@ -51,33 +60,43 @@ export default function EventDetailScreen() {
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <View style={[styles.navBar, { paddingTop: (Platform.OS === 'web' ? webTopInset : insets.top) + 4 }]}>
-        <Pressable onPress={() => router.back()} style={styles.backButton}>
-          <Ionicons name="chevron-back" size={24} color={colors.text} />
-        </Pressable>
-        <Text style={[styles.navTitle, { color: colors.text }]} numberOfLines={1}>Event Details</Text>
-        <View style={{ width: 36 }} />
-      </View>
-
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 40 }}>
-        <View style={[styles.heroSection, { backgroundColor: catColor + '12' }]}>
-          <View style={[styles.heroDate]}>
-            <Text style={[styles.heroDay, { color: catColor }]}>{dateObj.getDate()}</Text>
-            <Text style={[styles.heroMonth, { color: catColor }]}>
-              {dateObj.toLocaleDateString('en-ZA', { month: 'short' }).toUpperCase()}
-            </Text>
-            <Text style={[styles.heroYear, { color: catColor }]}>{dateObj.getFullYear()}</Text>
-          </View>
+        <View style={styles.heroContainer}>
+          <Image
+            source={eventImages[event.category]}
+            style={styles.heroImage}
+            contentFit="cover"
+          />
+          <LinearGradient
+            colors={['rgba(0,0,0,0.2)', 'rgba(0,0,0,0.75)']}
+            style={styles.heroOverlay}
+          >
+            <Pressable
+              onPress={() => router.back()}
+              style={[styles.floatingBack, { top: (Platform.OS === 'web' ? webTopInset : insets.top) + 8 }]}
+            >
+              <Ionicons name="chevron-back" size={22} color="#fff" />
+            </Pressable>
+
+            <View style={styles.heroBottom}>
+              <View style={[styles.datePill, { backgroundColor: catColor }]}>
+                <Text style={styles.dateDay}>{dateObj.getDate()}</Text>
+                <Text style={styles.dateMonth}>
+                  {dateObj.toLocaleDateString('en-ZA', { month: 'short' }).toUpperCase()}
+                </Text>
+              </View>
+              <View style={styles.heroTitleArea}>
+                <View style={[styles.categoryBadge, { backgroundColor: 'rgba(255,255,255,0.2)' }]}>
+                  <Text style={styles.categoryText}>{event.category}</Text>
+                </View>
+                <Text style={styles.heroTitle} numberOfLines={2}>{event.title}</Text>
+              </View>
+            </View>
+          </LinearGradient>
         </View>
 
         <View style={styles.content}>
-          <View style={[styles.categoryBadge, { backgroundColor: catColor + '18' }]}>
-            <Text style={[styles.categoryText, { color: catColor }]}>{event.category}</Text>
-          </View>
-
-          <Text style={[styles.title, { color: colors.text }]}>{event.title}</Text>
-
-          <View style={styles.detailsCard}>
+          <View style={[styles.detailsCard, { backgroundColor: isDark ? Colors.dark.card : '#fff' }]}>
             <View style={styles.detailRow}>
               <View style={[styles.detailIcon, { backgroundColor: catColor + '15' }]}>
                 <Ionicons name="calendar-outline" size={16} color={catColor} />
@@ -149,37 +168,67 @@ export default function EventDetailScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  navBar: {
+  heroContainer: {
+    height: 260,
+    position: 'relative',
+  },
+  heroImage: {
+    width: '100%',
+    height: '100%',
+  },
+  heroOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    justifyContent: 'flex-end',
+    padding: 16,
+  },
+  floatingBack: {
+    position: 'absolute',
+    left: 12,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: 'rgba(0,0,0,0.4)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  heroBottom: {
     flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    alignItems: 'flex-end',
+    gap: 12,
+  },
+  datePill: {
     paddingHorizontal: 12,
-    paddingBottom: 8,
-  },
-  backButton: { width: 36, height: 36, alignItems: 'center', justifyContent: 'center' },
-  navTitle: { fontSize: 16, fontFamily: fontFamily.semiBold, flex: 1, textAlign: 'center' },
-  heroSection: {
+    paddingVertical: 8,
+    borderRadius: 12,
     alignItems: 'center',
-    paddingVertical: 28,
-    marginHorizontal: 16,
-    borderRadius: 20,
-    marginBottom: 16,
   },
-  heroDate: { alignItems: 'center' },
-  heroDay: { fontSize: 42, fontFamily: fontFamily.extraBold },
-  heroMonth: { fontSize: 14, fontFamily: fontFamily.bold, letterSpacing: 2 },
-  heroYear: { fontSize: 14, fontFamily: fontFamily.medium },
-  content: { paddingHorizontal: 20, gap: 12 },
-  categoryBadge: { paddingHorizontal: 12, paddingVertical: 4, borderRadius: 8, alignSelf: 'flex-start' },
-  categoryText: { fontSize: 12, fontFamily: fontFamily.bold },
-  title: { fontSize: 24, fontFamily: fontFamily.extraBold, lineHeight: 30 },
-  detailsCard: { gap: 14, marginTop: 4 },
+  dateDay: { fontSize: 22, fontFamily: fontFamily.extraBold, color: '#fff' },
+  dateMonth: { fontSize: 10, fontFamily: fontFamily.bold, color: 'rgba(255,255,255,0.8)', letterSpacing: 1 },
+  heroTitleArea: { flex: 1, gap: 4 },
+  categoryBadge: { paddingHorizontal: 10, paddingVertical: 3, borderRadius: 8, alignSelf: 'flex-start' },
+  categoryText: { fontSize: 11, fontFamily: fontFamily.bold, color: '#fff' },
+  heroTitle: { fontSize: 20, fontFamily: fontFamily.bold, color: '#fff', lineHeight: 26 },
+  content: { paddingHorizontal: 20, paddingTop: 16, gap: 14 },
+  detailsCard: {
+    borderRadius: 16,
+    padding: 16,
+    gap: 14,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.06,
+    shadowRadius: 4,
+    elevation: 2,
+  },
   detailRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   detailIcon: { width: 36, height: 36, borderRadius: 10, alignItems: 'center', justifyContent: 'center' },
   detailLabel: { fontSize: 11, fontFamily: fontFamily.medium },
   detailValue: { fontSize: 14, fontFamily: fontFamily.semiBold },
-  description: { fontSize: 14, fontFamily: fontFamily.regular, lineHeight: 22, marginTop: 4 },
-  ticketInfo: { gap: 8, marginTop: 4 },
+  description: { fontSize: 14, fontFamily: fontFamily.regular, lineHeight: 22 },
+  ticketInfo: { gap: 8 },
   ticketLabel: { fontSize: 12, fontFamily: fontFamily.bold, letterSpacing: 0.5 },
   ticketRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   ticketBadge: { flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 10, paddingVertical: 6, borderRadius: 8 },
@@ -191,9 +240,11 @@ const styles = StyleSheet.create({
     gap: 8,
     paddingVertical: 16,
     borderRadius: 14,
-    marginTop: 8,
+    marginTop: 4,
   },
   registerButtonText: { color: '#fff', fontSize: 16, fontFamily: fontFamily.bold },
+  navBar: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 12, paddingBottom: 8 },
+  backButton: { width: 36, height: 36, alignItems: 'center', justifyContent: 'center' },
   emptyState: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 12 },
   emptyText: { fontSize: 15, fontFamily: fontFamily.medium },
 });

@@ -8,6 +8,7 @@ import {
   Platform,
   Linking,
 } from 'react-native';
+import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -17,6 +18,8 @@ import Colors from '@/constants/colors';
 import { fontFamily } from '@/lib/fonts';
 import { useTheme } from '@/lib/useTheme';
 import { DONATION_CONFIG } from '@/lib/data';
+
+const giveHero = require('@/assets/images/give-hero.png');
 
 export default function GiveScreen() {
   const insets = useSafeAreaInsets();
@@ -46,18 +49,25 @@ export default function GiveScreen() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 100 }}
       >
-        <LinearGradient
-          colors={isDark ? ['#1A3050', '#0D0D12'] : ['#2471A3', '#5DADE2', Colors.light.background]}
-          style={[styles.header, { paddingTop: (Platform.OS === 'web' ? webTopInset : insets.top) + 16 }]}
-        >
-          <View style={styles.headerIcon}>
-            <Ionicons name="heart" size={32} color="#fff" />
-          </View>
-          <Text style={styles.headerTitle}>Give Generously</Text>
-          <Text style={styles.headerSubtitle}>
-            Your giving supports the work of the ministry and helps bring hope to communities across the nations.
-          </Text>
-        </LinearGradient>
+        <View style={styles.heroContainer}>
+          <Image
+            source={giveHero}
+            style={styles.heroImage}
+            contentFit="cover"
+          />
+          <LinearGradient
+            colors={['rgba(36,113,163,0.6)', 'rgba(36,113,163,0.9)', isDark ? Colors.dark.background : Colors.light.background]}
+            style={[styles.heroOverlay, { paddingTop: (Platform.OS === 'web' ? webTopInset : insets.top) + 16 }]}
+          >
+            <View style={styles.headerIcon}>
+              <Ionicons name="heart" size={32} color="#fff" />
+            </View>
+            <Text style={styles.headerTitle}>Give Generously</Text>
+            <Text style={styles.headerSubtitle}>
+              Your giving supports the work of the ministry and helps bring hope to communities across the nations.
+            </Text>
+          </LinearGradient>
+        </View>
 
         <View style={styles.content}>
           <Text style={[styles.sectionLabel, { color: colors.textSecondary }]}>CHOOSE HOW TO GIVE</Text>
@@ -142,10 +152,24 @@ export default function GiveScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  header: {
-    paddingHorizontal: 24,
-    paddingBottom: 32,
+  heroContainer: {
+    height: 260,
+    position: 'relative',
+  },
+  heroImage: {
+    width: '100%',
+    height: '100%',
+  },
+  heroOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
     alignItems: 'center',
+    justifyContent: 'flex-end',
+    paddingHorizontal: 24,
+    paddingBottom: 28,
     borderBottomLeftRadius: 28,
     borderBottomRightRadius: 28,
   },
@@ -167,7 +191,7 @@ const styles = StyleSheet.create({
   headerSubtitle: {
     fontSize: 14,
     fontFamily: fontFamily.regular,
-    color: 'rgba(255,255,255,0.8)',
+    color: 'rgba(255,255,255,0.85)',
     textAlign: 'center',
     lineHeight: 20,
   },

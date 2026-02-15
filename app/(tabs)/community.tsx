@@ -7,6 +7,8 @@ import {
   Pressable,
   Platform,
 } from 'react-native';
+import { Image } from 'expo-image';
+import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
@@ -15,6 +17,8 @@ import Colors from '@/constants/colors';
 import { fontFamily } from '@/lib/fonts';
 import { useTheme } from '@/lib/useTheme';
 
+const communityHero = require('@/assets/images/community-hero.png');
+
 const CHANNELS = [
   {
     id: 'prayer',
@@ -22,7 +26,6 @@ const CHANNELS = [
     description: 'Share your prayer needs and pray for others',
     icon: 'hand-left' as const,
     color: Colors.primary,
-    memberCount: 'Community',
   },
   {
     id: 'general',
@@ -30,7 +33,6 @@ const CHANNELS = [
     description: 'Fellowship and general conversation',
     icon: 'chatbubbles' as const,
     color: Colors.accentBlue,
-    memberCount: 'Community',
   },
 ];
 
@@ -51,7 +53,23 @@ export default function CommunityScreen() {
           <Text style={[styles.headerSub, { color: colors.textSecondary }]}>Connect, share, and grow together</Text>
         </View>
 
+        <View style={styles.heroCard}>
+          <Image
+            source={communityHero}
+            style={styles.heroImage}
+            contentFit="cover"
+          />
+          <LinearGradient
+            colors={['transparent', 'rgba(0,0,0,0.75)']}
+            style={styles.heroOverlay}
+          >
+            <Text style={styles.heroText}>Join our growing community of believers</Text>
+          </LinearGradient>
+        </View>
+
         <View style={styles.content}>
+          <Text style={[styles.sectionLabel, { color: colors.textSecondary }]}>CHANNELS</Text>
+
           {CHANNELS.map(channel => (
             <Pressable
               key={channel.id}
@@ -73,10 +91,6 @@ export default function CommunityScreen() {
               <View style={styles.channelInfo}>
                 <Text style={[styles.channelName, { color: colors.text }]}>{channel.name}</Text>
                 <Text style={[styles.channelDesc, { color: colors.textSecondary }]}>{channel.description}</Text>
-                <View style={styles.channelMeta}>
-                  <Ionicons name="people-outline" size={13} color={colors.textSecondary} />
-                  <Text style={[styles.channelMembers, { color: colors.textSecondary }]}>{channel.memberCount}</Text>
-                </View>
               </View>
               <Ionicons name="chevron-forward" size={20} color={colors.textSecondary} />
             </Pressable>
@@ -112,9 +126,41 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontFamily: fontFamily.regular,
   },
+  heroCard: {
+    height: 150,
+    marginHorizontal: 16,
+    borderRadius: 18,
+    overflow: 'hidden',
+    marginBottom: 16,
+  },
+  heroImage: {
+    width: '100%',
+    height: '100%',
+  },
+  heroOverlay: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    padding: 14,
+    paddingTop: 40,
+  },
+  heroText: {
+    color: '#fff',
+    fontSize: 16,
+    fontFamily: fontFamily.bold,
+    lineHeight: 22,
+  },
   content: {
     paddingHorizontal: 16,
     gap: 12,
+  },
+  sectionLabel: {
+    fontSize: 11,
+    fontFamily: fontFamily.bold,
+    letterSpacing: 1,
+    marginLeft: 4,
+    marginBottom: 2,
   },
   channelCard: {
     flexDirection: 'row',
@@ -147,16 +193,6 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontFamily: fontFamily.regular,
     lineHeight: 18,
-  },
-  channelMeta: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    marginTop: 2,
-  },
-  channelMembers: {
-    fontSize: 11,
-    fontFamily: fontFamily.medium,
   },
   guidelinesCard: {
     flexDirection: 'row',

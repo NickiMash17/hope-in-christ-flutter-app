@@ -7,7 +7,10 @@ import {
   Pressable,
   Platform,
   Linking,
+  ImageBackground,
+  Dimensions,
 } from 'react-native';
+import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -17,6 +20,9 @@ import Colors from '@/constants/colors';
 import { fontFamily } from '@/lib/fonts';
 import { useTheme } from '@/lib/useTheme';
 import { SCHEDULE, MINISTRY_INFO, SERMONS } from '@/lib/data';
+
+const heroImage = require('@/assets/images/hero-home.png');
+const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 function getTodaySchedule() {
   const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -84,25 +90,32 @@ export default function HomeScreen() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={[styles.scrollContent, { paddingBottom: 100 }]}
       >
-        <LinearGradient
-          colors={isDark ? ['#2A1548', '#1A0A30', Colors.dark.background] : ['#5B2C8E', '#7B4BAE', Colors.light.background]}
-          style={[styles.header, { paddingTop: (Platform.OS === 'web' ? webTopInset : insets.top) + 16 }]}
-        >
-          <View style={styles.headerTop}>
-            <View style={styles.headerTextContainer}>
-              <Text style={styles.welcomeText}>Welcome to</Text>
-              <Text style={styles.ministryName}>{MINISTRY_INFO.shortName}</Text>
-              <Text style={styles.sloganText}>{MINISTRY_INFO.slogan1}</Text>
+        <View style={styles.heroContainer}>
+          <Image
+            source={heroImage}
+            style={styles.heroImage}
+            contentFit="cover"
+          />
+          <LinearGradient
+            colors={['rgba(91,44,142,0.75)', 'rgba(91,44,142,0.92)', isDark ? Colors.dark.background : Colors.light.background]}
+            style={[styles.heroOverlay, { paddingTop: (Platform.OS === 'web' ? webTopInset : insets.top) + 16 }]}
+          >
+            <View style={styles.headerTop}>
+              <View style={styles.headerTextContainer}>
+                <Text style={styles.welcomeText}>Welcome to</Text>
+                <Text style={styles.ministryName}>{MINISTRY_INFO.shortName}</Text>
+                <Text style={styles.sloganText}>{MINISTRY_INFO.slogan1}</Text>
+              </View>
+              <Pressable
+                onPress={() => handlePress('about')}
+                style={({ pressed }) => [styles.aboutButton, { opacity: pressed ? 0.7 : 1 }]}
+              >
+                <Ionicons name="information-circle-outline" size={26} color="#fff" />
+              </Pressable>
             </View>
-            <Pressable
-              onPress={() => handlePress('about')}
-              style={({ pressed }) => [styles.aboutButton, { opacity: pressed ? 0.7 : 1 }]}
-            >
-              <Ionicons name="information-circle-outline" size={26} color="#fff" />
-            </Pressable>
-          </View>
-          <Text style={styles.serviceStyle}>{MINISTRY_INFO.serviceStyle}</Text>
-        </LinearGradient>
+            <Text style={styles.serviceStyle}>{MINISTRY_INFO.serviceStyle}</Text>
+          </LinearGradient>
+        </View>
 
         <View style={styles.content}>
           <View style={styles.quickActionsRow}>
@@ -130,6 +143,30 @@ export default function HomeScreen() {
               </Pressable>
             ))}
           </View>
+
+          <Pressable
+            onPress={() => handlePress('sermon')}
+            style={({ pressed }) => ({ transform: [{ scale: pressed ? 0.98 : 1 }] })}
+          >
+            <View style={styles.latestSermonCard}>
+              <Image
+                source={require('@/assets/images/sermon-word.png')}
+                style={styles.latestSermonImage}
+                contentFit="cover"
+              />
+              <LinearGradient
+                colors={['transparent', 'rgba(0,0,0,0.8)']}
+                style={styles.latestSermonOverlay}
+              >
+                <View style={styles.latestSermonBadge}>
+                  <Ionicons name="play-circle" size={14} color="#fff" />
+                  <Text style={styles.latestSermonBadgeText}>Latest Sermon</Text>
+                </View>
+                <Text style={styles.latestSermonTitle}>{SERMONS[0].title}</Text>
+                <Text style={styles.latestSermonSpeaker}>{SERMONS[0].speaker}</Text>
+              </LinearGradient>
+            </View>
+          </Pressable>
 
           {todaySchedule && (
             <Pressable onPress={() => handlePress('schedule')}>
@@ -221,9 +258,23 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1 },
   scrollContent: {},
-  header: {
+  heroContainer: {
+    height: 240,
+    position: 'relative',
+  },
+  heroImage: {
+    width: '100%',
+    height: '100%',
+  },
+  heroOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
     paddingHorizontal: 20,
-    paddingBottom: 32,
+    paddingBottom: 24,
+    justifyContent: 'flex-end',
     borderBottomLeftRadius: 28,
     borderBottomRightRadius: 28,
   },
@@ -235,7 +286,7 @@ const styles = StyleSheet.create({
   headerTextContainer: { flex: 1 },
   welcomeText: {
     fontSize: 14,
-    color: 'rgba(255,255,255,0.8)',
+    color: 'rgba(255,255,255,0.85)',
     fontFamily: fontFamily.medium,
     marginBottom: 2,
   },
@@ -247,7 +298,7 @@ const styles = StyleSheet.create({
   },
   sloganText: {
     fontSize: 13,
-    color: 'rgba(255,255,255,0.7)',
+    color: 'rgba(255,255,255,0.75)',
     fontFamily: fontFamily.medium,
     fontStyle: 'italic',
     marginTop: 6,
@@ -291,6 +342,51 @@ const styles = StyleSheet.create({
     fontFamily: fontFamily.semiBold,
     textAlign: 'center',
     lineHeight: 14,
+  },
+  latestSermonCard: {
+    height: 160,
+    borderRadius: 16,
+    overflow: 'hidden',
+  },
+  latestSermonImage: {
+    width: '100%',
+    height: '100%',
+  },
+  latestSermonOverlay: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    padding: 14,
+    paddingTop: 40,
+  },
+  latestSermonBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: 'rgba(91,44,142,0.8)',
+    paddingHorizontal: 10,
+    paddingVertical: 3,
+    borderRadius: 8,
+    alignSelf: 'flex-start',
+    marginBottom: 6,
+  },
+  latestSermonBadgeText: {
+    color: '#fff',
+    fontSize: 11,
+    fontFamily: fontFamily.semiBold,
+  },
+  latestSermonTitle: {
+    color: '#fff',
+    fontSize: 18,
+    fontFamily: fontFamily.bold,
+    lineHeight: 22,
+  },
+  latestSermonSpeaker: {
+    color: 'rgba(255,255,255,0.7)',
+    fontSize: 12,
+    fontFamily: fontFamily.regular,
+    marginTop: 2,
   },
   card: {
     borderRadius: 16,
