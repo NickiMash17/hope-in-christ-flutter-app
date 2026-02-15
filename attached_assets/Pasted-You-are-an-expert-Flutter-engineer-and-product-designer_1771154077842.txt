@@ -1,0 +1,136 @@
+You are an expert Flutter engineer and product designer. Build a production-ready Flutter app for a Christian ministry called “Hope in Christ for All Nations Ministries”.
+
+GOAL
+A mobile app that helps members and visitors:
+1) Watch/listen to sermons and teachings (audio/video)
+2) Give/donate securely
+3) Register for conferences and events
+4) Join interactive chats (community + prayer requests)
+Also include a schedule, location, departments, leadership info, and social links.
+
+TECH STACK REQUIREMENTS
+- Flutter (latest stable) + Dart
+- Clean Architecture (presentation/domain/data) OR simple layered architecture but organized
+- State management: Riverpod (preferred) or Provider (choose one and be consistent)
+- Routing: go_router
+- Networking: dio
+- Local storage: shared_preferences for simple settings + cached data
+- If backend is needed: use Firebase (Auth + Firestore) for chat + registrations; keep it minimal and simple
+- If payments/donations need an integration: implement “donation intent” flow and allow 2 options:
+  (A) External link button to PayFast/PayPal/Stripe checkout (configurable)
+  (B) Manual EFT details page (admin-configurable)
+Do NOT hardcode real keys. Use placeholder config values in one file.
+
+BRANDING
+Use official colors:
+- Purple, Red, Blue, White, Black
+Create a consistent theme:
+- Light theme: white background, purple primary, red/blue accents, black text
+- Dark theme: near-black background, purple primary, red/blue accents, white text
+Use Material 3, modern rounded cards, clean spacing.
+App slogan options to include in About screen:
+- “Inspiring Hope… Encouraging Life”
+- “Winning, Discipling, Imparting and Sending”
+
+APP NAVIGATION (Bottom Tabs)
+Tabs:
+1) Home
+2) Sermons
+3) Give
+4) Events
+5) Community
+
+SCREENS & FEATURES
+1) Home
+- Welcome header, ministry name + slogan
+- Quick actions: Watch Live, Latest Sermon, Give, Register
+- Service schedule summary (today + next service)
+- Location card with address + “Open in Maps”
+Address:
+824 Simunye Street, Mountainview Zone 02, KwaMhlanga, Mpumalanga 1022
+Office hours:
+07:30–17:00
+Service style:
+Word – Worship – Prayer – Praise
+
+2) Sermons
+- List of sermons with title, speaker, date, category (Word/Teaching/Prayer)
+- Sermon detail screen with:
+  - embedded YouTube video (or external open)
+  - audio playback option (if audio URL present)
+  - notes/summary
+- Search + filter by category and speaker
+- Data source: start with local JSON mock in assets, structured so it can be replaced with Firestore/API later.
+
+3) Give (Donations)
+- Clean giving screen with:
+  - Give once / Give monthly (UI only, explain “coming soon” if not implemented)
+  - Buttons: “Donate Online” (opens configurable URL), “EFT Details”, “Contact for Giving”
+- EFT Details page: bank details placeholders (do not invent real bank details)
+- Confirmation message screen after donation intent
+
+4) Events (Conferences/Registrations)
+- Events list + event detail
+- Register flow:
+  - name, surname, phone, email, ticket type (General/VIP), attendance type (in-person/online)
+  - Submit to Firestore (preferred) or store locally if Firebase not configured
+- Show success screen + add-to-calendar option (generate .ics content or simple “Add to calendar” instructions)
+
+5) Community (Interactive chat)
+- Community landing:
+  - “Prayer Requests” channel
+  - “General Chat” channel
+- Use Firebase Auth anonymous sign-in OR simple nickname entry if Firebase not configured
+- Firestore chat messages with timestamps, message bubbles, and basic moderation:
+  - profanity filter (simple list) and report button
+- Allow admins (flag in Firestore) to pin a message
+
+EXTRA SCREENS
+- About / Leadership
+  Leadership:
+  Pastor Thabo & Mrs Ntombi Boshomane
+  Short bio for Pastor Thabo (paraphrase and keep it respectful, not too long)
+  Mention ministry established 18 Oct 2015; call accepted 2009; mission to preach to all nations.
+  Include departments list:
+  Worship, Ushering, Youth Ministry, Women Fellowship, Men’s Fellowship, Children Ministry,
+  Catering Team, Media Team, Evangelism, Pastors Fellowship, Community Affairs, Social Service
+  Mention admin/HR: Pastor Thoko Mahlangu
+
+- Media & Social
+  Links to Facebook, Twitter/X, TikTok, WhatsApp, YouTube
+  Include “Streaming: Facebook” note
+
+SCHEDULE DATA (Show in Home + separate ‘Schedule’ modal/page)
+- Sunday:
+  Leader Training 08:00–09:00
+  Intercession 09:00–10:00
+  Power Hour: Prayer & Prophetic Ministry (time between 09:00–10:00 or after; if unclear, display as part of morning flow)
+  Main Service 10:00–12:30
+  Daily online devotion 04:00–05:00
+- Wednesday:
+  Fasting and Prayer
+  Bible Study 18:30–19:30
+- Friday:
+  Youth Service 18:30–19:30
+- Saturday:
+  Intercession 18:00–19:00
+
+IMPORTANT UX REQUIREMENTS
+- App must be responsive and look good on small phones
+- Use reusable components: ministry card, schedule tile, sermon tile, event tile
+- Add loading states, empty states, and error states
+- Add basic accessibility: readable contrast, text scaling friendly
+
+PROJECT REQUIREMENTS
+- Provide a clear folder structure
+- Include a README with:
+  - setup steps (Flutter SDK)
+  - how to run
+  - where to configure donation links + Firebase config
+  - how to add sermons/events data
+- Provide dummy data for sermons and events in /assets/json/
+- Include a simple logo placeholder (text-based) and app icon instructions
+
+OUTPUT
+Generate the full Flutter project code with all screens wired together, mock data working, and Firebase integration optional behind a config flag.
+If Firebase is not configured, app should still run with mock/local storage features enabled.
