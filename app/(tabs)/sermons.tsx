@@ -23,9 +23,17 @@ import { useResponsiveLayout } from '@/lib/layout';
 const CATEGORIES = ['All', 'Word', 'Teaching', 'Prayer'] as const;
 
 const sermonImages: Record<string, any> = {
-  '1': require('@/assets/new/pastor teaching congregants.jpeg'),
-  '2': require('@/assets/new/pastor.jpeg'),
-  '3': require('@/assets/new/pastor and wife 1.jpeg'),
+  '1': require('@/assets/new/pastor.jpeg'),
+  '2': require('@/assets/new/pastor teaching congregants.jpeg'),
+  '3': require('@/assets/new/new purple.png'),
+  '4': require('@/assets/new/pastor.jpeg'),
+  '5': require('@/assets/new/pastor teaching congregants.jpeg'),
+  '6': require('@/assets/new/new purple.png'),
+  '7': require('@/assets/new/church youth.jpeg'),
+  '8': require('@/assets/new/pastor.jpeg'),
+  '9': require('@/assets/new/pastor teaching congregants.jpeg'),
+  '10': require('@/assets/new/new purple.png'),
+  '11': require('@/assets/new/pastor.jpeg'),
 };
 
 function SermonCard({ sermon, isDark, colors }: { sermon: any; isDark: boolean; colors: any }) {
