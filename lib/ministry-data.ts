@@ -101,7 +101,7 @@ export const SERMONS = [
     thumbnail: require('@/assets/images/sermon-word.png'),
     videoUrl: "https://x.com/HicfanMin/status/2012583926393405814",
     audioUrl: "https://x.com/HicfanMin/status/2012583926393405814",
-    notes: "Watch the full service recording",
+    notes: "Listen to the full audio sermon recording",
     description: "Sunday morning service with powerful worship, prayer, and the Word of God."
   },
   {
@@ -114,7 +114,7 @@ export const SERMONS = [
     thumbnail: require('@/assets/images/sermon-teaching.png'),
     videoUrl: "https://x.com/HicfanMin/status/2012006173621305623",
     audioUrl: "https://x.com/HicfanMin/status/2012006173621305623",
-    notes: "Watch the full service recording",
+    notes: "Listen to the full audio sermon recording",
     description: "Sunday morning service with inspiring worship and biblical teaching."
   },
   {
@@ -127,7 +127,7 @@ export const SERMONS = [
     thumbnail: require('@/assets/images/sermon-prayer.png'),
     videoUrl: "https://x.com/HicfanMin/status/2011644539405283418",
     audioUrl: "https://x.com/HicfanMin/status/2011644539405283418",
-    notes: "Watch the full Bible study service recording",
+    notes: "Listen to the full audio Bible study recording",
     description: "Wednesday Bible study service with deep teaching from the Word."
   },
   {
@@ -140,7 +140,7 @@ export const SERMONS = [
     thumbnail: require('@/assets/images/sermon-word.png'),
     videoUrl: "https://x.com/HicfanMin/status/2011478722289766841",
     audioUrl: "https://x.com/HicfanMin/status/2011478722289766841",
-    notes: "Watch the full service recording",
+    notes: "Listen to the full audio sermon recording",
     description: "Sunday morning service featuring prayer, praise, and powerful preaching."
   },
   {
@@ -153,7 +153,7 @@ export const SERMONS = [
     thumbnail: require('@/assets/images/sermon-teaching.png'),
     videoUrl: "https://x.com/HicfanMin/status/2011283259980931523",
     audioUrl: "https://x.com/HicfanMin/status/2011283259980931523",
-    notes: "Watch the full service recording",
+    notes: "Listen to the full audio sermon recording",
     description: "Sunday morning service with anointed worship and the Word."
   },
   {
@@ -166,7 +166,7 @@ export const SERMONS = [
     thumbnail: require('@/assets/images/sermon-prayer.png'),
     videoUrl: "https://x.com/HicfanMin/status/2011093811074842845",
     audioUrl: "https://x.com/HicfanMin/status/2011093811074842845",
-    notes: "Watch the full service recording",
+    notes: "Listen to the full audio sermon recording",
     description: "Sunday morning service with transformative teaching from the Word."
   },
   {
@@ -179,7 +179,7 @@ export const SERMONS = [
     thumbnail: require('@/assets/images/sermon-word.png'),
     videoUrl: "https://x.com/HicfanMin/status/2010995206930464962",
     audioUrl: "https://x.com/HicfanMin/status/2010995206930464962",
-    notes: "Watch the youth service recording",
+    notes: "Listen to the full audio youth service recording",
     description: "Friday evening youth service with dynamic worship and relevant teaching."
   },
   {
@@ -192,7 +192,7 @@ export const SERMONS = [
     thumbnail: require('@/assets/images/sermon-teaching.png'),
     videoUrl: "https://x.com/HicfanMin/status/2010921137488675256",
     audioUrl: "https://x.com/HicfanMin/status/2010921137488675256",
-    notes: "Watch the full service recording",
+    notes: "Listen to the full audio sermon recording",
     description: "Sunday morning service with powerful ministry and worship."
   },
   {
@@ -205,7 +205,7 @@ export const SERMONS = [
     thumbnail: require('@/assets/images/sermon-prayer.png'),
     videoUrl: "https://x.com/HicfanMin/status/2010917970462040101",
     audioUrl: "https://x.com/HicfanMin/status/2010917970462040101",
-    notes: "Watch the full service recording",
+    notes: "Listen to the full audio sermon recording",
     description: "Special ministry service with prayer and the Word."
   },
   {
@@ -218,7 +218,7 @@ export const SERMONS = [
     thumbnail: require('@/assets/images/sermon-word.png'),
     videoUrl: "https://x.com/HicfanMin/status/2010917936429502671",
     audioUrl: "https://x.com/HicfanMin/status/2010917936429502671",
-    notes: "Watch the evening service recording",
+    notes: "Listen to the full audio evening service recording",
     description: "Evening service focused on prayer and intercession."
   },
   {
@@ -231,7 +231,7 @@ export const SERMONS = [
     thumbnail: require('@/assets/images/sermon-teaching.png'),
     videoUrl: "https://x.com/HicfanMin/status/2010557048476618916",
     audioUrl: "https://x.com/HicfanMin/status/2010557048476618916",
-    notes: "Watch the full service recording",
+    notes: "Listen to the full audio sermon recording",
     description: "Sunday morning service with revelatory teaching and worship."
   }
 ];
