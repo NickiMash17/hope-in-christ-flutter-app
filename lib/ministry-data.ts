@@ -12,14 +12,15 @@ export const MINISTRY_INFO = {
   adminHR: "Pastor Thoko Mahlangu",
   socialMedia: {
     facebook: "https://www.facebook.com/hopeinchristforallnations",
-    twitter: "https://twitter.com/hopeinchrist",
+    twitter: "https://x.com/HicfanMin",
     tiktok: "https://www.tiktok.com/@hopeinchrist",
     whatsapp: "https://wa.me/27XXXXXXXXXX",
     youtube: "https://www.youtube.com/@hopeinchrist",
   },
   streaming: {
-    platform: "Facebook",
+    platform: "Facebook & Twitter/X",
     url: "https://www.facebook.com/hopeinchristforallnations",
+    twitterUrl: "https://x.com/HicfanMin",
   },
   leadership: {
     seniorPastors: "Pastor Thabo & Mrs Ntombi Boshomane",
@@ -92,42 +93,81 @@ export const SCHEDULE = [
 export const SERMONS = [
   {
     id: "1",
-    title: "The Power of Hope in Christ",
+    title: "Sunday Service - February 23, 2026",
     speaker: "Pastor Thabo Boshomane",
-    date: "2026-02-11",
-    duration: "45:32",
+    date: "2026-02-23",
+    duration: "1:15:00",
     category: "Word",
     thumbnail: require('@/assets/images/sermon-word.png'),
-    videoUrl: "https://www.facebook.com/hopeinchristforallnations",
-    audioUrl: "https://www.facebook.com/hopeinchristforallnations",
-    notes: "Key Points: 1) Hope anchors the soul (Hebrews 6:19) 2) Hope in Christ gives us purpose 3) Living hope through resurrection (1 Peter 1:3)",
-    description: "Discover the transformative power of placing your hope in Jesus Christ and how it can revolutionize your daily walk with God."
+    videoUrl: "https://x.com/HicfanMin",
+    audioUrl: "https://x.com/HicfanMin",
+    notes: "Watch the full service recording on our Twitter/X account",
+    description: "Sunday morning service with powerful worship, prayer, and the Word of God."
   },
   {
     id: "2", 
-    title: "Winning Souls for Christ",
+    title: "Sunday Service - February 16, 2026",
     speaker: "Pastor Thabo Boshomane",
-    date: "2026-02-04",
-    duration: "52:18",
-    category: "Teaching",
+    date: "2026-02-16",
+    duration: "1:12:00",
+    category: "Word",
     thumbnail: require('@/assets/images/sermon-teaching.png'),
-    videoUrl: "https://www.facebook.com/hopeinchristforallnations",
-    audioUrl: "https://www.facebook.com/hopeinchristforallnations",
-    notes: "Key Points: 1) The Great Commission (Matthew 28:19-20) 2) Being fishers of men 3) Personal evangelism strategies 4) Power of testimony",
-    description: "Learn effective strategies for evangelism and soul-winning in the modern world."
+    videoUrl: "https://x.com/HicfanMin",
+    audioUrl: "https://x.com/HicfanMin",
+    notes: "Watch the full service recording on our Twitter/X account",
+    description: "Sunday morning service with inspiring worship and biblical teaching."
   },
   {
     id: "3",
-    title: "The Discipline of Discipleship",
+    title: "Sunday Service - February 9, 2026",
     speaker: "Pastor Thabo Boshomane", 
-    date: "2026-01-28",
-    duration: "48:45",
-    category: "Prayer",
+    date: "2026-02-09",
+    duration: "1:18:00",
+    category: "Word",
     thumbnail: require('@/assets/images/sermon-prayer.png'),
-    videoUrl: "https://www.facebook.com/hopeinchristforallnations",
-    audioUrl: "https://www.facebook.com/hopeinchristforallnations",
-    notes: "Key Points: 1) Counting the cost of discipleship 2) Making disciples, not just converts 3) Imparting kingdom principles 4) Sending equipped believers",
-    description: "Understanding the call to discipleship and how to effectively disciple others in their faith journey."
+    videoUrl: "https://x.com/HicfanMin",
+    audioUrl: "https://x.com/HicfanMin",
+    notes: "Watch the full service recording on our Twitter/X account",
+    description: "Sunday morning service featuring prayer, praise, and powerful preaching."
+  },
+  {
+    id: "4",
+    title: "Sunday Service - February 2, 2026",
+    speaker: "Pastor Thabo Boshomane",
+    date: "2026-02-02",
+    duration: "1:20:00",
+    category: "Word",
+    thumbnail: require('@/assets/images/sermon-word.png'),
+    videoUrl: "https://x.com/HicfanMin",
+    audioUrl: "https://x.com/HicfanMin",
+    notes: "Watch the full service recording on our Twitter/X account",
+    description: "Sunday morning service with anointed worship and the Word."
+  },
+  {
+    id: "5",
+    title: "Sunday Service - January 26, 2026",
+    speaker: "Pastor Thabo Boshomane",
+    date: "2026-01-26",
+    duration: "1:10:00",
+    category: "Word",
+    thumbnail: require('@/assets/images/sermon-teaching.png'),
+    videoUrl: "https://x.com/HicfanMin",
+    audioUrl: "https://x.com/HicfanMin",
+    notes: "Watch the full service recording on our Twitter/X account",
+    description: "Sunday morning service with transformative teaching from the Word."
+  },
+  {
+    id: "6",
+    title: "Friday Youth Service - February 21, 2026",
+    speaker: "Youth Leaders",
+    date: "2026-02-21",
+    duration: "55:00",
+    category: "Teaching",
+    thumbnail: require('@/assets/images/sermon-prayer.png'),
+    videoUrl: "https://x.com/HicfanMin",
+    audioUrl: "https://x.com/HicfanMin",
+    notes: "Watch the youth service recording on our Twitter/X account",
+    description: "Friday evening youth service with dynamic worship and relevant teaching."
   }
 ];
 
@@ -248,7 +288,7 @@ export const DEPARTMENTS = [
 export const SOCIAL_LINKS = {
   facebook: "https://www.facebook.com/hopeinchristforallnations",
   youtube: "https://www.youtube.com/@hopeinchrist",
-  twitter: "https://twitter.com/hopeinchrist",
+  twitter: "https://x.com/HicfanMin",
   tiktok: "https://www.tiktok.com/@hopeinchrist",
   whatsapp: "https://wa.me/27XXXXXXXXXX"
 };
