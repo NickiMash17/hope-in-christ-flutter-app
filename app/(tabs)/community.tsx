@@ -16,8 +16,9 @@ import * as Haptics from 'expo-haptics';
 import Colors from '@/constants/colors';
 import { fontFamily } from '@/lib/fonts';
 import { useTheme } from '@/lib/useTheme';
+import { useResponsiveLayout } from '@/lib/layout';
 
-const communityHero = require('@/assets/images/community-hero.png');
+const communityHero = require('@/assets/new/worship team 2.jpeg');
 
 const CHANNELS = [
   {
@@ -39,18 +40,34 @@ const CHANNELS = [
 export default function CommunityScreen() {
   const insets = useSafeAreaInsets();
   const { isDark, colors } = useTheme();
+  const layout = useResponsiveLayout();
   const webTopInset = Platform.OS === 'web' ? 67 : 0;
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
+      <LinearGradient
+        colors={['rgba(74,35,90,0.14)', 'rgba(36,113,163,0.08)', 'transparent']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={styles.atmosphere}
+      />
+      <View style={styles.orbPrimary} />
+      <View style={styles.orbSecondary} />
       <ScrollView
         contentInsetAdjustmentBehavior="automatic"
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 100 }}
       >
+        <View style={[layout.maxWidthStyle, { paddingHorizontal: layout.horizontalPadding }]}>
         <View style={[styles.header, { paddingTop: (Platform.OS === 'web' ? webTopInset : insets.top) + 8 }]}>
           <Text style={[styles.headerTitle, { color: colors.text }]}>Community</Text>
           <Text style={[styles.headerSub, { color: colors.textSecondary }]}>Connect, share, and grow together</Text>
+          <View style={styles.headerMetaRow}>
+            <View style={[styles.headerMetaBadge, { backgroundColor: isDark ? Colors.dark.card : '#ffffff' }]}>
+              <Ionicons name="people" size={13} color={Colors.primary} />
+              <Text style={[styles.headerMetaText, { color: colors.text }]}>Private Fellowship</Text>
+            </View>
+          </View>
         </View>
 
         <View style={styles.heroCard}>
@@ -106,6 +123,7 @@ export default function CommunityScreen() {
             </View>
           </View>
         </View>
+        </View>
       </ScrollView>
     </View>
   );
@@ -113,8 +131,28 @@ export default function CommunityScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
+  atmosphere: {
+    ...StyleSheet.absoluteFillObject,
+  },
+  orbPrimary: {
+    position: 'absolute',
+    top: -120,
+    right: -90,
+    width: 250,
+    height: 250,
+    borderRadius: 125,
+    backgroundColor: 'rgba(106,71,205,0.13)',
+  },
+  orbSecondary: {
+    position: 'absolute',
+    bottom: 140,
+    left: -70,
+    width: 200,
+    height: 200,
+    borderRadius: 100,
+    backgroundColor: 'rgba(36,113,163,0.1)',
+  },
   header: {
-    paddingHorizontal: 16,
     paddingBottom: 12,
   },
   headerTitle: {
@@ -126,9 +164,27 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontFamily: fontFamily.regular,
   },
+  headerMetaRow: {
+    marginTop: 12,
+    flexDirection: 'row',
+  },
+  headerMetaBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 999,
+    borderWidth: 1,
+    borderColor: 'rgba(91,44,142,0.28)',
+  },
+  headerMetaText: {
+    fontSize: 11,
+    fontFamily: fontFamily.semiBold,
+    letterSpacing: 0.2,
+  },
   heroCard: {
     height: 150,
-    marginHorizontal: 16,
     borderRadius: 18,
     overflow: 'hidden',
     marginBottom: 16,
@@ -152,7 +208,6 @@ const styles = StyleSheet.create({
     lineHeight: 22,
   },
   content: {
-    paddingHorizontal: 16,
     gap: 12,
   },
   sectionLabel: {
@@ -166,12 +221,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     padding: 16,
-    borderRadius: 16,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.25)',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.06,
-    shadowRadius: 4,
-    elevation: 2,
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.14,
+    shadowRadius: 14,
+    elevation: 6,
     gap: 14,
   },
   channelIconWrap: {

@@ -17,6 +17,7 @@ import Colors from '@/constants/colors';
 import { fontFamily } from '@/lib/fonts';
 import { useTheme } from '@/lib/useTheme';
 import { MINISTRY_INFO, DEPARTMENTS, SOCIAL_LINKS } from '@/lib/data';
+import { useResponsiveLayout } from '@/lib/layout';
 
 const DEPT_ICONS: Record<string, { icon: string; set: string }> = {
   'Worship': { icon: 'musical-notes', set: 'ion' },
@@ -36,6 +37,7 @@ const DEPT_ICONS: Record<string, { icon: string; set: string }> = {
 export default function AboutScreen() {
   const insets = useSafeAreaInsets();
   const { isDark, colors } = useTheme();
+  const layout = useResponsiveLayout();
   const webTopInset = Platform.OS === 'web' ? 67 : 0;
 
   const openLink = (url: string) => {
@@ -54,6 +56,7 @@ export default function AboutScreen() {
       </View>
 
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 40 }}>
+        <View style={[layout.maxWidthStyle, { paddingHorizontal: layout.horizontalPadding }]}>
         <LinearGradient
           colors={isDark ? ['#2A1548', '#1A0A30'] : ['#5B2C8E', '#7B4BAE']}
           style={styles.heroSection}
@@ -169,6 +172,7 @@ export default function AboutScreen() {
             </View>
           </View>
         </View>
+        </View>
       </ScrollView>
     </View>
   );
@@ -183,7 +187,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 28,
     paddingHorizontal: 24,
-    marginHorizontal: 16,
+    marginHorizontal: 0,
     borderRadius: 20,
     marginBottom: 16,
     gap: 6,
@@ -202,7 +206,7 @@ const styles = StyleSheet.create({
   heroSlogan2: { fontSize: 11, fontFamily: fontFamily.semiBold, color: 'rgba(255,255,255,0.6)', letterSpacing: 0.5 },
   heroBadge: { flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 6, backgroundColor: 'rgba(255,255,255,0.1)', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 8 },
   heroBadgeText: { fontSize: 11, fontFamily: fontFamily.medium, color: 'rgba(255,255,255,0.8)' },
-  content: { paddingHorizontal: 16, gap: 14 },
+  content: { paddingHorizontal: 0, gap: 14 },
   card: { borderRadius: 16, padding: 16, shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.06, shadowRadius: 4, elevation: 2 },
   cardHeader: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 14 },
   cardTitle: { fontSize: 16, fontFamily: fontFamily.bold },

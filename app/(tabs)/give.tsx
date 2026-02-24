@@ -17,39 +17,50 @@ import * as Haptics from 'expo-haptics';
 import Colors from '@/constants/colors';
 import { fontFamily } from '@/lib/fonts';
 import { useTheme } from '@/lib/useTheme';
-import { DONATION_CONFIG } from '@/lib/data';
+import { DONATION_INFO } from '@/lib/ministry-data';
+import { useResponsiveLayout } from '@/lib/layout';
 
-const giveHero = require('@/assets/images/give-hero.png');
+const giveHero = require('@/assets/new/pastor and wife 3.jpeg');
 
 export default function GiveScreen() {
   const insets = useSafeAreaInsets();
   const { isDark, colors } = useTheme();
+  const layout = useResponsiveLayout();
   const webTopInset = Platform.OS === 'web' ? 67 : 0;
 
   const handleAction = (action: string) => {
     if (Platform.OS !== 'web') Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     switch (action) {
       case 'online':
-        Linking.openURL(DONATION_CONFIG.onlineUrl);
+        Linking.openURL(DONATION_INFO.onlineGiving.url);
         router.push('/donation-success');
         break;
       case 'eft':
         router.push('/eft-details');
         break;
       case 'contact':
-        Linking.openURL(`tel:${DONATION_CONFIG.contactPhone}`);
+        Linking.openURL(`tel:+27123456789`);
         break;
     }
   };
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
+      <LinearGradient
+        colors={['rgba(36,113,163,0.14)', 'rgba(212,175,55,0.08)', 'transparent']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={styles.atmosphere}
+      />
+      <View style={styles.orbPrimary} />
+      <View style={styles.orbSecondary} />
       <ScrollView
         contentInsetAdjustmentBehavior="automatic"
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 100 }}
       >
-        <View style={styles.heroContainer}>
+        <View style={[layout.maxWidthStyle, { paddingHorizontal: layout.horizontalPadding }]}>
+        <View style={[styles.heroContainer, { marginHorizontal: 0 }]}>
           <Image
             source={giveHero}
             style={styles.heroImage}
@@ -145,6 +156,7 @@ export default function GiveScreen() {
             </Text>
           </View>
         </View>
+        </View>
       </ScrollView>
     </View>
   );
@@ -152,9 +164,32 @@ export default function GiveScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
+  atmosphere: {
+    ...StyleSheet.absoluteFillObject,
+  },
+  orbPrimary: {
+    position: 'absolute',
+    top: -100,
+    right: -90,
+    width: 240,
+    height: 240,
+    borderRadius: 120,
+    backgroundColor: 'rgba(70,130,180,0.14)',
+  },
+  orbSecondary: {
+    position: 'absolute',
+    bottom: 160,
+    left: -60,
+    width: 180,
+    height: 180,
+    borderRadius: 90,
+    backgroundColor: 'rgba(212,175,55,0.11)',
+  },
   heroContainer: {
     height: 260,
     position: 'relative',
+    borderRadius: 24,
+    overflow: 'hidden',
   },
   heroImage: {
     width: '100%',
@@ -210,12 +245,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     padding: 16,
-    borderRadius: 14,
+    borderRadius: 18,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.25)',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 3,
-    elevation: 1,
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.14,
+    shadowRadius: 14,
+    elevation: 6,
     gap: 12,
   },
   giveIconWrap: {

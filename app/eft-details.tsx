@@ -14,10 +14,12 @@ import Colors from '@/constants/colors';
 import { fontFamily } from '@/lib/fonts';
 import { useTheme } from '@/lib/useTheme';
 import { DONATION_CONFIG } from '@/lib/data';
+import { useResponsiveLayout } from '@/lib/layout';
 
 export default function EFTDetailsScreen() {
   const insets = useSafeAreaInsets();
   const { isDark, colors } = useTheme();
+  const layout = useResponsiveLayout();
   const webTopInset = Platform.OS === 'web' ? 67 : 0;
 
   const eft = DONATION_CONFIG.eftDetails;
@@ -42,6 +44,7 @@ export default function EFTDetailsScreen() {
       </View>
 
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 40 }}>
+        <View style={[layout.maxWidthStyle, { paddingHorizontal: layout.horizontalPadding }]}>
         <View style={styles.headerSection}>
           <View style={[styles.headerIcon, { backgroundColor: Colors.accentBlue + '15' }]}>
             <MaterialCommunityIcons name="bank-transfer" size={36} color={Colors.accentBlue} />
@@ -83,8 +86,9 @@ export default function EFTDetailsScreen() {
           style={[styles.doneButton, { backgroundColor: Colors.accentBlue }]}
         >
           <Ionicons name="checkmark-circle" size={20} color="#fff" />
-          <Text style={styles.doneButtonText}>I've Made a Transfer</Text>
+          <Text style={styles.doneButtonText}>I&apos;ve Made a Transfer</Text>
         </Pressable>
+        </View>
       </ScrollView>
     </View>
   );
@@ -100,7 +104,6 @@ const styles = StyleSheet.create({
   headerTitle: { fontSize: 22, fontFamily: fontFamily.bold },
   headerSubtitle: { fontSize: 14, fontFamily: fontFamily.regular, textAlign: 'center' },
   detailsCard: {
-    marginHorizontal: 16,
     borderRadius: 16,
     padding: 16,
     shadowColor: '#000',
@@ -117,7 +120,6 @@ const styles = StyleSheet.create({
   divider: { height: 1, marginLeft: 48 },
   noteCard: {
     flexDirection: 'row',
-    marginHorizontal: 16,
     marginTop: 14,
     padding: 14,
     borderRadius: 12,
@@ -129,7 +131,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: 8,
-    marginHorizontal: 16,
     marginTop: 16,
     paddingVertical: 16,
     borderRadius: 14,

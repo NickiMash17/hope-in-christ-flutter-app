@@ -1,0 +1,293 @@
+export const MINISTRY_INFO = {
+  name: "Hope In Christ for All Nations Ministries",
+  fullName: "Hope In Christ for All Nations Ministries",
+  shortName: "Hope In Christ",
+  slogan1: "Inspiring Hope... Encouraging Life",
+  slogan2: "Winning, Discipling, Imparting and Sending",
+  address: "824 Simunye Street, Mountainview Zone 02, KwaMhlanga, Mpumalanga 1022",
+  officeHours: "07:30-17:00",
+  serviceStyle: "Services characterized by Word-Worship Prayer-Praise",
+  established: "2015",
+  pastorBio: "Pastor Thabo Boshomane was ordained and released from Hope Restoration Ministry in Kempton Park. He established Hope In Christ on October 18, 2015, after accepting God's call in 2009 to preach the gospel to all nations. He is a life coach and NLP practitioner who believes everyone must be saved and discipled to become the best of who God intended for them.",
+  adminHR: "Pastor Thoko Mahlangu",
+  socialMedia: {
+    facebook: "https://www.facebook.com/hopeinchristforallnations",
+    twitter: "https://twitter.com/hopeinchrist",
+    tiktok: "https://www.tiktok.com/@hopeinchrist",
+    whatsapp: "https://wa.me/27XXXXXXXXXX",
+    youtube: "https://www.youtube.com/@hopeinchrist",
+  },
+  streaming: {
+    platform: "Facebook",
+    url: "https://www.facebook.com/hopeinchristforallnations",
+  },
+  leadership: {
+    seniorPastors: "Pastor Thabo & Mrs Ntombi Boshomane",
+    pastorThabo: {
+      title: "Senior Pastor",
+      ordination: "Ordained and Released from Hope Restoration Ministry based in Kempton Park, under the leadership of Pastor SC and Pastor PA Mathebula",
+      founded: "Established the ministry on 18th October 2015, after accepting the call of God in 2009 to preach the gospel to all nations and across the world",
+      belief: "Believes everyone must be saved and discipled to become the best of who God has intended for them",
+      additional: "Life coach and NLP practitioner"
+    },
+    admin: "Pastor Thoko Mahlangu - Admin and HR responsibilities"
+  },
+  departments: [
+    "Worship Team",
+    "Ushering Ministry",
+    "Youth Ministry", 
+    "Women's Fellowship",
+    "Men's Fellowship",
+    "Children's Ministry",
+    "Catering Team",
+    "Media Team",
+    "Evangelism",
+    "Pastors' Fellowship",
+    "Community Affairs",
+    "Social Services"
+  ],
+  values: {
+    dressing: "Presentable",
+    services: "Spirit-filled and God-powered service, vibrant and exciting"
+  }
+};
+
+export const SCHEDULE = [
+  {
+    day: "Sunday",
+    items: [
+      { time: "08:00-09:00", title: "Leader Training" },
+      { time: "09:00-10:00", title: "Intercession" },
+      { time: "10:00-12:30", title: "Power Hour: Prayer & Prophetic Ministry" },
+      { time: "10:00-12:30", title: "Main Service" },
+    ]
+  },
+  {
+    day: "Daily",
+    items: [
+      { time: "04:00-05:00", title: "Online Devotion" },
+    ]
+  },
+  {
+    day: "Wednesday",
+    items: [
+      { time: "All Day", title: "Fasting and Prayer" },
+      { time: "18:30-19:30", title: "Bible Study" },
+    ]
+  },
+  {
+    day: "Friday",
+    items: [
+      { time: "18:30-19:30", title: "Youth Service" },
+    ]
+  },
+  {
+    day: "Saturday",
+    items: [
+      { time: "18:00-19:00", title: "Intercession" },
+    ]
+  }
+];
+
+export const SERMONS = [
+  {
+    id: "1",
+    title: "The Power of Hope in Christ",
+    speaker: "Pastor Thabo Boshomane",
+    date: "2026-02-11",
+    duration: "45:32",
+    category: "Word",
+    thumbnail: require('@/assets/images/sermon-word.png'),
+    videoUrl: "https://www.facebook.com/hopeinchristforallnations",
+    audioUrl: "https://www.facebook.com/hopeinchristforallnations",
+    notes: "Key Points: 1) Hope anchors the soul (Hebrews 6:19) 2) Hope in Christ gives us purpose 3) Living hope through resurrection (1 Peter 1:3)",
+    description: "Discover the transformative power of placing your hope in Jesus Christ and how it can revolutionize your daily walk with God."
+  },
+  {
+    id: "2", 
+    title: "Winning Souls for Christ",
+    speaker: "Pastor Thabo Boshomane",
+    date: "2026-02-04",
+    duration: "52:18",
+    category: "Teaching",
+    thumbnail: require('@/assets/images/sermon-teaching.png'),
+    videoUrl: "https://www.facebook.com/hopeinchristforallnations",
+    audioUrl: "https://www.facebook.com/hopeinchristforallnations",
+    notes: "Key Points: 1) The Great Commission (Matthew 28:19-20) 2) Being fishers of men 3) Personal evangelism strategies 4) Power of testimony",
+    description: "Learn effective strategies for evangelism and soul-winning in the modern world."
+  },
+  {
+    id: "3",
+    title: "The Discipline of Discipleship",
+    speaker: "Pastor Thabo Boshomane", 
+    date: "2026-01-28",
+    duration: "48:45",
+    category: "Prayer",
+    thumbnail: require('@/assets/images/sermon-prayer.png'),
+    videoUrl: "https://www.facebook.com/hopeinchristforallnations",
+    audioUrl: "https://www.facebook.com/hopeinchristforallnations",
+    notes: "Key Points: 1) Counting the cost of discipleship 2) Making disciples, not just converts 3) Imparting kingdom principles 4) Sending equipped believers",
+    description: "Understanding the call to discipleship and how to effectively disciple others in their faith journey."
+  }
+];
+
+export const EVENTS = [
+  {
+    id: "1",
+    title: "Annual Victory Conference 2026",
+    category: "Conference",
+    date: "2026-03-15",
+    time: "09:00 - 17:00",
+    location: "824 Simunye Street, KwaMhlanga",
+    price: "Free",
+    ticketTypes: ["Free Entry", "VIP Pass"],
+    attendanceTypes: ["In-Person", "Online"],
+    image: require('@/assets/images/event-conference.png'),
+    description: "Join us for our annual victory conference featuring powerful preaching, worship, and ministry sessions. Experience transformative teachings, prophetic ministry, and powerful worship.",
+    registrationRequired: true,
+    maxAttendees: 500,
+    currentAttendees: 234
+  },
+  {
+    id: "2",
+    title: "Youth Empowerment Summit",
+    category: "Youth",
+    date: "2026-03-22",
+    time: "18:00 - 21:00",
+    location: "824 Simunye Street, KwaMhlanga",
+    price: "R50",
+    ticketTypes: ["General Entry", "Early Bird"],
+    attendanceTypes: ["In-Person"],
+    image: require('@/assets/images/event-youth.png'),
+    description: "A special gathering for young people focused on empowerment, leadership, and spiritual growth. Join us for dynamic worship, relevant teaching, and powerful connections.",
+    registrationRequired: true,
+    maxAttendees: 200,
+    currentAttendees: 156
+  },
+  {
+    id: "3",
+    title: "Marriage Enrichment Seminar",
+    category: "Fellowship",
+    date: "2026-04-06",
+    time: "14:00 - 17:00",
+    location: "824 Simunye Street, KwaMhlanga",
+    price: "R100 per couple",
+    ticketTypes: ["Couple Pass"],
+    attendanceTypes: ["In-Person", "Online"],
+    image: require('@/assets/images/event-fellowship.png'),
+    description: "Strengthen your marriage through biblical principles and practical guidance. This intimate seminar covers communication, conflict resolution, and building a Christ-centered marriage.",
+    registrationRequired: true,
+    maxAttendees: 50,
+    currentAttendees: 42
+  },
+  {
+    id: "4",
+    title: "Easter Sunday Celebration",
+    category: "Service",
+    date: "2026-04-20",
+    time: "10:00 - 13:00",
+    location: "824 Simunye Street, KwaMhlanga",
+    price: "Free",
+    ticketTypes: ["Free Entry"],
+    attendanceTypes: ["In-Person", "Online"],
+    image: require('@/assets/images/event-easter.png'),
+    description: "Celebrate the resurrection of our Lord Jesus Christ with powerful worship, inspiring preaching, and joyful fellowship. All are welcome!",
+    registrationRequired: false,
+    maxAttendees: 1000,
+    currentAttendees: 0
+  }
+];
+
+export const DONATION_INFO = {
+  bankDetails: {
+    bank: "First National Bank",
+    accountName: "Hope In Christ for All Nations Ministries",
+    accountNumber: "62859217458",
+    branchCode: "250655",
+    accountType: "Cheque Account"
+  },
+  onlineGiving: {
+    url: "https://www.hopeinchrist.org/give",
+    platforms: ["PayPal", "PayFast", "SnapScan"]
+  },
+  givingOptions: [
+    {
+      title: "Tithe",
+      description: "Giving 10% of your income as commanded in Malachi 3:10"
+    },
+    {
+      title: "Offering", 
+      description: "Freewill offering above and beyond your tithe"
+    },
+    {
+      title: "Building Fund",
+      description: "Contributing towards our church building project"
+    },
+    {
+      title: "Missions",
+      description: "Supporting our local and international mission work"
+    }
+  ]
+};
+
+export const DEPARTMENTS = [
+  "Worship",
+  "Ushering",
+  "Youth Ministry",
+  "Women Fellowship",
+  "Men's Fellowship",
+  "Children Ministry",
+  "Catering Team",
+  "Media Team",
+  "Evangelism",
+  "Pastors Fellowship",
+  "Community Affairs",
+  "Social Service"
+];
+
+export const SOCIAL_LINKS = {
+  facebook: "https://www.facebook.com/hopeinchristforallnations",
+  youtube: "https://www.youtube.com/@hopeinchrist",
+  twitter: "https://twitter.com/hopeinchrist",
+  tiktok: "https://www.tiktok.com/@hopeinchrist",
+  whatsapp: "https://wa.me/27XXXXXXXXXX"
+};
+
+export const CHAT_CHANNELS = [
+  {
+    id: "general",
+    name: "General Fellowship",
+    description: "Open discussions and community fellowship",
+    icon: "chatbubbles",
+    color: "#5B2C8E"
+  },
+  {
+    id: "prayer",
+    name: "Prayer Requests",
+    description: "Share and receive prayer support",
+    icon: "heart",
+    color: "#C0392B"
+  },
+  {
+    id: "testimonies",
+    name: "Testimonies",
+    description: "Share what God has done in your life",
+    icon: "star",
+    color: "#D4A017"
+  },
+  {
+    id: "youth",
+    name: "Youth Corner",
+    description: "Discussions for our young people",
+    icon: "people",
+    color: "#2471A3"
+  },
+  {
+    id: "bible-study",
+    name: "Bible Study",
+    description: "Discuss scripture and biblical topics",
+    icon: "book",
+    color: "#5B2C8E"
+  }
+];
+

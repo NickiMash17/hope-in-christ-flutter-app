@@ -18,6 +18,7 @@ import Colors from '@/constants/colors';
 import { fontFamily } from '@/lib/fonts';
 import { useTheme } from '@/lib/useTheme';
 import { SERMONS } from '@/lib/data';
+import { useResponsiveLayout } from '@/lib/layout';
 
 const sermonImages: Record<string, any> = {
   Word: require('@/assets/images/sermon-word.png'),
@@ -29,6 +30,7 @@ export default function SermonDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const insets = useSafeAreaInsets();
   const { isDark, colors } = useTheme();
+  const layout = useResponsiveLayout();
   const webTopInset = Platform.OS === 'web' ? 67 : 0;
   const sermon = SERMONS.find(s => s.id === id);
 
@@ -57,10 +59,19 @@ export default function SermonDetailScreen() {
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
+      <LinearGradient
+        colors={['rgba(74,35,90,0.16)', 'rgba(30,58,138,0.08)', 'transparent']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={styles.atmosphere}
+      />
+      <View style={styles.orbPrimary} />
+      <View style={styles.orbSecondary} />
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 40 }}
       >
+        <View style={[layout.maxWidthStyle, { width: '100%' }]}>
         <View style={styles.heroContainer}>
           <Image
             source={sermonImages[sermon.category]}
@@ -97,7 +108,7 @@ export default function SermonDetailScreen() {
           </LinearGradient>
         </View>
 
-        <View style={styles.content}>
+        <View style={[styles.content, { paddingHorizontal: layout.horizontalPadding }]}>
           <Text style={[styles.title, { color: colors.text }]}>{sermon.title}</Text>
           <View style={styles.metaRow}>
             <Ionicons name="person-outline" size={14} color={colors.textSecondary} />
@@ -149,6 +160,7 @@ export default function SermonDetailScreen() {
             </View>
           )}
         </View>
+        </View>
       </ScrollView>
     </View>
   );
@@ -156,9 +168,33 @@ export default function SermonDetailScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
+  atmosphere: {
+    ...StyleSheet.absoluteFillObject,
+  },
+  orbPrimary: {
+    position: 'absolute',
+    top: -120,
+    right: -84,
+    width: 250,
+    height: 250,
+    borderRadius: 125,
+    backgroundColor: 'rgba(106,71,205,0.14)',
+  },
+  orbSecondary: {
+    position: 'absolute',
+    bottom: 140,
+    left: -80,
+    width: 220,
+    height: 220,
+    borderRadius: 110,
+    backgroundColor: 'rgba(31,83,168,0.1)',
+  },
   heroContainer: {
     height: 240,
     position: 'relative',
+    borderBottomLeftRadius: 24,
+    borderBottomRightRadius: 24,
+    overflow: 'hidden',
   },
   heroImage: {
     width: '100%',
@@ -207,7 +243,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   content: {
-    paddingHorizontal: 20,
+    paddingHorizontal: 0,
     paddingTop: 16,
     gap: 10,
   },
@@ -242,7 +278,9 @@ const styles = StyleSheet.create({
     gap: 6,
     paddingHorizontal: 20,
     paddingVertical: 12,
-    borderRadius: 12,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.24)',
     flex: 1,
     justifyContent: 'center',
   },
@@ -254,7 +292,14 @@ const styles = StyleSheet.create({
   notesCard: {
     marginTop: 12,
     padding: 16,
-    borderRadius: 14,
+    borderRadius: 18,
+    borderWidth: 1,
+    borderColor: 'rgba(91,44,142,0.14)',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.12,
+    shadowRadius: 14,
+    elevation: 6,
     gap: 10,
   },
   notesHeader: {

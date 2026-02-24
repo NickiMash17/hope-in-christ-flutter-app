@@ -10,6 +10,7 @@ import {
   KeyboardAvoidingView,
   Alert,
 } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -19,6 +20,7 @@ import Colors from '@/constants/colors';
 import { fontFamily } from '@/lib/fonts';
 import { useTheme } from '@/lib/useTheme';
 import { ChatMessage } from '@/lib/data';
+import { useResponsiveLayout } from '@/lib/layout';
 
 const CHANNEL_INFO: Record<string, { name: string; color: string }> = {
   prayer: { name: 'Prayer Requests', color: Colors.primary },
@@ -66,6 +68,7 @@ export default function ChatScreen() {
   const { channel } = useLocalSearchParams<{ channel: string }>();
   const insets = useSafeAreaInsets();
   const { isDark, colors } = useTheme();
+  const layout = useResponsiveLayout();
   const webTopInset = Platform.OS === 'web' ? 67 : 0;
 
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -88,7 +91,7 @@ export default function ChatScreen() {
         setNickname(saved);
         setShowNicknameInput(false);
       }
-    } catch (e) {}
+    } catch {}
   };
 
   const loadMessages = async () => {
@@ -97,7 +100,7 @@ export default function ChatScreen() {
       if (saved) {
         setMessages(JSON.parse(saved));
       }
-    } catch (e) {}
+    } catch {}
   };
 
   const saveNickname = async () => {
@@ -127,7 +130,7 @@ export default function ChatScreen() {
 
     try {
       await AsyncStorage.setItem(`chat_${channel}`, JSON.stringify(updatedMessages));
-    } catch (e) {}
+    } catch {}
   }, [inputText, nickname, messages, channel]);
 
   const handleReport = (messageId: string) => {
@@ -137,6 +140,12 @@ export default function ChatScreen() {
   if (showNicknameInput) {
     return (
       <View style={[styles.container, { backgroundColor: colors.background }]}>
+        <LinearGradient
+          colors={['rgba(74,35,90,0.16)', 'rgba(36,113,163,0.08)', 'transparent']}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.atmosphere}
+        />
         <View style={[styles.navBar, { paddingTop: (Platform.OS === 'web' ? webTopInset : insets.top) + 4 }]}>
           <Pressable onPress={() => router.back()} style={styles.backButton}>
             <Ionicons name="chevron-back" size={24} color={colors.text} />
@@ -146,6 +155,7 @@ export default function ChatScreen() {
         </View>
 
         <View style={styles.nicknameContainer}>
+          <View style={[layout.narrowWidthStyle, { width: '100%', alignItems: 'center' }]}>
           <View style={[styles.nicknameIcon, { backgroundColor: info.color + '15' }]}>
             <Ionicons name="person-circle-outline" size={48} color={info.color} />
           </View>
@@ -169,6 +179,7 @@ export default function ChatScreen() {
           >
             <Text style={styles.nicknameButtonText}>Join Chat</Text>
           </Pressable>
+          </View>
         </View>
       </View>
     );
@@ -176,6 +187,12 @@ export default function ChatScreen() {
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
+      <LinearGradient
+        colors={['rgba(74,35,90,0.16)', 'rgba(36,113,163,0.08)', 'transparent']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={styles.atmosphere}
+      />
       <View style={[styles.navBar, { paddingTop: (Platform.OS === 'web' ? webTopInset : insets.top) + 4 }]}>
         <Pressable onPress={() => router.back()} style={styles.backButton}>
           <Ionicons name="chevron-back" size={24} color={colors.text} />
@@ -189,43 +206,56 @@ export default function ChatScreen() {
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         keyboardVerticalOffset={0}
       >
-        <FlatList
-          data={messages}
-          keyExtractor={item => item.id}
-          renderItem={({ item }) => (
-            <Pressable onLongPress={() => handleReport(item.id)}>
-              <MessageBubble message={item} isOwn={item.nickname === nickname} colors={colors} isDark={isDark} />
-            </Pressable>
-          )}
-          contentContainerStyle={[styles.messagesList, { paddingBottom: 8 }]}
-          showsVerticalScrollIndicator={false}
-          ListEmptyComponent={
-            <View style={styles.emptyChat}>
-              <Ionicons name="chatbubble-ellipses-outline" size={40} color={colors.textSecondary} />
-              <Text style={[styles.emptyChatText, { color: colors.textSecondary }]}>
-                No messages yet. Start the conversation!
-              </Text>
-            </View>
-          }
-        />
-
-        <View style={[styles.inputBar, { backgroundColor: isDark ? Colors.dark.surface : '#fff', paddingBottom: Platform.OS === 'web' ? 34 : insets.bottom || 8 }]}>
-          <TextInput
-            style={[styles.chatInput, { backgroundColor: isDark ? Colors.dark.card : Colors.gray100, color: colors.text }]}
-            placeholder={channel === 'prayer' ? 'Share a prayer request...' : 'Type a message...'}
-            placeholderTextColor={colors.textSecondary}
-            value={inputText}
-            onChangeText={setInputText}
-            multiline
-            maxLength={500}
+        <View style={[layout.maxWidthStyle, { flex: 1, width: '100%' }]}>
+          <FlatList
+            data={messages}
+            keyExtractor={item => item.id}
+            renderItem={({ item }) => (
+              <Pressable onLongPress={() => handleReport(item.id)}>
+                <MessageBubble message={item} isOwn={item.nickname === nickname} colors={colors} isDark={isDark} />
+              </Pressable>
+            )}
+            contentContainerStyle={[styles.messagesList, { paddingBottom: 8, paddingHorizontal: layout.horizontalPadding }]}
+            showsVerticalScrollIndicator={false}
+            ListEmptyComponent={
+              <View style={styles.emptyChat}>
+                <Ionicons name="chatbubble-ellipses-outline" size={40} color={colors.textSecondary} />
+                <Text style={[styles.emptyChatText, { color: colors.textSecondary }]}>
+                  No messages yet. Start the conversation!
+                </Text>
+              </View>
+            }
           />
-          <Pressable
-            onPress={sendMessage}
-            style={[styles.sendButton, { backgroundColor: info.color, opacity: inputText.trim() ? 1 : 0.4 }]}
-            disabled={!inputText.trim()}
+
+          <View
+            style={[
+              styles.inputBar,
+              {
+                backgroundColor: isDark ? Colors.dark.surface : '#fff',
+                paddingBottom: Platform.OS === 'web' ? 34 : insets.bottom || 8,
+                paddingHorizontal: layout.horizontalPadding,
+                borderTopWidth: 1,
+                borderTopColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(91,44,142,0.12)',
+              },
+            ]}
           >
-            <Ionicons name="send" size={18} color="#fff" />
-          </Pressable>
+            <TextInput
+              style={[styles.chatInput, { backgroundColor: isDark ? Colors.dark.card : Colors.gray100, color: colors.text }]}
+              placeholder={channel === 'prayer' ? 'Share a prayer request...' : 'Type a message...'}
+              placeholderTextColor={colors.textSecondary}
+              value={inputText}
+              onChangeText={setInputText}
+              multiline
+              maxLength={500}
+            />
+            <Pressable
+              onPress={sendMessage}
+              style={[styles.sendButton, { backgroundColor: info.color, opacity: inputText.trim() ? 1 : 0.4 }]}
+              disabled={!inputText.trim()}
+            >
+              <Ionicons name="send" size={18} color="#fff" />
+            </Pressable>
+          </View>
         </View>
       </KeyboardAvoidingView>
     </View>
@@ -234,27 +264,39 @@ export default function ChatScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
+  atmosphere: {
+    ...StyleSheet.absoluteFillObject,
+  },
   navBar: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 12, paddingBottom: 8 },
   backButton: { width: 36, height: 36, alignItems: 'center', justifyContent: 'center' },
   navTitle: { fontSize: 16, fontFamily: fontFamily.semiBold, flex: 1, textAlign: 'center' },
-  messagesList: { paddingHorizontal: 16, paddingTop: 8, flexGrow: 1 },
+  messagesList: { paddingTop: 8, flexGrow: 1 },
   bubbleContainer: { flexDirection: 'row', marginBottom: 10, alignItems: 'flex-end', gap: 8 },
   bubbleLeft: { justifyContent: 'flex-start' },
   bubbleRight: { justifyContent: 'flex-end' },
   avatar: { width: 32, height: 32, borderRadius: 16, alignItems: 'center', justifyContent: 'center' },
   avatarText: { fontSize: 13, fontFamily: fontFamily.bold },
-  bubble: { maxWidth: '75%', paddingHorizontal: 14, paddingVertical: 10, borderRadius: 16 },
+  bubble: {
+    maxWidth: '82%',
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.16)',
+  },
   bubbleNickname: { fontSize: 11, fontFamily: fontFamily.bold, marginBottom: 2 },
   bubbleText: { fontSize: 14, fontFamily: fontFamily.regular, lineHeight: 20 },
   bubbleTime: { fontSize: 10, fontFamily: fontFamily.regular, marginTop: 4, textAlign: 'right' },
   inputBar: {
     flexDirection: 'row',
     alignItems: 'flex-end',
-    paddingHorizontal: 12,
     paddingTop: 8,
     gap: 8,
-    borderTopWidth: 0.5,
-    borderTopColor: 'rgba(0,0,0,0.08)',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -4 },
+    shadowOpacity: 0.08,
+    shadowRadius: 10,
+    elevation: 6,
   },
   chatInput: {
     flex: 1,

@@ -2,23 +2,28 @@
   "expo": {
     "name": "Hope in Christ",
     "slug": "hope-in-christ",
-    "version": "1.0.0",
+    "version": "2.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "hopeinchrist",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
+    "description": "Hope In Christ for All Nations Ministries - Inspiring Hope, Encouraging Life. Experience powerful worship, transformative teachings, and connect with our vibrant community.",
+    "primaryColor": "#4A235A",
     "splash": {
-      "image": "./assets/images/splash-icon.png",
+      "image": "./assets/new/new purple.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#351783"
     },
     "ios": {
-      "supportsTablet": false,
-      "bundleIdentifier": "com.hopeinchrist"
+      "supportsTablet": true,
+      "bundleIdentifier": "com.hopeinchrist.ministries",
+      "buildNumber": "2.0.0"
     },
     "android": {
-      "package": "com.hopeinchrist",
+      "package": "com.hopeinchrist.ministries",
+      "versionCode": 2,
+      "permissions": ["CAMERA", "READ_EXTERNAL_STORAGE", "WRITE_EXTERNAL_STORAGE"],
       "adaptiveIcon": {
         "backgroundColor": "#5B2C8E",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
@@ -34,6 +39,15 @@
         "expo-router",
         {
           "origin": "https://replit.com/"
+        }
+      ],
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/new/new purple.png",
+          "imageWidth": 200,
+          "resizeMode": "contain",
+          "backgroundColor": "#351783"
         }
       ],
       "expo-font",

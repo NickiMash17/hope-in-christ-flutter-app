@@ -17,6 +17,7 @@ import Colors from '@/constants/colors';
 import { fontFamily } from '@/lib/fonts';
 import { useTheme } from '@/lib/useTheme';
 import { EVENTS } from '@/lib/data';
+import { useResponsiveLayout } from '@/lib/layout';
 
 const eventImages: Record<string, any> = {
   Conference: require('@/assets/images/event-conference.png'),
@@ -36,6 +37,7 @@ export default function EventDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const insets = useSafeAreaInsets();
   const { isDark, colors } = useTheme();
+  const layout = useResponsiveLayout();
   const webTopInset = Platform.OS === 'web' ? 67 : 0;
   const event = EVENTS.find(e => e.id === id);
 
@@ -60,7 +62,16 @@ export default function EventDetailScreen() {
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
+      <LinearGradient
+        colors={['rgba(74,35,90,0.14)', 'rgba(36,113,163,0.08)', 'transparent']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={styles.atmosphere}
+      />
+      <View style={styles.orbPrimary} />
+      <View style={styles.orbSecondary} />
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 40 }}>
+        <View style={[layout.maxWidthStyle, { width: '100%' }]}>
         <View style={styles.heroContainer}>
           <Image
             source={eventImages[event.category]}
@@ -95,7 +106,7 @@ export default function EventDetailScreen() {
           </LinearGradient>
         </View>
 
-        <View style={styles.content}>
+        <View style={[styles.content, { paddingHorizontal: layout.horizontalPadding }]}>
           <View style={[styles.detailsCard, { backgroundColor: isDark ? Colors.dark.card : '#fff' }]}>
             <View style={styles.detailRow}>
               <View style={[styles.detailIcon, { backgroundColor: catColor + '15' }]}>
@@ -161,6 +172,7 @@ export default function EventDetailScreen() {
             <Text style={styles.registerButtonText}>Register Now</Text>
           </Pressable>
         </View>
+        </View>
       </ScrollView>
     </View>
   );
@@ -168,9 +180,33 @@ export default function EventDetailScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
+  atmosphere: {
+    ...StyleSheet.absoluteFillObject,
+  },
+  orbPrimary: {
+    position: 'absolute',
+    top: -120,
+    right: -80,
+    width: 250,
+    height: 250,
+    borderRadius: 125,
+    backgroundColor: 'rgba(106,71,205,0.13)',
+  },
+  orbSecondary: {
+    position: 'absolute',
+    bottom: 140,
+    left: -70,
+    width: 200,
+    height: 200,
+    borderRadius: 100,
+    backgroundColor: 'rgba(70,130,180,0.1)',
+  },
   heroContainer: {
     height: 260,
     position: 'relative',
+    borderBottomLeftRadius: 24,
+    borderBottomRightRadius: 24,
+    overflow: 'hidden',
   },
   heroImage: {
     width: '100%',
@@ -212,16 +248,18 @@ const styles = StyleSheet.create({
   categoryBadge: { paddingHorizontal: 10, paddingVertical: 3, borderRadius: 8, alignSelf: 'flex-start' },
   categoryText: { fontSize: 11, fontFamily: fontFamily.bold, color: '#fff' },
   heroTitle: { fontSize: 20, fontFamily: fontFamily.bold, color: '#fff', lineHeight: 26 },
-  content: { paddingHorizontal: 20, paddingTop: 16, gap: 14 },
+  content: { paddingHorizontal: 0, paddingTop: 16, gap: 14 },
   detailsCard: {
-    borderRadius: 16,
+    borderRadius: 20,
     padding: 16,
     gap: 14,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.22)',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.06,
-    shadowRadius: 4,
-    elevation: 2,
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.16,
+    shadowRadius: 14,
+    elevation: 6,
   },
   detailRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   detailIcon: { width: 36, height: 36, borderRadius: 10, alignItems: 'center', justifyContent: 'center' },
@@ -231,7 +269,16 @@ const styles = StyleSheet.create({
   ticketInfo: { gap: 8 },
   ticketLabel: { fontSize: 12, fontFamily: fontFamily.bold, letterSpacing: 0.5 },
   ticketRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
-  ticketBadge: { flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 10, paddingVertical: 6, borderRadius: 8 },
+  ticketBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: 'rgba(91,44,142,0.14)',
+  },
   ticketText: { fontSize: 12, fontFamily: fontFamily.medium },
   registerButton: {
     flexDirection: 'row',

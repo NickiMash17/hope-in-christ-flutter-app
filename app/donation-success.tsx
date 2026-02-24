@@ -4,7 +4,6 @@ import {
   Text,
   View,
   Pressable,
-  Platform,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -12,14 +11,26 @@ import { router } from 'expo-router';
 import Colors from '@/constants/colors';
 import { fontFamily } from '@/lib/fonts';
 import { useTheme } from '@/lib/useTheme';
+import { useResponsiveLayout } from '@/lib/layout';
 
 export default function DonationSuccessScreen() {
   const insets = useSafeAreaInsets();
-  const { isDark, colors } = useTheme();
+  const { colors } = useTheme();
+  const layout = useResponsiveLayout();
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <View style={styles.content}>
+      <View
+        style={[
+          styles.content,
+          layout.narrowWidthStyle,
+          {
+            paddingTop: insets.top + 24,
+            paddingBottom: insets.bottom + 24,
+            paddingHorizontal: layout.horizontalPadding,
+          },
+        ]}
+      >
         <View style={[styles.iconWrap, { backgroundColor: Colors.accentBlue + '15' }]}>
           <Ionicons name="heart-circle" size={64} color={Colors.accentBlue} />
         </View>
@@ -31,7 +42,7 @@ export default function DonationSuccessScreen() {
         </Text>
 
         <Text style={[styles.verse, { color: Colors.primary }]}>
-          "Give, and it will be given to you. A good measure, pressed down, shaken together and running over."
+          &quot;Give, and it will be given to you. A good measure, pressed down, shaken together and running over.&quot;
         </Text>
         <Text style={[styles.verseRef, { color: colors.textSecondary }]}>- Luke 6:38</Text>
 
@@ -52,7 +63,6 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: 32,
     gap: 14,
   },
   iconWrap: {

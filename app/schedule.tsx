@@ -14,12 +14,14 @@ import Colors from '@/constants/colors';
 import { fontFamily } from '@/lib/fonts';
 import { useTheme } from '@/lib/useTheme';
 import { SCHEDULE } from '@/lib/data';
+import { useResponsiveLayout } from '@/lib/layout';
 
 const DAY_COLORS = [Colors.primary, Colors.accentBlue, Colors.accent, Colors.gold];
 
 export default function ScheduleScreen() {
   const insets = useSafeAreaInsets();
   const { isDark, colors } = useTheme();
+  const layout = useResponsiveLayout();
   const webTopInset = Platform.OS === 'web' ? 67 : 0;
 
   const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -35,8 +37,9 @@ export default function ScheduleScreen() {
         <View style={{ width: 36 }} />
       </View>
 
-      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 40, paddingHorizontal: 16, gap: 14 }}>
-        {SCHEDULE.map((day, idx) => {
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 40 }}>
+        <View style={[layout.maxWidthStyle, { paddingHorizontal: layout.horizontalPadding, gap: 14 }]}>
+          {SCHEDULE.map((day, idx) => {
           const color = DAY_COLORS[idx % DAY_COLORS.length];
           const isToday = day.day === today;
           return (
@@ -63,6 +66,7 @@ export default function ScheduleScreen() {
             </View>
           );
         })}
+        </View>
       </ScrollView>
     </View>
   );

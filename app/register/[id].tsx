@@ -10,6 +10,7 @@ import {
   Alert,
   KeyboardAvoidingView,
 } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -19,11 +20,13 @@ import Colors from '@/constants/colors';
 import { fontFamily } from '@/lib/fonts';
 import { useTheme } from '@/lib/useTheme';
 import { EVENTS } from '@/lib/data';
+import { useResponsiveLayout } from '@/lib/layout';
 
 export default function RegisterScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const insets = useSafeAreaInsets();
   const { isDark, colors } = useTheme();
+  const layout = useResponsiveLayout();
   const webTopInset = Platform.OS === 'web' ? 67 : 0;
   const event = EVENTS.find(e => e.id === id);
 
@@ -76,7 +79,7 @@ export default function RegisterScreen() {
       registrations.push(registration);
       await AsyncStorage.setItem('registrations', JSON.stringify(registrations));
       setIsSuccess(true);
-    } catch (e) {
+    } catch {
       Alert.alert('Error', 'Something went wrong. Please try again.');
     } finally {
       setIsSubmitting(false);
@@ -86,7 +89,13 @@ export default function RegisterScreen() {
   if (isSuccess) {
     return (
       <View style={[styles.container, { backgroundColor: colors.background }]}>
-        <View style={styles.successContainer}>
+        <View
+          style={[
+            styles.successContainer,
+            layout.narrowWidthStyle,
+            { paddingHorizontal: layout.horizontalPadding },
+          ]}
+        >
           <View style={[styles.successIcon, { backgroundColor: Colors.primary + '15' }]}>
             <Ionicons name="checkmark-circle" size={64} color={Colors.primary} />
           </View>
@@ -110,6 +119,14 @@ export default function RegisterScreen() {
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
+      <LinearGradient
+        colors={['rgba(74,35,90,0.14)', 'rgba(36,113,163,0.08)', 'transparent']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={styles.atmosphere}
+      />
+      <View style={styles.orbPrimary} />
+      <View style={styles.orbSecondary} />
       <View style={[styles.navBar, { paddingTop: (Platform.OS === 'web' ? webTopInset : insets.top) + 4 }]}>
         <Pressable onPress={() => router.back()} style={styles.backButton}>
           <Ionicons name="chevron-back" size={24} color={colors.text} />
@@ -128,15 +145,16 @@ export default function RegisterScreen() {
           contentContainerStyle={{ paddingBottom: insets.bottom + 20 }}
           keyboardShouldPersistTaps="handled"
         >
-          <View style={styles.eventSummary}>
+          <View style={[layout.narrowWidthStyle, { paddingHorizontal: layout.horizontalPadding }]}>
+          <View style={[styles.eventSummary, { backgroundColor: isDark ? Colors.dark.card : '#fff' }]}>
             <Text style={[styles.eventName, { color: colors.text }]}>{event.title}</Text>
             <Text style={[styles.eventDate, { color: colors.textSecondary }]}>
               {new Date(event.date).toLocaleDateString('en-ZA', { day: 'numeric', month: 'long', year: 'numeric' })} | {event.time}
             </Text>
           </View>
 
-          <View style={styles.form}>
-            <View style={styles.formRow}>
+          <View style={[styles.form, { backgroundColor: isDark ? Colors.dark.card : '#fff' }]}>
+            <View style={[styles.formRow, !layout.isTablet && styles.formRowStack]}>
               <View style={styles.formField}>
                 <Text style={[styles.label, { color: colors.textSecondary }]}>First Name *</Text>
                 <TextInput
@@ -249,6 +267,7 @@ export default function RegisterScreen() {
               )}
             </Pressable>
           </View>
+          </View>
         </ScrollView>
       </KeyboardAvoidingView>
     </View>
@@ -257,14 +276,61 @@ export default function RegisterScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
+  atmosphere: {
+    ...StyleSheet.absoluteFillObject,
+  },
+  orbPrimary: {
+    position: 'absolute',
+    top: -120,
+    right: -80,
+    width: 250,
+    height: 250,
+    borderRadius: 125,
+    backgroundColor: 'rgba(106,71,205,0.13)',
+  },
+  orbSecondary: {
+    position: 'absolute',
+    bottom: 140,
+    left: -70,
+    width: 200,
+    height: 200,
+    borderRadius: 100,
+    backgroundColor: 'rgba(70,130,180,0.1)',
+  },
   navBar: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 12, paddingBottom: 8 },
   backButton: { width: 36, height: 36, alignItems: 'center', justifyContent: 'center' },
   navTitle: { fontSize: 16, fontFamily: fontFamily.semiBold, flex: 1, textAlign: 'center' },
-  eventSummary: { paddingHorizontal: 20, paddingVertical: 12, gap: 4 },
+  eventSummary: {
+    paddingHorizontal: 18,
+    paddingVertical: 16,
+    gap: 4,
+    borderRadius: 18,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.24)',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.12,
+    shadowRadius: 14,
+    elevation: 6,
+    marginBottom: 12,
+  },
   eventName: { fontSize: 20, fontFamily: fontFamily.bold },
   eventDate: { fontSize: 13, fontFamily: fontFamily.regular },
-  form: { paddingHorizontal: 20, gap: 16 },
+  form: {
+    paddingHorizontal: 16,
+    paddingVertical: 16,
+    gap: 16,
+    borderRadius: 18,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.24)',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.12,
+    shadowRadius: 14,
+    elevation: 6,
+  },
   formRow: { flexDirection: 'row', gap: 12 },
+  formRowStack: { flexDirection: 'column', gap: 16 },
   formField: { flex: 1, gap: 6 },
   label: { fontSize: 12, fontFamily: fontFamily.semiBold, marginLeft: 4 },
   input: { paddingHorizontal: 14, paddingVertical: 12, borderRadius: 12, fontSize: 14, fontFamily: fontFamily.regular },
