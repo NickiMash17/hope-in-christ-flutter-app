@@ -36,7 +36,9 @@ export default function AboutScreen() {
         Linking.openURL(MINISTRY_INFO.socialMedia.facebook);
         break;
       case 'youtube':
-        Linking.openURL(MINISTRY_INFO.socialMedia.youtube);
+        if (MINISTRY_INFO.socialMedia.youtube) {
+          Linking.openURL(MINISTRY_INFO.socialMedia.youtube);
+        }
         break;
       case 'whatsapp':
         Linking.openURL(MINISTRY_INFO.socialMedia.whatsapp);

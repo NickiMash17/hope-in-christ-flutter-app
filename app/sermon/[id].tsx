@@ -124,28 +124,16 @@ export default function SermonDetailScreen() {
           <Text style={[styles.description, { color: colors.text }]}>{sermon.description}</Text>
 
           <View style={styles.actionsRow}>
-            {sermon.videoUrl && (
-              <Pressable
-                onPress={() => {
-                  if (Platform.OS !== 'web') Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                  Linking.openURL(sermon.videoUrl!);
-                }}
-                style={[styles.actionButton, { backgroundColor: Colors.accent }]}
-              >
-                <Ionicons name="play" size={18} color="#fff" />
-                <Text style={styles.actionButtonText}>Watch Video</Text>
-              </Pressable>
-            )}
             {sermon.audioUrl && (
               <Pressable
                 onPress={() => {
                   if (Platform.OS !== 'web') Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                   Linking.openURL(sermon.audioUrl!);
                 }}
-                style={[styles.actionButton, { backgroundColor: Colors.accentBlue }]}
+                style={[styles.actionButton, { backgroundColor: Colors.primary }]}
               >
                 <Ionicons name="headset" size={18} color="#fff" />
-                <Text style={styles.actionButtonText}>Listen</Text>
+                <Text style={styles.actionButtonText}>Listen to Audio</Text>
               </Pressable>
             )}
           </View>

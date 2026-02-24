@@ -16,7 +16,7 @@ A premium, world-class mobile and web application for Hope In Christ for All Nat
 
 ### 🏠 Home Screen
 - **Ministry Impact Stats** - Real-time statistics showcasing our reach
-- **Quick Actions** - Watch live, access latest sermons, give, and register
+- **Quick Actions** - Watch live services, listen to sermons, give, and register
 - **Featured Sermon** - Highlighted teaching with easy access
 - **Today's Schedule** - View daily ministry activities
 - **Location Integration** - Direct maps integration to visit us
@@ -235,11 +235,13 @@ This project is private and belongs to Hope In Christ for All Nations Ministries
 
 **Social Media:**
 - Facebook: [@hopeinchristforallnations](https://www.facebook.com/hopeinchristforallnations)
-- YouTube: [@hopeinchrist](https://www.youtube.com/@hopeinchrist)
-- Twitter: [@hopeinchrist](https://twitter.com/hopeinchrist)
+- Twitter/X: [@HicfanMin](https://x.com/HicfanMin) - Audio Sermons
 - TikTok: [@hopeinchrist](https://www.tiktok.com/@hopeinchrist)
+- WhatsApp: Available
+- YouTube: Coming Soon
 
-**Live Streaming:** Facebook Live
+**Live Streaming:** Facebook Live  
+**Audio Sermons:** Twitter/X (@HicfanMin)
 
 ---
 

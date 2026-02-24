@@ -136,7 +136,7 @@ export default function AboutScreen() {
               <Text style={[styles.cardTitle, { color: colors.text }]}>Connect With Us</Text>
             </View>
             <Text style={[styles.streamingNote, { color: colors.textSecondary }]}>
-              Streaming: Facebook Live
+              Live Services: Facebook Live | Audio Sermons: Twitter/X
             </Text>
             <View style={styles.socialRow}>
               <Pressable
@@ -145,12 +145,14 @@ export default function AboutScreen() {
               >
                 <FontAwesome5 name="facebook" size={20} color="#1877F2" />
               </Pressable>
-              <Pressable
-                onPress={() => openLink(SOCIAL_LINKS.youtube)}
-                style={[styles.socialButton, { backgroundColor: '#FF0000' + '18' }]}
-              >
-                <FontAwesome5 name="youtube" size={20} color="#FF0000" />
-              </Pressable>
+              {SOCIAL_LINKS.youtube && (
+                <Pressable
+                  onPress={() => openLink(SOCIAL_LINKS.youtube)}
+                  style={[styles.socialButton, { backgroundColor: '#FF0000' + '18', opacity: 0.5 }]}
+                >
+                  <FontAwesome5 name="youtube" size={20} color="#FF0000" />
+                </Pressable>
+              )}
               <Pressable
                 onPress={() => openLink(SOCIAL_LINKS.twitter)}
                 style={[styles.socialButton, { backgroundColor: '#1DA1F2' + '18' }]}

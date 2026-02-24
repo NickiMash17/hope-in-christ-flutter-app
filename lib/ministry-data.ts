@@ -15,12 +15,13 @@ export const MINISTRY_INFO = {
     twitter: "https://x.com/HicfanMin",
     tiktok: "https://www.tiktok.com/@hopeinchrist",
     whatsapp: "https://wa.me/27XXXXXXXXXX",
-    youtube: "https://www.youtube.com/@hopeinchrist",
+    youtube: "", // Coming soon
   },
   streaming: {
-    platform: "Facebook & Twitter/X",
+    platform: "Facebook Live",
     url: "https://www.facebook.com/hopeinchristforallnations",
     twitterUrl: "https://x.com/HicfanMin",
+    note: "Audio sermons available on Twitter/X"
   },
   leadership: {
     seniorPastors: "Pastor Thabo & Mrs Ntombi Boshomane",
@@ -352,10 +353,10 @@ export const DEPARTMENTS = [
 
 export const SOCIAL_LINKS = {
   facebook: "https://www.facebook.com/hopeinchristforallnations",
-  youtube: "https://www.youtube.com/@hopeinchrist",
   twitter: "https://x.com/HicfanMin",
   tiktok: "https://www.tiktok.com/@hopeinchrist",
-  whatsapp: "https://wa.me/27XXXXXXXXXX"
+  whatsapp: "https://wa.me/27XXXXXXXXXX",
+  youtube: "" // Coming soon
 };
 
 export const CHAT_CHANNELS = [
