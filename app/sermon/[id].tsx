@@ -17,7 +17,7 @@ import * as Haptics from 'expo-haptics';
 import Colors from '@/constants/colors';
 import { fontFamily } from '@/lib/fonts';
 import { useTheme } from '@/lib/useTheme';
-import { SERMONS } from '@/lib/data';
+import { SERMONS } from '@/lib/ministry-data';
 import { useResponsiveLayout } from '@/lib/layout';
 
 const sermonImages: Record<string, any> = {
@@ -93,15 +93,15 @@ export default function SermonDetailScreen() {
               <View style={[styles.categoryBadge, { backgroundColor: catColor }]}>
                 <Text style={styles.categoryText}>{sermon.category}</Text>
               </View>
-              {sermon.videoUrl && (
+              {sermon.audioUrl && (
                 <Pressable
                   onPress={() => {
                     if (Platform.OS !== 'web') Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                    Linking.openURL(sermon.videoUrl!);
+                    Linking.openURL(sermon.audioUrl!);
                   }}
                   style={styles.playButton}
                 >
-                  <Ionicons name="play" size={28} color="#fff" />
+                  <Ionicons name="headset" size={28} color="#fff" />
                 </Pressable>
               )}
             </View>

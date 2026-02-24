@@ -16,7 +16,7 @@ import * as Haptics from 'expo-haptics';
 import Colors from '@/constants/colors';
 import { fontFamily } from '@/lib/fonts';
 import { useTheme } from '@/lib/useTheme';
-import { EVENTS } from '@/lib/data';
+import { EVENTS } from '@/lib/ministry-data';
 import { useResponsiveLayout } from '@/lib/layout';
 
 const eventImages: Record<string, any> = {

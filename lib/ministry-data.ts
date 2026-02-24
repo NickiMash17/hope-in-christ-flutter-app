@@ -100,7 +100,6 @@ export const SERMONS = [
     duration: "1:15:00",
     category: "Word",
     thumbnail: require('@/assets/new/pastor.jpeg'),
-    videoUrl: "https://x.com/HicfanMin/status/2012583926393405814",
     audioUrl: "https://x.com/HicfanMin/status/2012583926393405814",
     notes: "Listen to the full audio sermon recording",
     description: "Sunday morning service with powerful worship, prayer, and the Word of God."
@@ -113,7 +112,6 @@ export const SERMONS = [
     duration: "1:12:00",
     category: "Word",
     thumbnail: require('@/assets/new/pastor teaching congregants.jpeg'),
-    videoUrl: "https://x.com/HicfanMin/status/2012006173621305623",
     audioUrl: "https://x.com/HicfanMin/status/2012006173621305623",
     notes: "Listen to the full audio sermon recording",
     description: "Sunday morning service with inspiring worship and biblical teaching."
@@ -126,7 +124,6 @@ export const SERMONS = [
     duration: "1:00:00",
     category: "Teaching",
     thumbnail: require('@/assets/new/new purple.png'),
-    videoUrl: "https://x.com/HicfanMin/status/2011644539405283418",
     audioUrl: "https://x.com/HicfanMin/status/2011644539405283418",
     notes: "Listen to the full audio Bible study recording",
     description: "Wednesday Bible study service with deep teaching from the Word."
@@ -139,7 +136,6 @@ export const SERMONS = [
     duration: "1:18:00",
     category: "Word",
     thumbnail: require('@/assets/new/pastor.jpeg'),
-    videoUrl: "https://x.com/HicfanMin/status/2011478722289766841",
     audioUrl: "https://x.com/HicfanMin/status/2011478722289766841",
     notes: "Listen to the full audio sermon recording",
     description: "Sunday morning service featuring prayer, praise, and powerful preaching."
@@ -152,7 +148,6 @@ export const SERMONS = [
     duration: "1:20:00",
     category: "Word",
     thumbnail: require('@/assets/new/pastor teaching congregants.jpeg'),
-    videoUrl: "https://x.com/HicfanMin/status/2011283259980931523",
     audioUrl: "https://x.com/HicfanMin/status/2011283259980931523",
     notes: "Listen to the full audio sermon recording",
     description: "Sunday morning service with anointed worship and the Word."
@@ -165,7 +160,6 @@ export const SERMONS = [
     duration: "1:10:00",
     category: "Word",
     thumbnail: require('@/assets/new/new purple.png'),
-    videoUrl: "https://x.com/HicfanMin/status/2011093811074842845",
     audioUrl: "https://x.com/HicfanMin/status/2011093811074842845",
     notes: "Listen to the full audio sermon recording",
     description: "Sunday morning service with transformative teaching from the Word."
@@ -178,7 +172,6 @@ export const SERMONS = [
     duration: "55:00",
     category: "Teaching",
     thumbnail: require('@/assets/new/church youth.jpeg'),
-    videoUrl: "https://x.com/HicfanMin/status/2010995206930464962",
     audioUrl: "https://x.com/HicfanMin/status/2010995206930464962",
     notes: "Listen to the full audio youth service recording",
     description: "Friday evening youth service with dynamic worship and relevant teaching."
@@ -191,7 +184,6 @@ export const SERMONS = [
     duration: "1:15:00",
     category: "Word",
     thumbnail: require('@/assets/new/pastor.jpeg'),
-    videoUrl: "https://x.com/HicfanMin/status/2010921137488675256",
     audioUrl: "https://x.com/HicfanMin/status/2010921137488675256",
     notes: "Listen to the full audio sermon recording",
     description: "Sunday morning service with powerful ministry and worship."
@@ -204,7 +196,6 @@ export const SERMONS = [
     duration: "1:05:00",
     category: "Word",
     thumbnail: require('@/assets/new/pastor teaching congregants.jpeg'),
-    videoUrl: "https://x.com/HicfanMin/status/2010917970462040101",
     audioUrl: "https://x.com/HicfanMin/status/2010917970462040101",
     notes: "Listen to the full audio sermon recording",
     description: "Special ministry service with prayer and the Word."
@@ -217,7 +208,6 @@ export const SERMONS = [
     duration: "50:00",
     category: "Prayer",
     thumbnail: require('@/assets/new/new purple.png'),
-    videoUrl: "https://x.com/HicfanMin/status/2010917936429502671",
     audioUrl: "https://x.com/HicfanMin/status/2010917936429502671",
     notes: "Listen to the full audio evening service recording",
     description: "Evening service focused on prayer and intercession."
@@ -230,7 +220,6 @@ export const SERMONS = [
     duration: "1:16:00",
     category: "Word",
     thumbnail: require('@/assets/new/pastor.jpeg'),
-    videoUrl: "https://x.com/HicfanMin/status/2010557048476618916",
     audioUrl: "https://x.com/HicfanMin/status/2010557048476618916",
     notes: "Listen to the full audio sermon recording",
     description: "Sunday morning service with revelatory teaching and worship."

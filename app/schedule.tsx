@@ -13,7 +13,7 @@ import { router } from 'expo-router';
 import Colors from '@/constants/colors';
 import { fontFamily } from '@/lib/fonts';
 import { useTheme } from '@/lib/useTheme';
-import { SCHEDULE } from '@/lib/data';
+import { SCHEDULE } from '@/lib/ministry-data';
 import { useResponsiveLayout } from '@/lib/layout';
 
 const DAY_COLORS = [Colors.primary, Colors.accentBlue, Colors.accent, Colors.gold];

@@ -19,7 +19,7 @@ import * as Haptics from 'expo-haptics';
 import Colors from '@/constants/colors';
 import { fontFamily } from '@/lib/fonts';
 import { useTheme } from '@/lib/useTheme';
-import { ChatMessage } from '@/lib/data';
+import { ChatMessage } from '@/lib/ministry-data';
 import { useResponsiveLayout } from '@/lib/layout';
 
 const CHANNEL_INFO: Record<string, { name: string; color: string }> = {

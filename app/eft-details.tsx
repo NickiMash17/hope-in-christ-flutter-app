@@ -13,7 +13,7 @@ import { router } from 'expo-router';
 import Colors from '@/constants/colors';
 import { fontFamily } from '@/lib/fonts';
 import { useTheme } from '@/lib/useTheme';
-import { DONATION_CONFIG } from '@/lib/data';
+import { DONATION_CONFIG } from '@/lib/ministry-data';
 import { useResponsiveLayout } from '@/lib/layout';
 
 export default function EFTDetailsScreen() {

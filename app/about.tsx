@@ -16,7 +16,7 @@ import * as Haptics from 'expo-haptics';
 import Colors from '@/constants/colors';
 import { fontFamily } from '@/lib/fonts';
 import { useTheme } from '@/lib/useTheme';
-import { MINISTRY_INFO, DEPARTMENTS, SOCIAL_LINKS } from '@/lib/data';
+import { MINISTRY_INFO, DEPARTMENTS, SOCIAL_LINKS } from '@/lib/ministry-data';
 import { useResponsiveLayout } from '@/lib/layout';
 
 const DEPT_ICONS: Record<string, { icon: string; set: string }> = {
