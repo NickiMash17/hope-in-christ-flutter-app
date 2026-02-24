@@ -9,6 +9,8 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useRouter } from 'expo-router';
+import * as Haptics from 'expo-haptics';
 import { useTheme } from '@/lib/useTheme';
 import { fontFamily } from '@/lib/fonts';
 import { ThemeToggle } from '@/components/ThemeToggle';
@@ -19,7 +21,26 @@ export default function SettingsScreen() {
   const insets = useSafeAreaInsets();
   const { colors } = useTheme();
   const layout = useResponsiveLayout();
+  const router = useRouter();
   const webTopInset = Platform.OS === 'web' ? 67 : 0;
+
+  const handlePress = (action: string) => {
+    if (Platform.OS !== 'web') Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    
+    switch (action) {
+      case 'live-stream':
+        router.push('/live-stream');
+        break;
+      case 'youtube':
+        router.push('/youtube-sermons');
+        break;
+      case 'about':
+        router.push('/about');
+        break;
+      default:
+        break;
+    }
+  };
 
   const settingsOptions = [
     {
@@ -27,6 +48,18 @@ export default function SettingsScreen() {
       subtitle: 'Manage your notifications',
       icon: 'notifications-outline',
       action: 'notifications',
+    },
+    {
+      title: 'Live Stream',
+      subtitle: 'Watch services live on Facebook',
+      icon: 'videocam-outline',
+      action: 'live-stream',
+    },
+    {
+      title: 'YouTube Channel',
+      subtitle: 'Video sermons (coming soon)',
+      icon: 'logo-youtube',
+      action: 'youtube',
     },
     {
       title: 'Privacy',
@@ -86,7 +119,10 @@ export default function SettingsScreen() {
         <View style={styles.settingsContainer}>
           {settingsOptions.slice(1).map((option, index) => (
             <GlassCard key={index} style={styles.settingCard}>
-              <Pressable style={styles.settingContent}>
+              <Pressable 
+                style={styles.settingContent}
+                onPress={() => handlePress(option.action)}
+              >
                 <View style={styles.settingLeft}>
                   <View style={[styles.settingIcon, { backgroundColor: colors.card }]}>
                     <Ionicons 

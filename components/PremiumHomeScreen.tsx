@@ -95,7 +95,7 @@ export function PremiumHomeScreen() {
 
     switch (action) {
       case 'live':
-        Linking.openURL('https://www.facebook.com/hopeinchristforallnations');
+        router.push('/live-stream');
         break;
       case 'sermon':
         router.push({ pathname: '/sermon/[id]', params: { id: SERMONS[0].id } });
@@ -105,6 +105,9 @@ export function PremiumHomeScreen() {
         break;
       case 'register':
         router.push('/(tabs)/events');
+        break;
+      case 'youtube':
+        router.push('/youtube-sermons');
         break;
       case 'schedule':
         router.push('/schedule');
