@@ -19,7 +19,7 @@ import * as Haptics from 'expo-haptics';
 import Colors from '@/constants/colors';
 import { fontFamily } from '@/lib/fonts';
 import { useTheme } from '@/lib/useTheme';
-import { ChatMessage } from '@/lib/ministry-data';
+import { ChatMessage } from '@/lib/data';
 import { useResponsiveLayout } from '@/lib/layout';
 
 const CHANNEL_INFO: Record<string, { name: string; color: string }> = {
@@ -79,12 +79,7 @@ export default function ChatScreen() {
 
   const info = CHANNEL_INFO[channel || ''] || { name: 'Chat', color: Colors.primary };
 
-  useEffect(() => {
-    loadNickname();
-    loadMessages();
-  }, [channel]);
-
-  const loadNickname = async () => {
+  const loadNickname = useCallback(async () => {
     try {
       const saved = await AsyncStorage.getItem('chat_nickname');
       if (saved) {
@@ -92,16 +87,21 @@ export default function ChatScreen() {
         setShowNicknameInput(false);
       }
     } catch {}
-  };
+  }, []);
 
-  const loadMessages = async () => {
+  const loadMessages = useCallback(async () => {
     try {
       const saved = await AsyncStorage.getItem(`chat_${channel}`);
       if (saved) {
         setMessages(JSON.parse(saved));
       }
     } catch {}
-  };
+  }, [channel]);
+
+  useEffect(() => {
+    loadNickname();
+    loadMessages();
+  }, [loadMessages, loadNickname]);
 
   const saveNickname = async () => {
     if (!nicknameText.trim()) return;

@@ -1,18 +1,18 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect } from 'react';
 import {
   View,
   StyleSheet,
   Animated,
   Pressable,
-  Platform,
+  ViewStyle,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useTheme } from '@/lib/useTheme';
-import { EnhancedColors, ColorUtils } from '@/constants/enhanced-colors';
+import { EnhancedColors } from '@/constants/enhanced-colors';
 
 interface PremiumGlassCardProps {
   children: React.ReactNode;
-  style?: any;
+  style?: ViewStyle;
   onPress?: () => void;
   gradient?: string[];
   shadowIntensity?: 'small' | 'medium' | 'large' | 'premium' | 'epic';
@@ -20,6 +20,16 @@ interface PremiumGlassCardProps {
   shimmer?: boolean;
   scaleOnPress?: boolean;
   delay?: number;
+}
+
+type GradientStops = [string, string, ...string[]];
+
+function asGradientStops(colors: readonly string[]): GradientStops {
+  if (colors.length >= 2) {
+    return [colors[0], colors[1], ...colors.slice(2)];
+  }
+  const fallback = colors[0] ?? EnhancedColors.primary;
+  return [fallback, fallback];
 }
 
 export function PremiumGlassCard({
@@ -33,17 +43,19 @@ export function PremiumGlassCard({
   scaleOnPress = true,
   delay = 0,
 }: PremiumGlassCardProps) {
-  const { isDark, colors } = useTheme();
-  const [isPressed, setIsPressed] = useState(false);
+  const { isDark } = useTheme();
   const animatedValue = useRef(new Animated.Value(0)).current;
   const scaleValue = useRef(new Animated.Value(1)).current;
   const shimmerValue = useRef(new Animated.Value(0)).current;
   const glowValue = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
+    let shimmerLoop: Animated.CompositeAnimation | undefined;
+    let glowLoop: Animated.CompositeAnimation | undefined;
+
     // Shimmer animation
     if (shimmer) {
-      Animated.loop(
+      shimmerLoop = Animated.loop(
         Animated.sequence([
           Animated.timing(shimmerValue, {
             toValue: 1,
@@ -56,12 +68,15 @@ export function PremiumGlassCard({
             useNativeDriver: false,
           }),
         ])
-      ).start();
+      );
+      shimmerLoop.start();
+    } else {
+      shimmerValue.setValue(0);
     }
 
     // Glow animation
     if (borderGlow) {
-      Animated.loop(
+      glowLoop = Animated.loop(
         Animated.sequence([
           Animated.timing(glowValue, {
             toValue: 1,
@@ -74,21 +89,30 @@ export function PremiumGlassCard({
             useNativeDriver: false,
           }),
         ])
-      ).start();
+      );
+      glowLoop.start();
+    } else {
+      glowValue.setValue(0);
     }
 
     // Entrance animation
-    Animated.timing(animatedValue, {
+    const entranceAnimation = Animated.timing(animatedValue, {
       toValue: 1,
       duration: 600,
       delay,
       useNativeDriver: true,
-    }).start();
-  }, [shimmer, borderGlow, delay]);
+    });
+    entranceAnimation.start();
+
+    return () => {
+      shimmerLoop?.stop();
+      glowLoop?.stop();
+      entranceAnimation.stop();
+    };
+  }, [animatedValue, borderGlow, delay, glowValue, shimmer, shimmerValue]);
 
   const handlePressIn = () => {
     if (scaleOnPress) {
-      setIsPressed(true);
       Animated.spring(scaleValue, {
         toValue: 0.95,
         tension: 300,
@@ -100,7 +124,6 @@ export function PremiumGlassCard({
 
   const handlePressOut = () => {
     if (scaleOnPress) {
-      setIsPressed(false);
       Animated.spring(scaleValue, {
         toValue: 1,
         tension: 300,
@@ -161,7 +184,7 @@ export function PremiumGlassCard({
       {borderGlow && (
         <Animated.View style={glowStyle}>
           <LinearGradient
-            colors={gradient || EnhancedColors.gradients.premium}
+            colors={asGradientStops(gradient || EnhancedColors.gradients.premium)}
             style={styles.glowGradient}
           />
         </Animated.View>
@@ -171,7 +194,7 @@ export function PremiumGlassCard({
         {shimmer && (
           <Animated.View style={shimmerStyle}>
             <LinearGradient
-              colors={EnhancedColors.animation.shimmer}
+              colors={asGradientStops(EnhancedColors.animation.shimmer)}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 1 }}
               style={styles.shimmerGradient}
@@ -181,7 +204,7 @@ export function PremiumGlassCard({
         
         {gradient && (
           <LinearGradient
-            colors={gradient}
+            colors={asGradientStops(gradient)}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
             style={styles.cardGradient}

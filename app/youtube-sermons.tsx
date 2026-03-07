@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   View,
   Text,
@@ -7,20 +7,14 @@ import {
   Pressable,
   Platform,
   Linking,
-  Image as RNImage,
-  Dimensions,
 } from 'react-native';
-import { Stack, router } from 'expo-router';
+import { Stack } from 'expo-router';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Image } from 'expo-image';
-import { BlurView } from 'expo-blur';
 import * as Haptics from 'expo-haptics';
 import { useTheme } from '@/lib/useTheme';
-import { layout } from '@/lib/layout';
-import { SafeAreaView } from 'react-native-safe-area-context';
-
-const { width } = Dimensions.get('window');
+import { useResponsiveLayout } from '@/lib/layout';
 
 interface VideoSermon {
   id: string;
@@ -62,7 +56,7 @@ const YOUTUBE_SERMONS: VideoSermon[] = [
 
 export default function YouTubeSermonsScreen() {
   const { colors, isDark } = useTheme();
-  const [selectedCategory, setSelectedCategory] = useState<'all' | 'coming'>('all');
+  const layout = useResponsiveLayout();
 
   const openYouTube = () => {
     if (Platform.OS !== 'web') Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -103,7 +97,7 @@ export default function YouTubeSermonsScreen() {
             <Text style={styles.heroTitle}>YouTube Channel</Text>
             <Text style={styles.heroSubtitle}>Video Sermons Coming Soon</Text>
             <Text style={styles.heroDescription}>
-              We're launching our official YouTube channel with full sermon videos, worship sessions, and biblical teachings in HD quality.
+              We&apos;re launching our official YouTube channel with full sermon videos, worship sessions, and biblical teachings in HD quality.
             </Text>
 
             <Pressable

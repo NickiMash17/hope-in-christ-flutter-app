@@ -1,8 +1,7 @@
 import React from 'react';
-import { View, StyleSheet, ViewStyle } from 'react-native';
+import { View, StyleSheet, ViewStyle, Platform } from 'react-native';
 import { BlurView } from 'expo-blur';
 import { useTheme } from '@/lib/useTheme';
-import { Platform } from 'react-native';
 
 interface GlassCardProps {
   children: React.ReactNode;

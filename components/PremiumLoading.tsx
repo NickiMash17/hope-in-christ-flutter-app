@@ -89,7 +89,7 @@ export function PremiumLoading({
       scaleLoop.stop();
       opacityLoop.stop();
     };
-  }, [showProgress]);
+  }, [opacityAnim, progressAnim, rotationAnim, scaleAnim, showProgress]);
 
   const getSizeStyles = () => {
     switch (size) {

@@ -11,17 +11,29 @@ import { Ionicons } from '@expo/vector-icons';
 import { fontFamily } from '@/lib/fonts';
 import { EnhancedColors } from '@/constants/enhanced-colors';
 
+interface StatItem {
+  label: string;
+  value: string;
+  icon: string;
+  color?: string;
+  gradient?: string[];
+  trend?: 'up' | 'down' | 'neutral';
+}
+
 interface PremiumStatsProps {
-  stats: Array<{
-    label: string;
-    value: string;
-    icon: string;
-    color?: string;
-    gradient?: string[];
-    trend?: 'up' | 'down' | 'neutral';
-  }>;
+  stats: StatItem[];
   animated?: boolean;
   containerWidth?: number;
+}
+
+type GradientStops = [string, string, ...string[]];
+
+function asGradientStops(colors: readonly string[]): GradientStops {
+  if (colors.length >= 2) {
+    return [colors[0], colors[1], ...colors.slice(2)];
+  }
+  const fallback = colors[0] ?? EnhancedColors.primary;
+  return [fallback, fallback];
 }
 
 export function PremiumStats({ stats, animated = true, containerWidth }: PremiumStatsProps) {
@@ -48,9 +60,9 @@ export function PremiumStats({ stats, animated = true, containerWidth }: Premium
 
       Animated.stagger(100, animations).start();
     }
-  }, [animated]);
+  }, [animated, animatedValues]);
 
-  const getStatColor = (stat: any) => {
+  const getStatColor = (stat: StatItem) => {
     if (stat.gradient) return stat.gradient;
     if (stat.color) return [stat.color, ColorUtils.darken(stat.color, 20)];
     return EnhancedColors.gradients.premium;
@@ -109,7 +121,7 @@ export function PremiumStats({ stats, animated = true, containerWidth }: Premium
             ]}
           >
             <LinearGradient
-              colors={getStatColor(stat) as any}
+              colors={asGradientStops(getStatColor(stat))}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 1 }}
               style={styles.statGradient}

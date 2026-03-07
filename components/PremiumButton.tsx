@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect } from 'react';
 import {
   View,
   Text,
@@ -9,7 +9,6 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
-import { useTheme } from '@/lib/useTheme';
 import { fontFamily } from '@/lib/fonts';
 import { EnhancedColors } from '@/constants/enhanced-colors';
 
@@ -28,6 +27,16 @@ interface PremiumButtonProps {
   gradient?: string[];
 }
 
+type GradientStops = [string, string, ...string[]];
+
+function asGradientStops(colors: readonly string[]): GradientStops {
+  if (colors.length >= 2) {
+    return [colors[0], colors[1], ...colors.slice(2)];
+  }
+  const fallback = colors[0] ?? EnhancedColors.primary;
+  return [fallback, fallback];
+}
+
 export function PremiumButton({
   title,
   onPress,
@@ -42,17 +51,18 @@ export function PremiumButton({
   animated = true,
   gradient,
 }: PremiumButtonProps) {
-  const { isDark } = useTheme();
   const { width } = useWindowDimensions();
-  const [isPressed, setIsPressed] = useState(false);
   const scaleValue = useRef(new Animated.Value(1)).current;
   const pulseValue = useRef(new Animated.Value(0)).current;
   const shimmerValue = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
+    let pulseLoop: Animated.CompositeAnimation | undefined;
+    let shimmerLoop: Animated.CompositeAnimation | undefined;
+
     if (animated && !disabled) {
       // Subtle pulse animation
-      Animated.loop(
+      pulseLoop = Animated.loop(
         Animated.sequence([
           Animated.timing(pulseValue, {
             toValue: 1,
@@ -65,24 +75,32 @@ export function PremiumButton({
             useNativeDriver: true,
           }),
         ])
-      ).start();
+      );
+      pulseLoop.start();
     }
 
     // Loading shimmer
     if (loading) {
-      Animated.loop(
+      shimmerLoop = Animated.loop(
         Animated.timing(shimmerValue, {
           toValue: 1,
           duration: 1500,
           useNativeDriver: false,
         })
-      ).start();
+      );
+      shimmerLoop.start();
+    } else {
+      shimmerValue.setValue(0);
     }
-  }, [animated, disabled, loading]);
+
+    return () => {
+      pulseLoop?.stop();
+      shimmerLoop?.stop();
+    };
+  }, [animated, disabled, loading, pulseValue, shimmerValue]);
 
   const handlePressIn = () => {
     if (!disabled && !loading) {
-      setIsPressed(true);
       Animated.spring(scaleValue, {
         toValue: 0.95,
         tension: 300,
@@ -94,7 +112,6 @@ export function PremiumButton({
 
   const handlePressOut = () => {
     if (!disabled && !loading) {
-      setIsPressed(false);
       Animated.spring(scaleValue, {
         toValue: 1,
         tension: 300,
@@ -109,13 +126,13 @@ export function PremiumButton({
       case 'primary':
         return gradient || EnhancedColors.gradients.premium;
       case 'secondary':
-        return gradient || EnhancedColors.gradients.info;
+        return gradient || EnhancedColors.gradients.ocean;
       case 'gold':
         return gradient || EnhancedColors.gradients.gold;
       case 'success':
-        return gradient || EnhancedColors.gradients.success;
+        return gradient || EnhancedColors.gradients.forest;
       case 'danger':
-        return gradient || EnhancedColors.gradients.danger;
+        return gradient || EnhancedColors.gradients.sunset;
       case 'gradient':
         return gradient || EnhancedColors.gradients.aurora;
       default:
@@ -247,7 +264,7 @@ export function PremiumButton({
     >
       <Animated.View style={buttonStyle}>
         <LinearGradient
-          colors={getVariantColors() as any}
+          colors={asGradientStops(getVariantColors())}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
           style={styles.gradient}
@@ -258,7 +275,7 @@ export function PremiumButton({
         {loading && (
           <Animated.View style={loadingStyle}>
             <LinearGradient
-              colors={EnhancedColors.animation.shimmer}
+              colors={asGradientStops(EnhancedColors.animation.shimmer)}
               start={{ x: -1, y: 0 }}
               end={{ x: 1, y: 0 }}
               style={styles.loadingGradient}

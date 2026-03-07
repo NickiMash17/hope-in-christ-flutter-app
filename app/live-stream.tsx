@@ -7,19 +7,15 @@ import {
   Pressable,
   Platform,
   Linking,
-  Dimensions,
   Alert,
 } from 'react-native';
 import { Stack } from 'expo-router';
-import { Ionicons, MaterialIcons, FontAwesome5 } from '@expo/vector-icons';
+import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Image } from 'expo-image';
 import * as Haptics from 'expo-haptics';
 import { useTheme } from '@/lib/useTheme';
-import { layout } from '@/lib/layout';
-import { MINISTRY_INFO } from '@/lib/ministry-data';
-
-const { width } = Dimensions.get('window');
+import { useResponsiveLayout } from '@/lib/layout';
+import Colors from '@/constants/colors';
 
 interface StreamSchedule {
   id: string;
@@ -63,6 +59,7 @@ const STREAM_SCHEDULE: StreamSchedule[] = [
 
 export default function LiveStreamScreen() {
   const { colors, isDark } = useTheme();
+  const layout = useResponsiveLayout();
   const [isCurrentlyLive, setIsCurrentlyLive] = useState(false);
 
   // Check if any service is currently live (you can implement actual live check via API)
@@ -207,7 +204,7 @@ export default function LiveStreamScreen() {
         {/* Stream Schedule */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Ionicons name="calendar" size={24} color={colors.primary} />
+            <Ionicons name="calendar" size={24} color={Colors.primary} />
             <Text style={[styles.sectionTitle, { color: colors.text }]}>Live Stream Schedule</Text>
           </View>
 
@@ -215,7 +212,7 @@ export default function LiveStreamScreen() {
             <View key={schedule.id} style={[styles.scheduleCard, { backgroundColor: colors.card }]}>
               <View style={styles.scheduleHeader}>
                 <View style={styles.scheduleDay}>
-                  <Text style={[styles.scheduleDayText, { color: colors.primary }]}>{schedule.day}</Text>
+                  <Text style={[styles.scheduleDayText, { color: Colors.primary }]}>{schedule.day}</Text>
                   <Text style={[styles.scheduleTime, { color: colors.text }]}>{schedule.time}</Text>
                 </View>
                 <View style={[styles.platformBadge, { backgroundColor: '#1877F2' + '18' }]}>
@@ -277,7 +274,7 @@ export default function LiveStreamScreen() {
           <Text style={[styles.howToTitle, { color: colors.text }]}>How to Watch Live</Text>
           
           <View style={styles.step}>
-            <View style={[styles.stepNumber, { backgroundColor: colors.primary }]}>
+            <View style={[styles.stepNumber, { backgroundColor: Colors.primary }]}>
               <Text style={styles.stepNumberText}>1</Text>
             </View>
             <Text style={[styles.stepText, { color: colors.text }]}>
@@ -286,7 +283,7 @@ export default function LiveStreamScreen() {
           </View>
 
           <View style={styles.step}>
-            <View style={[styles.stepNumber, { backgroundColor: colors.primary }]}>
+            <View style={[styles.stepNumber, { backgroundColor: Colors.primary }]}>
               <Text style={styles.stepNumberText}>2</Text>
             </View>
             <Text style={[styles.stepText, { color: colors.text }]}>
@@ -295,16 +292,16 @@ export default function LiveStreamScreen() {
           </View>
 
           <View style={styles.step}>
-            <View style={[styles.stepNumber, { backgroundColor: colors.primary }]}>
+            <View style={[styles.stepNumber, { backgroundColor: Colors.primary }]}>
               <Text style={styles.stepNumberText}>3</Text>
             </View>
             <Text style={[styles.stepText, { color: colors.text }]}>
-              Tap "Watch on Facebook" when the service is live
+              Tap &quot;Watch on Facebook&quot; when the service is live
             </Text>
           </View>
 
           <View style={styles.step}>
-            <View style={[styles.stepNumber, { backgroundColor: colors.primary }]}>
+            <View style={[styles.stepNumber, { backgroundColor: Colors.primary }]}>
               <Text style={styles.stepNumberText}>4</Text>
             </View>
             <Text style={[styles.stepText, { color: colors.text }]}>
