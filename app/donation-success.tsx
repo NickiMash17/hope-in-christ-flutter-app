@@ -1,17 +1,12 @@
-import React from 'react';
-import {
-  StyleSheet,
-  Text,
-  View,
-  Pressable,
-} from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { router } from 'expo-router';
-import Colors from '@/constants/colors';
-import { fontFamily } from '@/lib/fonts';
-import { useTheme } from '@/lib/useTheme';
-import { useResponsiveLayout } from '@/lib/layout';
+import React from "react";
+import { StyleSheet, Text, View, Pressable } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { router } from "expo-router";
+import Colors from "@/constants/colors";
+import { fontFamily } from "@/lib/fonts";
+import { useTheme } from "@/lib/useTheme";
+import { useResponsiveLayout } from "@/lib/layout";
 
 export default function DonationSuccessScreen() {
   const insets = useSafeAreaInsets();
@@ -31,20 +26,26 @@ export default function DonationSuccessScreen() {
           },
         ]}
       >
-        <View style={[styles.iconWrap, { backgroundColor: Colors.accentBlue + '15' }]}>
-          <Ionicons name="heart-circle" size={64} color={Colors.accentBlue} />
+        <View
+          style={[styles.iconWrap, { backgroundColor: Colors.primary + "18" }]}
+        >
+          <Ionicons name="heart-circle" size={64} color={Colors.primary} />
         </View>
 
         <Text style={[styles.title, { color: colors.text }]}>Thank You!</Text>
 
         <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
-          Your generosity makes a difference. May God bless you abundantly for your cheerful giving.
+          Your generosity makes a difference. May God bless you abundantly for
+          your cheerful giving.
         </Text>
 
         <Text style={[styles.verse, { color: Colors.primary }]}>
-          &quot;Give, and it will be given to you. A good measure, pressed down, shaken together and running over.&quot;
+          &quot;Give, and it will be given to you. A good measure, pressed down,
+          shaken together and running over.&quot;
         </Text>
-        <Text style={[styles.verseRef, { color: colors.textSecondary }]}>- Luke 6:38</Text>
+        <Text style={[styles.verseRef, { color: colors.textSecondary }]}>
+          - Luke 6:38
+        </Text>
 
         <Pressable
           onPress={() => router.back()}
@@ -61,16 +62,16 @@ const styles = StyleSheet.create({
   container: { flex: 1 },
   content: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     gap: 14,
   },
   iconWrap: {
     width: 100,
     height: 100,
     borderRadius: 30,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     marginBottom: 8,
   },
   title: {
@@ -80,14 +81,14 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: 15,
     fontFamily: fontFamily.regular,
-    textAlign: 'center',
+    textAlign: "center",
     lineHeight: 22,
   },
   verse: {
     fontSize: 14,
     fontFamily: fontFamily.medium,
-    textAlign: 'center',
-    fontStyle: 'italic',
+    textAlign: "center",
+    fontStyle: "italic",
     lineHeight: 20,
     marginTop: 8,
   },
@@ -102,7 +103,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   buttonText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 16,
     fontFamily: fontFamily.bold,
   },
