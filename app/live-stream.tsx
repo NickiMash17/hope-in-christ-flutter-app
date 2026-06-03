@@ -85,7 +85,7 @@ export default function LiveStreamScreen() {
   const openFacebookLive = () => {
     if (Platform.OS !== "web")
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    Linking.openURL("https://www.facebook.com/hopeinchristforallnations/live");
+    Linking.openURL("https://www.facebook.com/hicfanm/live");
   };
 
   const openYouTubeLive = () => {

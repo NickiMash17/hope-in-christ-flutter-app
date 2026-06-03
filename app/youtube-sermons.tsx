@@ -7,9 +7,10 @@ import {
   Pressable,
   Platform,
   Linking,
+  ActivityIndicator,
 } from "react-native";
 import { router } from "expo-router";
-import { Ionicons, MaterialIcons } from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { Image } from "expo-image";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -18,67 +19,74 @@ import { useTheme } from "@/lib/useTheme";
 import { useResponsiveLayout } from "@/lib/layout";
 import { fontFamily } from "@/lib/fonts";
 import Colors from "@/constants/colors";
+import { usePodcasts } from "@/lib/db";
+import type { PodcastAppearance } from "@/lib/supabase";
 
-interface VideoSermon {
-  id: string;
-  title: string;
-  description: string;
-  date: string;
-  thumbnail: any;
-  youtubeUrl?: string;
-  comingSoon?: boolean;
+const PLATFORM_ICON: Record<string, { name: any; color: string }> = {
+  spotify: { name: "logo-spotify" as any,  color: "#1DB954" },
+  apple:   { name: "logo-apple" as any,    color: "#FC3C44" },
+  youtube: { name: "logo-youtube" as any,  color: "#FF0000" },
+  google:  { name: "logo-google" as any,   color: "#4285F4" },
+  other:   { name: "mic-outline" as any,   color: Colors.primary },
+};
+
+function PodcastCard({ item, isDark, colors }: { item: PodcastAppearance; isDark: boolean; colors: any }) {
+  const platform = (item.platform ?? "other").toLowerCase();
+  const iconCfg = PLATFORM_ICON[platform] ?? PLATFORM_ICON.other;
+
+  const open = () => {
+    if (Platform.OS !== "web") Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    Linking.openURL(item.url);
+  };
+
+  return (
+    <Pressable
+      onPress={open}
+      style={({ pressed }) => [
+        styles.podcastCard,
+        {
+          backgroundColor: isDark ? Colors.dark.card : "#fff",
+          borderColor: isDark ? "rgba(255,255,255,0.07)" : "rgba(91,44,142,0.1)",
+          opacity: pressed ? 0.88 : 1,
+        },
+      ]}
+    >
+      {item.thumbnail_url ? (
+        <Image source={{ uri: item.thumbnail_url }} style={styles.podcastThumb} contentFit="cover" />
+      ) : (
+        <View style={[styles.podcastThumbPlaceholder, { backgroundColor: iconCfg.color + "18" }]}>
+          <Ionicons name={iconCfg.name} size={28} color={iconCfg.color} />
+        </View>
+      )}
+      <View style={styles.podcastInfo}>
+        <Text style={[styles.podcastShow, { color: colors.textSecondary }]} numberOfLines={1}>
+          {item.podcast_name}
+        </Text>
+        <Text style={[styles.podcastTitle, { color: colors.text }]} numberOfLines={2}>
+          {item.episode_title}
+        </Text>
+        {item.date && (
+          <Text style={[styles.podcastDate, { color: colors.textSecondary }]}>
+            {new Date(item.date).toLocaleDateString("en-ZA", { day: "numeric", month: "short", year: "numeric" })}
+          </Text>
+        )}
+        <View style={[styles.listenPill, { backgroundColor: iconCfg.color + "18" }]}>
+          <Ionicons name={iconCfg.name} size={13} color={iconCfg.color} />
+          <Text style={[styles.listenText, { color: iconCfg.color }]}>Listen</Text>
+        </View>
+      </View>
+    </Pressable>
+  );
 }
-
-const YOUTUBE_SERMONS: VideoSermon[] = [
-  {
-    id: "coming-1",
-    title: "YouTube Channel Coming Soon!",
-    description:
-      "Our YouTube channel is launching soon with full sermon videos, worship sessions, and biblical teachings. Stay tuned!",
-    date: "Coming Soon",
-    thumbnail: require("@/assets/new/pastor.jpeg"),
-    comingSoon: true,
-  },
-  {
-    id: "coming-2",
-    title: "Subscribe to Get Notified",
-    description:
-      "Be among the first to watch our video sermons when we launch. Full HD quality with subtitles.",
-    date: "Coming Soon",
-    thumbnail: require("@/assets/new/pastor teaching congregants.jpeg"),
-    comingSoon: true,
-  },
-  {
-    id: "coming-3",
-    title: "Video Archive Coming",
-    description:
-      "We will be uploading past sermons and creating new video content regularly.",
-    date: "Coming Soon",
-    thumbnail: require("@/assets/new/new purple.png"),
-    comingSoon: true,
-  },
-];
 
 export default function YouTubeSermonsScreen() {
   const { colors, isDark } = useTheme();
   const layout = useResponsiveLayout();
   const insets = useSafeAreaInsets();
-
-  const openYouTube = () => {
-    if (Platform.OS !== "web")
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    Linking.openURL("https://www.youtube.com/@hopeinchrist");
-  };
-
-  const openTwitter = () => {
-    if (Platform.OS !== "web")
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    Linking.openURL("https://x.com/HicfanMin");
-  };
+  const { data: podcasts = [], isLoading } = usePodcasts();
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-      {/* ── Atmosphere ── */}
       <LinearGradient
         colors={["rgba(74,35,90,0.14)", "rgba(255,0,0,0.05)", "transparent"]}
         start={{ x: 0, y: 0 }}
@@ -88,31 +96,21 @@ export default function YouTubeSermonsScreen() {
       <View style={styles.orbPrimary} />
       <View style={styles.orbSecondary} />
 
-      {/* ── Custom Nav Bar ── */}
-      <View
-        style={[
-          styles.navBar,
-          { paddingTop: (Platform.OS === "web" ? 67 : insets.top) + 4 },
-        ]}
-      >
+      {/* Nav bar */}
+      <View style={[styles.navBar, { paddingTop: (Platform.OS === "web" ? 67 : insets.top) + 4 }]}>
         <Pressable onPress={() => router.back()} style={styles.backButton}>
           <Ionicons name="chevron-back" size={24} color={colors.text} />
         </Pressable>
-        <Text style={[styles.navTitle, { color: colors.text }]}>
-          YouTube Sermons
-        </Text>
+        <Text style={[styles.navTitle, { color: colors.text }]}>Podcast Appearances</Text>
         <View style={styles.navPlaceholder} />
       </View>
 
       <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={[
-          styles.content,
-          { paddingHorizontal: layout.horizontalPadding },
-        ]}
+        contentContainerStyle={[styles.content, { paddingHorizontal: layout.horizontalPadding }]}
       >
         <View style={layout.maxWidthStyle}>
-          {/* ── Hero Card ── */}
+          {/* Hero */}
           <LinearGradient
             colors={isDark ? ["#4A235A", "#1a1a2e"] : ["#6B3AA0", "#4A235A"]}
             start={{ x: 0, y: 0 }}
@@ -121,285 +119,45 @@ export default function YouTubeSermonsScreen() {
           >
             <View style={styles.heroContent}>
               <View style={styles.iconContainer}>
-                <Ionicons name="logo-youtube" size={44} color="#FF0000" />
+                <Ionicons name="mic" size={44} color="#fff" />
               </View>
-              <Text style={styles.heroTitle}>YouTube Channel</Text>
-              <Text style={styles.heroSubtitle}>Video Sermons Coming Soon</Text>
+              <Text style={styles.heroTitle}>Guest Appearances</Text>
+              <Text style={styles.heroSubtitle}>Pastor Thabo on Podcasts & Media</Text>
               <Text style={styles.heroDescription}>
-                We&apos;re launching our official YouTube channel with full
-                sermon videos, worship sessions, and biblical teachings in HD
-                quality.
+                Listen to Pastor Thabo Boshomane share the Word of God across various
+                podcast platforms and media interviews.
               </Text>
-
-              {/* Subscribe button */}
-              <Pressable
-                onPress={openYouTube}
-                style={({ pressed }) => [
-                  styles.subscribeButton,
-                  { opacity: pressed ? 0.85 : 1 },
-                ]}
-              >
-                <LinearGradient
-                  colors={["#FF0000", "#CC0000"]}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 0 }}
-                  style={styles.subscribeGradient}
-                >
-                  <Ionicons name="logo-youtube" size={20} color="#fff" />
-                  <Text style={styles.subscribeText}>Subscribe on YouTube</Text>
-                </LinearGradient>
-              </Pressable>
-
-              <Text style={styles.availableNowText}>
-                Listen to audio sermons on Twitter/X now
-              </Text>
-
-              <Pressable
-                onPress={openTwitter}
-                style={({ pressed }) => [
-                  styles.twitterButton,
-                  { opacity: pressed ? 0.85 : 1 },
-                ]}
-              >
-                <Ionicons name="logo-twitter" size={18} color="#1DA1F2" />
-                <Text style={styles.twitterButtonText}>
-                  Listen on Twitter/X
-                </Text>
-              </Pressable>
             </View>
           </LinearGradient>
 
-          {/* ── What to Expect ── */}
-          <View style={styles.featuresSection}>
+          {/* Podcast list */}
+          <View style={styles.listSection}>
             <View style={styles.sectionHeader}>
-              <View
-                style={[
-                  styles.sectionAccent,
-                  { backgroundColor: Colors.primary },
-                ]}
-              />
+              <View style={[styles.sectionAccent, { backgroundColor: Colors.primary }]} />
               <Text style={[styles.sectionTitle, { color: colors.text }]}>
-                What to Expect
+                {podcasts.length > 0 ? `${podcasts.length} Episode${podcasts.length !== 1 ? "s" : ""}` : "Episodes"}
               </Text>
             </View>
 
-            {[
-              {
-                icon: (
-                  <MaterialIcons
-                    name="video-library"
-                    size={22}
-                    color="#FF0000"
-                  />
-                ),
-                bg: "#FF000018",
-                title: "Full Video Sermons",
-                description:
-                  "Complete Sunday services and special events in high definition",
-              },
-              {
-                icon: (
-                  <Ionicons name="musical-notes" size={22} color="#6B3AA0" />
-                ),
-                bg: "#6B3AA018",
-                title: "Worship Sessions",
-                description:
-                  "Experience powerful worship moments from our services",
-              },
-              {
-                icon: <Ionicons name="book" size={22} color={Colors.gold} />,
-                bg: Colors.gold + "18",
-                title: "Bible Teachings",
-                description:
-                  "In-depth biblical studies and practical life applications",
-              },
-              {
-                icon: (
-                  <MaterialIcons name="subtitles" size={22} color="#25D366" />
-                ),
-                bg: "#25D36618",
-                title: "Subtitles & Quality",
-                description:
-                  "Multiple subtitle options and HD streaming quality",
-              },
-            ].map((feature, idx) => (
-              <View
-                key={idx}
-                style={[
-                  styles.featureCard,
-                  {
-                    backgroundColor: isDark ? Colors.dark.card : "#fff",
-                    borderColor: isDark
-                      ? "rgba(255,255,255,0.07)"
-                      : "rgba(91,44,142,0.1)",
-                  },
-                ]}
-              >
-                <View
-                  style={[styles.featureIcon, { backgroundColor: feature.bg }]}
-                >
-                  {feature.icon}
+            {isLoading && (
+              <ActivityIndicator size="large" color={Colors.primary} style={{ marginTop: 32 }} />
+            )}
+
+            {!isLoading && podcasts.length === 0 && (
+              <View style={styles.emptyState}>
+                <View style={[styles.emptyIcon, { backgroundColor: Colors.primary + "14" }]}>
+                  <Ionicons name="mic-outline" size={36} color={Colors.primary} />
                 </View>
-                <View style={styles.featureContent}>
-                  <Text style={[styles.featureTitle, { color: colors.text }]}>
-                    {feature.title}
-                  </Text>
-                  <Text
-                    style={[
-                      styles.featureDescription,
-                      { color: colors.textSecondary },
-                    ]}
-                  >
-                    {feature.description}
-                  </Text>
-                </View>
+                <Text style={[styles.emptyTitle, { color: colors.text }]}>No episodes yet</Text>
+                <Text style={[styles.emptySubtitle, { color: colors.textSecondary }]}>
+                  Podcast appearances will appear here once added.
+                </Text>
               </View>
+            )}
+
+            {podcasts.map((item) => (
+              <PodcastCard key={item.id} item={item} isDark={isDark} colors={colors} />
             ))}
-          </View>
-
-          {/* ── Coming to YouTube (previews) ── */}
-          <View style={styles.previewSection}>
-            <View style={styles.sectionHeader}>
-              <View
-                style={[styles.sectionAccent, { backgroundColor: "#FF0000" }]}
-              />
-              <Text style={[styles.sectionTitle, { color: colors.text }]}>
-                Coming to YouTube
-              </Text>
-            </View>
-
-            {YOUTUBE_SERMONS.map((sermon) => (
-              <View
-                key={sermon.id}
-                style={[
-                  styles.videoCard,
-                  {
-                    backgroundColor: isDark ? Colors.dark.card : "#fff",
-                    borderColor: isDark
-                      ? "rgba(255,255,255,0.07)"
-                      : "rgba(91,44,142,0.1)",
-                  },
-                ]}
-              >
-                <View style={styles.thumbnailWrap}>
-                  <Image
-                    source={sermon.thumbnail}
-                    style={styles.thumbnail}
-                    contentFit="cover"
-                  />
-                  <LinearGradient
-                    colors={["transparent", "rgba(0,0,0,0.7)"]}
-                    style={styles.thumbnailOverlay}
-                  >
-                    <View style={styles.comingSoonBadge}>
-                      <Ionicons name="time-outline" size={13} color="#fff" />
-                      <Text style={styles.comingSoonText}>Coming Soon</Text>
-                    </View>
-                  </LinearGradient>
-                </View>
-
-                <View style={styles.videoInfo}>
-                  <Text style={[styles.videoTitle, { color: colors.text }]}>
-                    {sermon.title}
-                  </Text>
-                  <Text
-                    style={[
-                      styles.videoDescription,
-                      { color: colors.textSecondary },
-                    ]}
-                    numberOfLines={2}
-                  >
-                    {sermon.description}
-                  </Text>
-                  <View style={styles.videoMeta}>
-                    <Ionicons
-                      name="calendar-outline"
-                      size={13}
-                      color={colors.textSecondary}
-                    />
-                    <Text
-                      style={[
-                        styles.videoDate,
-                        { color: colors.textSecondary },
-                      ]}
-                    >
-                      {sermon.date}
-                    </Text>
-                  </View>
-                </View>
-              </View>
-            ))}
-          </View>
-
-          {/* ── Stay Connected ── */}
-          <View style={styles.ctaSection}>
-            <Text style={[styles.ctaTitle, { color: colors.text }]}>
-              Stay Connected
-            </Text>
-            <Text
-              style={[styles.ctaDescription, { color: colors.textSecondary }]}
-            >
-              Follow us on social media to get notified when our YouTube channel
-              launches!
-            </Text>
-
-            <View style={styles.socialButtons}>
-              <Pressable
-                onPress={() => {
-                  if (Platform.OS !== "web")
-                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                  Linking.openURL(
-                    "https://www.facebook.com/hopeinchristforallnations",
-                  );
-                }}
-                style={[styles.socialButton, { backgroundColor: "#1877F218" }]}
-              >
-                <Ionicons name="logo-facebook" size={20} color="#1877F2" />
-                <Text style={[styles.socialButtonText, { color: "#1877F2" }]}>
-                  Facebook
-                </Text>
-              </Pressable>
-
-              <Pressable
-                onPress={openTwitter}
-                style={[styles.socialButton, { backgroundColor: "#1DA1F218" }]}
-              >
-                <Ionicons name="logo-twitter" size={20} color="#1DA1F2" />
-                <Text style={[styles.socialButtonText, { color: "#1DA1F2" }]}>
-                  Twitter/X
-                </Text>
-              </Pressable>
-
-              <Pressable
-                onPress={() => {
-                  if (Platform.OS !== "web")
-                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                  Linking.openURL("https://www.tiktok.com/@hopeinchrist");
-                }}
-                style={[
-                  styles.socialButton,
-                  {
-                    backgroundColor: isDark
-                      ? "rgba(255,255,255,0.08)"
-                      : "rgba(0,0,0,0.06)",
-                  },
-                ]}
-              >
-                <MaterialIcons
-                  name="music-note"
-                  size={20}
-                  color={isDark ? "#fff" : "#000"}
-                />
-                <Text
-                  style={[
-                    styles.socialButtonText,
-                    { color: isDark ? "#fff" : "#000" },
-                  ]}
-                >
-                  TikTok
-                </Text>
-              </Pressable>
-            </View>
           </View>
         </View>
       </ScrollView>
@@ -711,5 +469,95 @@ const styles = StyleSheet.create({
   socialButtonText: {
     fontSize: 13,
     fontFamily: fontFamily.semiBold,
+  },
+
+  // ── Podcast cards ──
+  listSection: {
+    marginBottom: 28,
+  },
+  podcastCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 12,
+    borderRadius: 18,
+    borderWidth: 1,
+    marginBottom: 10,
+    gap: 12,
+    shadowColor: "#241063",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.09,
+    shadowRadius: 10,
+    elevation: 4,
+  },
+  podcastThumb: {
+    width: 72,
+    height: 72,
+    borderRadius: 14,
+  },
+  podcastThumbPlaceholder: {
+    width: 72,
+    height: 72,
+    borderRadius: 14,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  podcastInfo: {
+    flex: 1,
+    gap: 3,
+  },
+  podcastShow: {
+    fontSize: 11,
+    fontFamily: fontFamily.semiBold,
+    letterSpacing: 0.3,
+    textTransform: "uppercase",
+  },
+  podcastTitle: {
+    fontSize: 14,
+    fontFamily: fontFamily.bold,
+    lineHeight: 19,
+  },
+  podcastDate: {
+    fontSize: 11,
+    fontFamily: fontFamily.regular,
+  },
+  listenPill: {
+    flexDirection: "row",
+    alignItems: "center",
+    alignSelf: "flex-start",
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 20,
+    gap: 5,
+    marginTop: 4,
+  },
+  listenText: {
+    fontSize: 11,
+    fontFamily: fontFamily.bold,
+  },
+
+  // ── Empty state ──
+  emptyState: {
+    alignItems: "center",
+    paddingTop: 40,
+    paddingBottom: 20,
+    gap: 10,
+  },
+  emptyIcon: {
+    width: 72,
+    height: 72,
+    borderRadius: 22,
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 4,
+  },
+  emptyTitle: {
+    fontSize: 16,
+    fontFamily: fontFamily.bold,
+  },
+  emptySubtitle: {
+    fontSize: 13,
+    fontFamily: fontFamily.regular,
+    textAlign: "center",
+    lineHeight: 19,
   },
 });

@@ -11,15 +11,15 @@ export const MINISTRY_INFO = {
   pastorBio: "Pastor Thabo Boshomane was ordained and released from Hope Restoration Ministry in Kempton Park. He established Hope In Christ on October 18, 2015, after accepting God's call in 2009 to preach the gospel to all nations. He is a life coach and NLP practitioner who believes everyone must be saved and discipled to become the best of who God intended for them.",
   adminHR: "Pastor Thoko Mahlangu",
   socialMedia: {
-    facebook: "https://www.facebook.com/hopeinchristforallnations",
+    facebook: "https://www.facebook.com/hicfanm/",
     twitter: "https://x.com/HicfanMin",
-    tiktok: "https://www.tiktok.com/@hopeinchrist",
+    tiktok: "https://www.tiktok.com/@hopeinchristforal",
     whatsapp: "https://wa.me/27XXXXXXXXXX",
     youtube: "", // Coming soon
   },
   streaming: {
     platform: "Facebook Live",
-    url: "https://www.facebook.com/hopeinchristforallnations",
+    url: "https://www.facebook.com/hicfanm/",
     twitterUrl: "https://x.com/HicfanMin",
     note: "Audio sermons available on Twitter/X"
   },
@@ -341,9 +341,9 @@ export const DEPARTMENTS = [
 ];
 
 export const SOCIAL_LINKS = {
-  facebook: "https://www.facebook.com/hopeinchristforallnations",
+  facebook: "https://www.facebook.com/hicfanm/",
   twitter: "https://x.com/HicfanMin",
-  tiktok: "https://www.tiktok.com/@hopeinchrist",
+  tiktok: "https://www.tiktok.com/@hopeinchristforal",
   whatsapp: "https://wa.me/27XXXXXXXXXX",
   youtube: "" // Coming soon
 };

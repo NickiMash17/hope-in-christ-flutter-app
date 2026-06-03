@@ -16,7 +16,7 @@ import * as Haptics from "expo-haptics";
 import Colors from "@/constants/colors";
 import { fontFamily } from "@/lib/fonts";
 import { useTheme } from "@/lib/useTheme";
-import { EVENTS } from "@/lib/ministry-data";
+import { useEvents } from "@/lib/db";
 import { useResponsiveLayout } from "@/lib/layout";
 
 const eventImages: Record<string, any> = {
@@ -218,12 +218,10 @@ export default function EventsScreen() {
   const layout = useResponsiveLayout();
   const webTopInset = Platform.OS === "web" ? 67 : 0;
 
-  const sortedEvents = [...EVENTS].sort(
-    (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime(),
-  );
+  const { data: events = [] } = useEvents();
 
-  // Split: first = featured, rest = regular list
-  const [featuredEvent, ...remainingEvents] = sortedEvents;
+  // Events come pre-sorted ascending from Supabase; split featured + rest
+  const [featuredEvent, ...remainingEvents] = events;
 
   const ListHeader = (
     <View style={{ paddingHorizontal: layout.horizontalPadding }}>

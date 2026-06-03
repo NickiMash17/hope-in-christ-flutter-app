@@ -195,9 +195,9 @@ export const DEPARTMENTS = [
 ];
 
 export const SOCIAL_LINKS = {
-  facebook: 'https://www.facebook.com/hopeinchristforallnations',
-  twitter: 'https://twitter.com/hopeinchrist',
-  tiktok: 'https://www.tiktok.com/@hopeinchrist',
+  facebook: 'https://www.facebook.com/hicfanm/',
+  twitter: 'https://x.com/HicfanMin',
+  tiktok: 'https://www.tiktok.com/@hopeinchristforal',
   whatsapp: 'https://wa.me/27000000000',
   youtube: 'https://www.youtube.com/@hopeinchrist',
 };

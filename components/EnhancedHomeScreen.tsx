@@ -77,7 +77,7 @@ export function EnhancedHomeScreen() {
     
     switch (action) {
       case 'live':
-        Linking.openURL('https://www.facebook.com/hopeinchristforallnations');
+        Linking.openURL('https://www.facebook.com/hicfanm/');
         break;
       case 'sermon':
         router.push({ pathname: '/sermon/[id]', params: { id: SERMONS[0].id } });

@@ -6,6 +6,7 @@ import {
   FlatList,
   Pressable,
   TextInput,
+  ActivityIndicator,
   Platform,
 } from "react-native";
 import { Image } from "expo-image";
@@ -14,7 +15,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { router } from "expo-router";
 import * as Haptics from "expo-haptics";
-import { SERMONS } from "@/lib/ministry-data";
+import { useSermons } from "@/lib/db";
 import Colors from "@/constants/colors";
 import { fontFamily } from "@/lib/fonts";
 import { useTheme } from "@/lib/useTheme";
@@ -22,19 +23,20 @@ import { useResponsiveLayout } from "@/lib/layout";
 
 const CATEGORIES = ["All", "Word", "Teaching", "Prayer"] as const;
 
-const sermonImages: Record<string, any> = {
-  "1": require("@/assets/new/pastor.jpeg"),
-  "2": require("@/assets/new/pastor teaching congregants.jpeg"),
-  "3": require("@/assets/new/new purple.png"),
-  "4": require("@/assets/new/pastor.jpeg"),
-  "5": require("@/assets/new/pastor teaching congregants.jpeg"),
-  "6": require("@/assets/new/new purple.png"),
-  "7": require("@/assets/new/church youth.jpeg"),
-  "8": require("@/assets/new/pastor.jpeg"),
-  "9": require("@/assets/new/pastor teaching congregants.jpeg"),
-  "10": require("@/assets/new/new purple.png"),
-  "11": require("@/assets/new/pastor.jpeg"),
-};
+// Fallback local images — cycled for any sermon without a thumbnail_url
+const FALLBACK_IMAGES = [
+  require("@/assets/new/pastor.jpeg"),
+  require("@/assets/new/pastor teaching congregants.jpeg"),
+  require("@/assets/new/new purple.png"),
+  require("@/assets/new/church youth.jpeg"),
+];
+
+function sermonImage(id: string, thumbnailUrl: string | null): any {
+  if (thumbnailUrl) return { uri: thumbnailUrl };
+  // stable fallback based on last char of id
+  const idx = parseInt(id.slice(-1), 16) % FALLBACK_IMAGES.length;
+  return FALLBACK_IMAGES[idx];
+}
 
 const categoryColors: Record<string, string> = {
   Word: Colors.primary,
@@ -43,8 +45,7 @@ const categoryColors: Record<string, string> = {
 };
 
 // ─── Featured "Latest Sermon" hero card ─────────────────────────────────────
-function FeaturedSermonCard({ colors }: { colors: any }) {
-  const sermon = SERMONS[0];
+function FeaturedSermonCard({ sermon, colors }: { sermon: any; colors: any }) {
   if (!sermon) return null;
 
   return (
@@ -60,7 +61,7 @@ function FeaturedSermonCard({ colors }: { colors: any }) {
       ]}
     >
       <Image
-        source={sermonImages[sermon.id]}
+        source={sermonImage(sermon.id, sermon.thumbnail_url)}
         style={styles.featuredImage}
         contentFit="cover"
       />
@@ -163,7 +164,7 @@ function SermonCard({
       {/* Thumbnail */}
       <View style={styles.sermonThumbWrap}>
         <Image
-          source={sermonImages[sermon.id]}
+          source={sermonImage(sermon.id, sermon.thumbnail_url)}
           style={styles.sermonThumb}
           contentFit="cover"
         />
@@ -231,8 +232,10 @@ export default function SermonsScreen() {
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
   const webTopInset = Platform.OS === "web" ? 67 : 0;
 
+  const { data: sermons = [], isLoading, error } = useSermons();
+
   const filteredSermons = useMemo(() => {
-    return SERMONS.filter((s) => {
+    return sermons.filter((s) => {
       const matchesCategory =
         selectedCategory === "All" || s.category === selectedCategory;
       const matchesSearch =
@@ -241,7 +244,7 @@ export default function SermonsScreen() {
         s.speaker.toLowerCase().includes(search.toLowerCase());
       return matchesCategory && matchesSearch;
     });
-  }, [search, selectedCategory]);
+  }, [sermons, search, selectedCategory]);
 
   const ListHeader = (
     <View style={{ paddingHorizontal: layout.horizontalPadding }}>
@@ -352,7 +355,7 @@ export default function SermonsScreen() {
               Latest Sermon
             </Text>
           </View>
-          <FeaturedSermonCard colors={colors} />
+          <FeaturedSermonCard sermon={sermons[0]} colors={colors} />
         </View>
       )}
 
@@ -384,6 +387,18 @@ export default function SermonsScreen() {
       <View style={styles.orbSecondary} />
 
       <View style={[layout.maxWidthStyle, { flex: 1, width: "100%" }]}>
+        {isLoading && (
+          <View style={styles.loadingState}>
+            <ActivityIndicator size="large" color={Colors.primary} />
+          </View>
+        )}
+        {!!error && (
+          <View style={styles.loadingState}>
+            <Text style={[styles.emptyTitle, { color: colors.text }]}>
+              Could not load sermons
+            </Text>
+          </View>
+        )}
         <FlatList
           data={filteredSermons}
           keyExtractor={(item) => item.id}
@@ -753,5 +768,11 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontFamily: fontFamily.regular,
     textAlign: "center",
+  },
+  loadingState: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingTop: 80,
   },
 });
