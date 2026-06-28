@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   StyleSheet,
   Text,
@@ -7,13 +7,22 @@ import {
   Pressable,
   Platform,
   Alert,
+  Linking,
+  Switch,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import * as Haptics from "expo-haptics";
 import { useTheme } from "@/lib/useTheme";
 import { fontFamily } from "@/lib/fonts";
+import {
+  requestNotificationPermission,
+  isNotificationsEnabled,
+  scheduleServiceReminders,
+  cancelServiceReminders,
+} from "@/lib/notifications";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { GlassCard } from "@/components/GlassCard";
 import { useResponsiveLayout } from "@/lib/layout";
@@ -25,22 +34,45 @@ export default function SettingsScreen() {
   const layout = useResponsiveLayout();
   const router = useRouter();
   const webTopInset = Platform.OS === "web" ? 67 : 0;
+  const [notificationsEnabled, setNotificationsEnabled] = useState(false);
+
+  useEffect(() => {
+    isNotificationsEnabled().then(setNotificationsEnabled);
+  }, []);
+
+  const handleNotificationToggle = async (value: boolean) => {
+    if (Platform.OS === "web") {
+      Alert.alert("Not Available", "Push notifications are not supported on web.");
+      return;
+    }
+    if (value) {
+      const granted = await requestNotificationPermission();
+      if (!granted) {
+        Alert.alert(
+          "Permission Required",
+          "Please enable notifications in your device settings.",
+          [{ text: "OK" }],
+        );
+        return;
+      }
+      await scheduleServiceReminders();
+      setNotificationsEnabled(true);
+      Alert.alert(
+        "Notifications Enabled!",
+        "You'll be reminded before Sunday, Wednesday, and Friday services.",
+        [{ text: "Great!" }],
+      );
+    } else {
+      await cancelServiceReminders();
+      setNotificationsEnabled(false);
+    }
+  };
 
   const handlePress = (action: string) => {
     if (Platform.OS !== "web")
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
 
     switch (action) {
-      case "notifications":
-        Alert.alert(
-          "Notifications",
-          "Stay updated with service times, events, and ministry announcements.",
-          [
-            { text: "Enable Notifications", onPress: () => {} },
-            { text: "Not Now", style: "cancel" },
-          ],
-        );
-        break;
       case "live-stream":
         router.push("/live-stream");
         break;
@@ -51,16 +83,13 @@ export default function SettingsScreen() {
         router.push("/about");
         break;
       case "privacy":
-        Alert.alert(
-          "Privacy",
-          "Your data is kept private and never shared with third parties.",
-        );
+        Linking.openURL("https://doc-hosting.flycricket.io/hope-in-christ-privacy-policy/671705c1-7314-4cc2-9d2f-c71d18c2607f/privacy");
+        break;
+      case "terms":
+        Linking.openURL("https://doc-hosting.flycricket.io/hope-in-christ-terms-of-use/565db735-e082-4222-81c6-bf4c8ec89bce/terms");
         break;
       case "help":
-        Alert.alert(
-          "Help & Support",
-          "For assistance, contact us at info@hopeinchrist.co.za or reach us on WhatsApp.",
-        );
+        Linking.openURL("https://wa.me/27825302000");
         break;
       default:
         break;
@@ -85,7 +114,7 @@ export default function SettingsScreen() {
     },
     {
       title: "YouTube Channel",
-      subtitle: "Video sermons — coming soon",
+      subtitle: "Pastor Thabo on YouTube",
       icon: "logo-youtube",
       action: "youtube",
       color: "#FF0000",
@@ -101,11 +130,18 @@ export default function SettingsScreen() {
       color: Colors.accentBlue,
     },
     {
-      title: "Privacy",
-      subtitle: "Your data is private & secure",
+      title: "Privacy Policy",
+      subtitle: "How we handle your data",
       icon: "lock-closed-outline",
       action: "privacy",
       color: Colors.primary,
+    },
+    {
+      title: "Terms of Use",
+      subtitle: "Terms & conditions of this app",
+      icon: "document-text-outline",
+      action: "terms",
+      color: Colors.accentBlue,
     },
     {
       title: "Help & Support",
@@ -118,6 +154,15 @@ export default function SettingsScreen() {
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
+      <LinearGradient
+        colors={["rgba(74,35,90,0.12)", "rgba(36,113,163,0.07)", "transparent"]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={styles.atmosphere}
+      />
+      <View style={styles.orbPrimary} />
+      <View style={styles.orbSecondary} />
+
       <ScrollView
         contentInsetAdjustmentBehavior="automatic"
         showsVerticalScrollIndicator={false}
@@ -135,9 +180,17 @@ export default function SettingsScreen() {
           ]}
         >
           <View style={styles.header}>
-            <Text style={[styles.headerTitle, { color: colors.text }]}>
-              Settings
-            </Text>
+            <View style={styles.headerAccentRow}>
+              <LinearGradient
+                colors={[Colors.primary, Colors.accentBlue]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 0, y: 1 }}
+                style={styles.headerAccentBar}
+              />
+              <Text style={[styles.headerTitle, { color: colors.text }]}>
+                Settings
+              </Text>
+            </View>
             <Text
               style={[styles.headerSubtitle, { color: colors.textSecondary }]}
             >
@@ -188,10 +241,7 @@ export default function SettingsScreen() {
               UPDATES
             </Text>
             <GlassCard style={styles.settingCard}>
-              <Pressable
-                style={styles.settingContent}
-                onPress={() => handlePress(notificationsOption.action)}
-              >
+              <View style={styles.settingContent}>
                 <View style={styles.settingLeft}>
                   <View
                     style={[
@@ -215,16 +265,22 @@ export default function SettingsScreen() {
                         { color: colors.textSecondary },
                       ]}
                     >
-                      {notificationsOption.subtitle}
+                      {notificationsEnabled
+                        ? "Reminders set for Sun, Wed & Fri"
+                        : "Tap to enable service reminders"}
                     </Text>
                   </View>
                 </View>
-                <Ionicons
-                  name="chevron-forward"
-                  size={16}
-                  color={colors.textSecondary}
+                <Switch
+                  value={notificationsEnabled}
+                  onValueChange={handleNotificationToggle}
+                  trackColor={{
+                    false: colors.border,
+                    true: Colors.primary + "99",
+                  }}
+                  thumbColor={notificationsEnabled ? Colors.primary : colors.textSecondary}
                 />
-              </Pressable>
+              </View>
             </GlassCard>
           </View>
 
@@ -333,24 +389,37 @@ export default function SettingsScreen() {
           </View>
 
           {/* App Info */}
-          <GlassCard style={styles.infoCard}>
+          <LinearGradient
+            colors={["#1a0f2e", "#0d1a3a"]}
+            style={styles.infoCard}
+          >
             <View style={styles.appInfo}>
-              <Text style={[styles.appName, { color: colors.text }]}>
+              <LinearGradient
+                colors={[Colors.primary, Colors.accentBlue]}
+                start={{ x: 0.15, y: 0 }}
+                end={{ x: 0.85, y: 1 }}
+                style={styles.appIconCircle}
+              >
+                <Ionicons name="globe-outline" size={28} color="#fff" />
+              </LinearGradient>
+              <Text style={styles.appName}>
                 Hope In Christ Ministries
               </Text>
-              <Text
-                style={[styles.appVersion, { color: colors.textSecondary }]}
-              >
+              <Text style={styles.appVersion}>
                 Version 1.0.0
               </Text>
-              <Text
-                style={[styles.appDescription, { color: colors.textSecondary }]}
-              >
+              <Text style={styles.appDescription}>
                 Empowering lives through faith and bringing hope to communities
                 across the nations.
               </Text>
             </View>
-          </GlassCard>
+            <LinearGradient
+              colors={[Colors.primary, Colors.accentBlue]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={styles.infoFooterBar}
+            />
+          </LinearGradient>
         </View>
       </ScrollView>
     </View>
@@ -360,18 +429,52 @@ export default function SettingsScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1 },
   scrollContent: { paddingBottom: 100 },
+
+  atmosphere: {
+    ...StyleSheet.absoluteFillObject,
+  },
+  orbPrimary: {
+    position: "absolute",
+    top: -100,
+    right: -80,
+    width: 220,
+    height: 220,
+    borderRadius: 110,
+    backgroundColor: "rgba(106,71,205,0.11)",
+  },
+  orbSecondary: {
+    position: "absolute",
+    bottom: 200,
+    left: -60,
+    width: 180,
+    height: 180,
+    borderRadius: 90,
+    backgroundColor: "rgba(36,113,163,0.09)",
+  },
+
   header: {
     paddingHorizontal: 16,
     paddingBottom: 24,
   },
+  headerAccentRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+    marginBottom: 4,
+  },
+  headerAccentBar: {
+    width: 4,
+    height: 32,
+    borderRadius: 2,
+  },
   headerTitle: {
     fontSize: 28,
     fontFamily: fontFamily.extraBold,
-    marginBottom: 4,
   },
   headerSubtitle: {
     fontSize: 14,
     fontFamily: fontFamily.regular,
+    marginLeft: 14,
   },
   section: {
     marginBottom: 24,
@@ -462,25 +565,45 @@ const styles = StyleSheet.create({
   },
   infoCard: {
     marginBottom: 4,
+    borderRadius: 20,
+    overflow: "hidden",
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.07)",
   },
   appInfo: {
     alignItems: "center",
-    padding: 8,
+    padding: 24,
+    paddingBottom: 20,
+    gap: 6,
+  },
+  appIconCircle: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 8,
   },
   appName: {
     fontSize: 18,
     fontFamily: fontFamily.bold,
-    marginBottom: 4,
+    color: "#fff",
+    textAlign: "center",
   },
   appVersion: {
-    fontSize: 14,
+    fontSize: 13,
     fontFamily: fontFamily.medium,
-    marginBottom: 8,
+    color: Colors.gold,
   },
   appDescription: {
-    fontSize: 14,
+    fontSize: 13,
     fontFamily: fontFamily.regular,
     textAlign: "center",
     lineHeight: 20,
+    color: "rgba(255,255,255,0.55)",
+    marginTop: 4,
+  },
+  infoFooterBar: {
+    height: 4,
   },
 });

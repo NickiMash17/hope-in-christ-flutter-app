@@ -39,6 +39,10 @@ const PURPOSE_COLORS = [
 export default function GiveScreen() {
   const insets = useSafeAreaInsets();
   const { isDark, colors } = useTheme();
+  const cardColors: [string, string] = isDark ? ['#1a0f2e', '#0d1a3a'] : [colors.card, colors.surface];
+  const cardText = { color: colors.text };
+  const cardSubText = { color: colors.textSecondary };
+  const cardDivider = { backgroundColor: colors.border };
   const layout = useResponsiveLayout();
   const webTopInset = Platform.OS === "web" ? 67 : 0;
 
@@ -48,13 +52,12 @@ export default function GiveScreen() {
     switch (action) {
       case "online":
         Linking.openURL(DONATION_INFO.onlineGiving.url);
-        router.push("/donation-success");
         break;
       case "eft":
         router.push("/eft-details");
         break;
       case "contact":
-        Linking.openURL(`tel:+27123456789`);
+        Linking.openURL(`tel:+27825302000`);
         break;
     }
   };
@@ -94,8 +97,8 @@ export default function GiveScreen() {
             />
             <LinearGradient
               colors={[
-                "rgba(36,113,163,0.55)",
-                "rgba(36,113,163,0.88)",
+                "rgba(74,35,90,0.45)",
+                "rgba(36,113,163,0.82)",
                 isDark ? Colors.dark.background : Colors.light.background,
               ]}
               style={[
@@ -117,6 +120,43 @@ export default function GiveScreen() {
             </LinearGradient>
           </View>
 
+          {/* ── Building Fund Campaign ── */}
+          <Pressable
+            onPress={() => {
+              if (Platform.OS !== "web")
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              router.push("/eft-details");
+            }}
+            style={({ pressed }) => [{ opacity: pressed ? 0.93 : 1 }]}
+          >
+            <LinearGradient
+              colors={["#1a1a2e", "#16213e", "#0f3460"]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.campaignCard}
+            >
+              <View style={styles.campaignTop}>
+                <View style={styles.campaignBadge}>
+                  <Text style={styles.campaignBadgeText}>ACTIVE CAMPAIGN</Text>
+                </View>
+                <Ionicons name="chevron-forward" size={16} color="rgba(255,255,255,0.4)" />
+              </View>
+              <View style={styles.campaignBody}>
+                <View style={styles.campaignIcon}>
+                  <MaterialCommunityIcons name="church" size={26} color={Colors.gold} />
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.campaignTitle}>HICFANM Building Fund</Text>
+                  <Text style={styles.campaignSub}>Help us buy the church land!</Text>
+                </View>
+                <View style={styles.goalPill}>
+                  <Text style={styles.goalText}>R75,000</Text>
+                </View>
+              </View>
+              <Text style={styles.campaignCta}>Donate via EFT · Tap to view banking details →</Text>
+            </LinearGradient>
+          </Pressable>
+
           {/* ── How to Give ── */}
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
@@ -131,7 +171,7 @@ export default function GiveScreen() {
               </Text>
             </View>
 
-            {/* Online */}
+            {/* Give via Facebook */}
             <Pressable
               onPress={() => handleAction("online")}
               style={({ pressed }) => [
@@ -142,39 +182,17 @@ export default function GiveScreen() {
                 },
               ]}
             >
-              <View
-                style={[
-                  styles.giveIconWrap,
-                  { backgroundColor: Colors.primary + "18" },
-                ]}
-              >
-                <Ionicons
-                  name="globe-outline"
-                  size={24}
-                  color={Colors.primary}
-                />
+              <View style={[styles.giveIconWrap, { backgroundColor: "#1877F218" }]}>
+                <Ionicons name="logo-facebook" size={24} color="#1877F2" />
               </View>
               <View style={styles.giveCardContent}>
-                <Text style={[styles.giveCardTitle, { color: colors.text }]}>
-                  Donate Online
-                </Text>
-                <Text
-                  style={[styles.giveCardDesc, { color: colors.textSecondary }]}
-                >
-                  Securely give via our online platform
+                <Text style={[styles.giveCardTitle, { color: colors.text }]}>Give via Facebook</Text>
+                <Text style={[styles.giveCardDesc, { color: colors.textSecondary }]}>
+                  Support the ministry on our Facebook page
                 </Text>
               </View>
-              <View
-                style={[
-                  styles.cardArrow,
-                  { backgroundColor: Colors.primary + "18" },
-                ]}
-              >
-                <Ionicons
-                  name="open-outline"
-                  size={16}
-                  color={Colors.primary}
-                />
+              <View style={[styles.cardArrow, { backgroundColor: "#1877F218" }]}>
+                <Ionicons name="open-outline" size={16} color="#1877F2" />
               </View>
             </Pressable>
 
@@ -321,28 +339,15 @@ export default function GiveScreen() {
           </View>
 
           {/* ── Scripture ── */}
-          <View
-            style={[
-              styles.scriptureCard,
-              {
-                backgroundColor: isDark
-                  ? Colors.dark.card
-                  : Colors.primary + "08",
-                borderColor: isDark
-                  ? "rgba(255,255,255,0.06)"
-                  : "rgba(91,44,142,0.14)",
-              },
-            ]}
-          >
-            <Ionicons name="book-outline" size={18} color={Colors.primary} />
-            <Text
-              style={[styles.scriptureText, { color: colors.textSecondary }]}
-            >
-              2 Corinthians 9:7 — Each of you should give what you have decided
-              in your heart to give, not reluctantly or under compulsion, for
-              God loves a cheerful giver.
+          <LinearGradient colors={["#1a0f2e", "#0d1a3a"]} style={styles.scriptureCard}>
+            <View style={styles.scriptureIconWrap}>
+              <Ionicons name="book" size={18} color={Colors.gold} />
+            </View>
+            <Text style={styles.scriptureText}>
+              "Each of you should give what you have decided in your heart to give, not reluctantly or under compulsion, for God loves a cheerful giver."
             </Text>
-          </View>
+            <Text style={styles.scriptureRef}>— 2 Corinthians 9:7</Text>
+          </LinearGradient>
         </View>
       </ScrollView>
     </View>
@@ -489,6 +494,77 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
 
+  // ── Campaign Card ──
+  campaignCard: {
+    borderRadius: 20,
+    padding: 18,
+    marginBottom: 24,
+    gap: 10,
+  },
+  campaignTop: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  campaignBadge: {
+    backgroundColor: "rgba(212,175,55,0.2)",
+    borderWidth: 1,
+    borderColor: "rgba(212,175,55,0.4)",
+    paddingHorizontal: 10,
+    paddingVertical: 3,
+    borderRadius: 20,
+  },
+  campaignBadgeText: {
+    color: Colors.gold,
+    fontSize: 9,
+    fontFamily: fontFamily.bold,
+    letterSpacing: 1,
+  },
+  campaignBody: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+  },
+  campaignIcon: {
+    width: 48,
+    height: 48,
+    borderRadius: 15,
+    backgroundColor: "rgba(212,175,55,0.15)",
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 1,
+    borderColor: "rgba(212,175,55,0.25)",
+  },
+  campaignTitle: {
+    fontSize: 16,
+    fontFamily: fontFamily.extraBold,
+    color: "#fff",
+    marginBottom: 2,
+  },
+  campaignSub: {
+    fontSize: 12,
+    fontFamily: fontFamily.regular,
+    color: "rgba(255,255,255,0.7)",
+  },
+  goalPill: {
+    backgroundColor: "rgba(212,175,55,0.18)",
+    borderWidth: 1,
+    borderColor: "rgba(212,175,55,0.35)",
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 14,
+  },
+  goalText: {
+    fontSize: 15,
+    fontFamily: fontFamily.extraBold,
+    color: Colors.gold,
+  },
+  campaignCta: {
+    fontSize: 11,
+    fontFamily: fontFamily.medium,
+    color: "rgba(255,255,255,0.45)",
+  },
+
   // ── Purpose Grid ──
   purposesGrid: {
     flexDirection: "row",
@@ -527,18 +603,31 @@ const styles = StyleSheet.create({
 
   // ── Scripture ──
   scriptureCard: {
-    flexDirection: "row",
-    padding: 16,
-    borderRadius: 16,
+    padding: 20,
+    borderRadius: 18,
+    gap: 10,
+    alignItems: "center",
     borderWidth: 1,
-    gap: 12,
-    alignItems: "flex-start",
+    borderColor: "rgba(255,255,255,0.07)",
+  },
+  scriptureIconWrap: {
+    width: 38, height: 38, borderRadius: 19,
+    backgroundColor: "rgba(212,175,55,0.15)",
+    alignItems: "center", justifyContent: "center",
+    borderWidth: 1, borderColor: "rgba(212,175,55,0.25)",
   },
   scriptureText: {
-    flex: 1,
-    fontSize: 12,
-    fontFamily: fontFamily.regular,
-    lineHeight: 19,
+    fontSize: 13,
+    fontFamily: fontFamily.medium,
+    color: "rgba(255,255,255,0.78)",
+    textAlign: "center",
+    lineHeight: 21,
     fontStyle: "italic",
+  },
+  scriptureRef: {
+    fontSize: 11,
+    fontFamily: fontFamily.semiBold,
+    color: Colors.gold,
+    letterSpacing: 0.3,
   },
 });

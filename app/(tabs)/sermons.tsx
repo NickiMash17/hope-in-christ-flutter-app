@@ -8,10 +8,12 @@ import {
   TextInput,
   ActivityIndicator,
   Platform,
+  Linking,
 } from "react-native";
 import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
+import { FontAwesome6 } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { router } from "expo-router";
 import * as Haptics from "expo-haptics";
@@ -118,12 +120,10 @@ function FeaturedSermonCard({ sermon, colors }: { sermon: any; colors: any }) {
 
           {/* Listen Now pill */}
           <View style={styles.featuredActions}>
-            <View style={styles.featuredPlayPill}>
-              <View style={styles.featuredPlayIconWrap}>
-                <Ionicons name="headset" size={15} color={Colors.primary} />
-              </View>
+            <LinearGradient colors={[Colors.primary, Colors.accentBlue]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={styles.featuredPlayPill}>
+              <Ionicons name="headset" size={15} color="#fff" />
               <Text style={styles.featuredPlayText}>Listen Now</Text>
-            </View>
+            </LinearGradient>
           </View>
         </View>
       </LinearGradient>
@@ -161,6 +161,9 @@ function SermonCard({
         },
       ]}
     >
+      {/* Left category accent bar */}
+      <View style={[styles.sermonAccentBar, { backgroundColor: catColor }]} />
+
       {/* Thumbnail */}
       <View style={styles.sermonThumbWrap}>
         <Image
@@ -168,9 +171,9 @@ function SermonCard({
           style={styles.sermonThumb}
           contentFit="cover"
         />
-        {/* Category colour strip */}
-        <View
-          style={[styles.sermonThumbStrip, { backgroundColor: catColor }]}
+        <LinearGradient
+          colors={["transparent", "rgba(0,0,0,0.55)"]}
+          style={StyleSheet.absoluteFillObject}
         />
       </View>
 
@@ -223,6 +226,38 @@ function SermonCard({
   );
 }
 
+// ─── X / Twitter recordings banner ──────────────────────────────────────────
+function RecordingsBanner({ isDark, colors }: { isDark: boolean; colors: any }) {
+  const cardColors: [string, string] = isDark ? ['#1a0f2e', '#0d1a3a'] : [colors.card, colors.surface];
+  const cardText = { color: colors.text };
+  const cardSubText = { color: colors.textSecondary };
+  return (
+    <Pressable
+      onPress={() => {
+        if (Platform.OS !== "web") Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        Linking.openURL("https://x.com/HicfanMin");
+      }}
+      style={({ pressed }) => ({ opacity: pressed ? 0.85 : 1 })}
+    >
+      <LinearGradient
+        colors={cardColors}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={[styles.recordingsBanner, { borderColor: isDark ? "rgba(255,255,255,0.08)" : colors.border }]}
+      >
+        <View style={[styles.recordingsIconWrap, { backgroundColor: isDark ? "rgba(255,255,255,0.12)" : colors.border }]}>
+          <FontAwesome6 name="x-twitter" size={18} color={isDark ? "#fff" : colors.text} solid />
+        </View>
+        <View style={styles.recordingsText}>
+          <Text style={[styles.recordingsTitle, cardText]}>Audio sermons on X</Text>
+          <Text style={[styles.recordingsSub, cardSubText]}>@HicfanMin · Tap to listen</Text>
+        </View>
+        <Ionicons name="chevron-forward" size={16} color={colors.textSecondary} />
+      </LinearGradient>
+    </Pressable>
+  );
+}
+
 // ─── Screen ───────────────────────────────────────────────────────────────────
 export default function SermonsScreen() {
   const insets = useSafeAreaInsets();
@@ -257,9 +292,8 @@ export default function SermonsScreen() {
           },
         ]}
       >
-        <Text style={[styles.headerTitle, { color: colors.text }]}>
-          Sermons
-        </Text>
+        <Text style={[styles.headerTitle, { color: colors.text }]}>Sermons</Text>
+        <Text style={[styles.headerSub, { color: colors.textSecondary }]}>Weekly revelations from the Word</Text>
 
         {/* Search bar */}
         <View
@@ -356,6 +390,13 @@ export default function SermonsScreen() {
             </Text>
           </View>
           <FeaturedSermonCard sermon={sermons[0]} colors={colors} />
+        </View>
+      )}
+
+      {/* ── X recordings banner ── */}
+      {selectedCategory === "All" && !search && (
+        <View style={{ marginBottom: 16 }}>
+          <RecordingsBanner isDark={isDark} />
         </View>
       )}
 
@@ -477,7 +518,12 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 28,
     fontFamily: fontFamily.extraBold,
-    marginBottom: 14,
+    marginBottom: 4,
+  },
+  headerSub: {
+    fontSize: 13,
+    fontFamily: fontFamily.regular,
+    marginBottom: 16,
   },
   searchBar: {
     flexDirection: "row",
@@ -641,22 +687,13 @@ const styles = StyleSheet.create({
   featuredPlayPill: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "rgba(255,255,255,0.92)",
-    paddingHorizontal: 14,
-    paddingVertical: 8,
+    paddingHorizontal: 16,
+    paddingVertical: 9,
     borderRadius: 20,
     gap: 7,
   },
-  featuredPlayIconWrap: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    backgroundColor: Colors.primary + "22",
-    alignItems: "center",
-    justifyContent: "center",
-  },
   featuredPlayText: {
-    color: Colors.primary,
+    color: "#fff",
     fontSize: 13,
     fontFamily: fontFamily.bold,
   },
@@ -677,7 +714,8 @@ const styles = StyleSheet.create({
   sermonCard: {
     flexDirection: "row",
     alignItems: "center",
-    padding: 12,
+    paddingVertical: 12,
+    paddingRight: 12,
     borderRadius: 18,
     borderWidth: 1,
     borderColor: "rgba(91,44,142,0.12)",
@@ -686,24 +724,23 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 12,
     elevation: 5,
-    gap: 13,
+    gap: 12,
+    overflow: "hidden",
+  },
+  sermonAccentBar: {
+    width: 4,
+    alignSelf: "stretch",
+    borderTopRightRadius: 2,
+    borderBottomRightRadius: 2,
   },
   sermonThumbWrap: {
-    position: "relative",
     borderRadius: 13,
     overflow: "hidden",
   },
   sermonThumb: {
-    width: 68,
-    height: 68,
+    width: 72,
+    height: 72,
     borderRadius: 13,
-  },
-  sermonThumbStrip: {
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    right: 0,
-    height: 3,
   },
   sermonInfo: {
     flex: 1,
@@ -775,4 +812,26 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     paddingTop: 80,
   },
+
+  // ── X recordings banner ──
+  recordingsBanner: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+    borderRadius: 14,
+    padding: 14,
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.08)",
+  },
+  recordingsIconWrap: {
+    width: 38,
+    height: 38,
+    borderRadius: 19,
+    backgroundColor: "rgba(255,255,255,0.12)",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  recordingsText: { flex: 1, gap: 2 },
+  recordingsTitle: { fontSize: 14, fontFamily: fontFamily.semiBold, color: "#fff" },
+  recordingsSub:   { fontSize: 12, fontFamily: fontFamily.regular,  color: "rgba(255,255,255,0.55)" },
 });

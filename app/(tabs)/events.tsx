@@ -18,6 +18,7 @@ import { fontFamily } from "@/lib/fonts";
 import { useTheme } from "@/lib/useTheme";
 import { useEvents } from "@/lib/db";
 import { useResponsiveLayout } from "@/lib/layout";
+import { EventCountdown } from "@/components/EventCountdown";
 
 const eventImages: Record<string, any> = {
   "1": require("@/assets/new/sunday-service-poster.jpeg"),
@@ -74,16 +75,20 @@ function FeaturedEventCard({
       >
         {/* Top row */}
         <View style={styles.featuredTopRow}>
-          {/* Next Event badge */}
           <View style={styles.nextEventBadge}>
             <View style={styles.nextEventDot} />
             <Text style={styles.nextEventText}>NEXT EVENT</Text>
           </View>
-
-          {/* Category badge */}
           <View style={[styles.categoryBadge, { backgroundColor: color }]}>
             <Text style={styles.categoryText}>{event.category}</Text>
           </View>
+        </View>
+
+        {/* Countdown row */}
+        <View style={styles.countdownRow}>
+          <Ionicons name="timer-outline" size={13} color="rgba(255,255,255,0.6)" />
+          <Text style={styles.countdownLabel}>Starts in</Text>
+          <EventCountdown date={event.date} time={event.time} color="#fff" />
         </View>
 
         {/* Bottom content */}
@@ -125,10 +130,14 @@ function FeaturedEventCard({
             </View>
 
             {/* Register pill */}
-            <View style={styles.featuredRegisterPill}>
+            <LinearGradient
+              colors={[Colors.primary, Colors.accentBlue]}
+              start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
+              style={styles.featuredRegisterPill}
+            >
               <Text style={styles.featuredRegisterText}>Tap to Register</Text>
-              <Ionicons name="arrow-forward" size={13} color={color} />
-            </View>
+              <Ionicons name="arrow-forward" size={13} color="#fff" />
+            </LinearGradient>
           </View>
         </View>
       </LinearGradient>
@@ -239,12 +248,7 @@ export default function EventsScreen() {
           Upcoming conferences and gatherings
         </Text>
         <View style={styles.headerMetaRow}>
-          <View
-            style={[
-              styles.headerMetaBadge,
-              { backgroundColor: isDark ? Colors.dark.card : "#ffffff" },
-            ]}
-          >
+          <View style={styles.headerMetaBadge}>
             <Ionicons name="sparkles" size={13} color={Colors.gold} />
             <Text style={[styles.headerMetaText, { color: colors.text }]}>
               Curated Experiences
@@ -288,16 +292,7 @@ export default function EventsScreen() {
             <Text style={[styles.sectionTitle, { color: colors.text }]}>
               More Events
             </Text>
-            <View
-              style={[
-                styles.countBadge,
-                {
-                  backgroundColor: isDark
-                    ? Colors.dark.card
-                    : Colors.accentBlue + "14",
-                },
-              ]}
-            >
+            <View style={styles.countBadge}>
               <Text style={[styles.countText, { color: Colors.accentBlue }]}>
                 {remainingEvents.length}
               </Text>
@@ -405,6 +400,7 @@ const styles = StyleSheet.create({
     borderRadius: 999,
     borderWidth: 1,
     borderColor: "rgba(212,175,55,0.34)",
+    backgroundColor: "rgba(212,160,23,0.1)",
   },
   headerMetaText: {
     fontSize: 11,
@@ -432,6 +428,24 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 20,
+    backgroundColor: Colors.accentBlue + "18",
+  },
+  countdownRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    backgroundColor: "rgba(0,0,0,0.45)",
+    alignSelf: "flex-start",
+    paddingHorizontal: 12,
+    paddingVertical: 7,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.15)",
+  },
+  countdownLabel: {
+    color: "rgba(255,255,255,0.7)",
+    fontSize: 11,
+    fontFamily: fontFamily.regular,
   },
   countText: {
     fontSize: 12,
@@ -461,6 +475,7 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFillObject,
     justifyContent: "space-between",
     padding: 18,
+    paddingTop: 16,
   },
   featuredTopRow: {
     flexDirection: "row",
@@ -482,7 +497,7 @@ const styles = StyleSheet.create({
     width: 7,
     height: 7,
     borderRadius: 4,
-    backgroundColor: "#A8F0B0",
+    backgroundColor: Colors.gold,
   },
   nextEventText: {
     color: "#fff",
@@ -555,17 +570,16 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     alignSelf: "flex-start",
-    backgroundColor: "rgba(255,255,255,0.9)",
-    paddingHorizontal: 12,
-    paddingVertical: 7,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
     borderRadius: 20,
     gap: 6,
-    marginTop: 2,
+    marginTop: 4,
   },
   featuredRegisterText: {
     fontSize: 12,
     fontFamily: fontFamily.bold,
-    color: "#1A1A2E",
+    color: "#fff",
   },
 
   // ── Upcoming label ──

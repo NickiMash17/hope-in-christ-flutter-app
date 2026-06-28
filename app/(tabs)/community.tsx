@@ -34,6 +34,10 @@ const CHANNEL_ICON_MAP: Record<string, IoniconsName> = {
 export default function CommunityScreen() {
   const insets = useSafeAreaInsets();
   const { isDark, colors } = useTheme();
+  const cardColors: [string, string] = isDark ? ['#1a0f2e', '#0d1a3a'] : [colors.card, colors.surface];
+  const cardText = { color: colors.text };
+  const cardSubText = { color: colors.textSecondary };
+  const cardDivider = { backgroundColor: colors.border };
   const layout = useResponsiveLayout();
   const webTopInset = Platform.OS === "web" ? 67 : 0;
 
@@ -92,18 +96,18 @@ export default function CommunityScreen() {
 
           {/* ── Hero Image ── */}
           <View style={styles.heroCard}>
-            <Image
-              source={communityHero}
-              style={styles.heroImage}
-              contentFit="cover"
-            />
-            <LinearGradient
-              colors={["transparent", "rgba(0,0,0,0.78)"]}
-              style={styles.heroOverlay}
-            >
-              <Text style={styles.heroText}>
-                Join our growing community of believers
-              </Text>
+            <Image source={communityHero} style={styles.heroImage} contentFit="cover" />
+            <LinearGradient colors={["transparent", "rgba(13,13,30,0.88)"]} style={styles.heroOverlay}>
+              <View style={styles.heroBottomRow}>
+                <View>
+                  <Text style={styles.heroText}>A community of believers</Text>
+                  <Text style={styles.heroSubText}>Encourage · Pray · Grow together</Text>
+                </View>
+                <View style={styles.heroPeopleBadge}>
+                  <Ionicons name="people" size={13} color="#fff" />
+                  <Text style={styles.heroPeopleText}>2.5K+</Text>
+                </View>
+              </View>
             </LinearGradient>
           </View>
 
@@ -216,46 +220,17 @@ export default function CommunityScreen() {
             ))}
 
             {/* ── Guidelines Card ── */}
-            <View
-              style={[
-                styles.guidelinesCard,
-                {
-                  backgroundColor: isDark
-                    ? Colors.dark.card
-                    : Colors.primary + "08",
-                  borderColor: isDark
-                    ? "rgba(255,255,255,0.06)"
-                    : "rgba(91,44,142,0.12)",
-                },
-              ]}
-            >
-              <View
-                style={[
-                  styles.guidelinesIconWrap,
-                  { backgroundColor: Colors.primary + "18" },
-                ]}
-              >
-                <Ionicons
-                  name="shield-checkmark"
-                  size={20}
-                  color={Colors.primary}
-                />
+            <LinearGradient colors={["#1a0f2e", "#0d1a3a"]} style={styles.guidelinesCard}>
+              <View style={styles.guidelinesIconWrap}>
+                <Ionicons name="shield-checkmark" size={20} color={Colors.primary} />
               </View>
               <View style={styles.guidelinesContent}>
-                <Text style={[styles.guidelinesTitle, { color: colors.text }]}>
-                  Community Guidelines
-                </Text>
-                <Text
-                  style={[
-                    styles.guidelinesText,
-                    { color: colors.textSecondary },
-                  ]}
-                >
-                  Be respectful, encourage one another, and keep conversations
-                  uplifting. Inappropriate content will be removed.
+                <Text style={styles.guidelinesTitle}>Community Guidelines</Text>
+                <Text style={styles.guidelinesText}>
+                  Be respectful, encourage one another, and keep conversations uplifting. Inappropriate content will be removed.
                 </Text>
               </View>
-            </View>
+            </LinearGradient>
           </View>
         </View>
       </ScrollView>
@@ -343,18 +318,25 @@ const styles = StyleSheet.create({
   },
   heroOverlay: {
     position: "absolute",
-    bottom: 0,
-    left: 0,
-    right: 0,
-    padding: 16,
-    paddingTop: 44,
+    bottom: 0, left: 0, right: 0,
+    padding: 16, paddingTop: 44,
+  },
+  heroBottomRow: {
+    flexDirection: "row", alignItems: "flex-end", justifyContent: "space-between",
   },
   heroText: {
-    color: "#fff",
-    fontSize: 16,
-    fontFamily: fontFamily.bold,
-    lineHeight: 22,
+    color: "#fff", fontSize: 16, fontFamily: fontFamily.bold, lineHeight: 22,
   },
+  heroSubText: {
+    color: "rgba(255,255,255,0.65)", fontSize: 12, fontFamily: fontFamily.regular, marginTop: 2,
+  },
+  heroPeopleBadge: {
+    flexDirection: "row", alignItems: "center", gap: 5,
+    backgroundColor: "rgba(91,44,142,0.75)",
+    paddingHorizontal: 10, paddingVertical: 6, borderRadius: 16,
+    borderWidth: 1, borderColor: "rgba(255,255,255,0.2)",
+  },
+  heroPeopleText: { color: "#fff", fontSize: 12, fontFamily: fontFamily.bold },
 
   // ── Channels ──
   content: {
@@ -442,31 +424,23 @@ const styles = StyleSheet.create({
   // ── Guidelines ──
   guidelinesCard: {
     flexDirection: "row",
-    padding: 14,
-    borderRadius: 16,
+    padding: 16,
+    borderRadius: 18,
     borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.07)",
     gap: 12,
     marginTop: 4,
     alignItems: "flex-start",
   },
   guidelinesIconWrap: {
-    width: 38,
-    height: 38,
-    borderRadius: 12,
-    alignItems: "center",
-    justifyContent: "center",
+    width: 38, height: 38, borderRadius: 12,
+    backgroundColor: "rgba(91,44,142,0.2)",
+    alignItems: "center", justifyContent: "center",
   },
-  guidelinesContent: {
-    flex: 1,
-    gap: 5,
-  },
-  guidelinesTitle: {
-    fontSize: 14,
-    fontFamily: fontFamily.bold,
-  },
+  guidelinesContent: { flex: 1, gap: 5 },
+  guidelinesTitle: { fontSize: 14, fontFamily: fontFamily.bold, color: "#fff" },
   guidelinesText: {
-    fontSize: 12,
-    fontFamily: fontFamily.regular,
-    lineHeight: 18,
+    fontSize: 12, fontFamily: fontFamily.regular,
+    lineHeight: 18, color: "rgba(255,255,255,0.62)",
   },
 });
