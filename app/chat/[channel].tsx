@@ -19,7 +19,14 @@ import * as Haptics from 'expo-haptics';
 import Colors from '@/constants/colors';
 import { fontFamily } from '@/lib/fonts';
 import { useTheme } from '@/lib/useTheme';
-import { ChatMessage } from '@/lib/data';
+interface ChatMessage {
+  id: string;
+  channel: string;
+  nickname: string;
+  text: string;
+  timestamp: number;
+  isPinned?: boolean;
+}
 import { useResponsiveLayout } from '@/lib/layout';
 
 const CHANNEL_INFO: Record<string, { name: string; color: string }> = {

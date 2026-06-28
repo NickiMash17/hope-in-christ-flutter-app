@@ -1,7 +1,8 @@
 import React, { useEffect, useRef } from 'react';
-import { Animated, StyleSheet, useWindowDimensions, View } from 'react-native';
+import { Animated, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Image } from 'expo-image';
+import { fontFamily } from '@/lib/fonts';
 
 export function SplashScreen({ onFinish }: { onFinish: () => void }) {
   const { width, height } = useWindowDimensions();
@@ -10,6 +11,7 @@ export function SplashScreen({ onFinish }: { onFinish: () => void }) {
   const logoIn = useRef(new Animated.Value(0)).current;
   const glowPulse = useRef(new Animated.Value(0)).current;
   const progress = useRef(new Animated.Value(0)).current;
+  const textIn = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     const pulseLoop = Animated.loop(
@@ -46,6 +48,12 @@ export function SplashScreen({ onFinish }: { onFinish: () => void }) {
         delay: 140,
         useNativeDriver: false,
       }),
+      Animated.timing(textIn, {
+        toValue: 1,
+        duration: 500,
+        delay: 340,
+        useNativeDriver: true,
+      }),
     ]).start();
 
     const timer = setTimeout(() => {
@@ -60,7 +68,7 @@ export function SplashScreen({ onFinish }: { onFinish: () => void }) {
       clearTimeout(timer);
       pulseLoop.stop();
     };
-  }, [glowPulse, logoIn, onFinish, progress, screenFade]);
+  }, [glowPulse, logoIn, onFinish, progress, screenFade, textIn]);
 
   const logoSize = Math.min(Math.max(width * 0.54, 210), 320);
   const shellSize = logoSize + 14;
@@ -156,6 +164,26 @@ export function SplashScreen({ onFinish }: { onFinish: () => void }) {
             contentFit="cover"
           />
         </Animated.View>
+
+        <Animated.View
+          style={[
+            styles.ministryTextWrap,
+            {
+              opacity: textIn,
+              transform: [
+                {
+                  translateY: textIn.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [12, 0],
+                  }),
+                },
+              ],
+            },
+          ]}
+        >
+          <Text style={styles.ministryName}>Hope In Christ</Text>
+          <Text style={styles.ministryTag}>For All Nations Ministries</Text>
+        </Animated.View>
       </View>
 
       <View style={styles.bottomWrap}>
@@ -228,6 +256,26 @@ const styles = StyleSheet.create({
   progressFill: {
     height: '100%',
     borderRadius: 999,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#D4A017',
+  },
+  ministryTextWrap: {
+    alignItems: 'center',
+    marginTop: 22,
+  },
+  ministryName: {
+    fontSize: 26,
+    fontFamily: fontFamily.extraBold,
+    color: '#FFFFFF',
+    letterSpacing: 0.3,
+    textAlign: 'center',
+  },
+  ministryTag: {
+    fontSize: 12,
+    fontFamily: fontFamily.semiBold,
+    color: '#D4A017',
+    letterSpacing: 1.4,
+    marginTop: 5,
+    textAlign: 'center',
+    opacity: 0.9,
   },
 });

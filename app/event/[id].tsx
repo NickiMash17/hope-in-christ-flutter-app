@@ -6,6 +6,7 @@ import {
   ScrollView,
   Pressable,
   Platform,
+  ActivityIndicator,
 } from 'react-native';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -16,14 +17,15 @@ import * as Haptics from 'expo-haptics';
 import Colors from '@/constants/colors';
 import { fontFamily } from '@/lib/fonts';
 import { useTheme } from '@/lib/useTheme';
-import { EVENTS } from '@/lib/ministry-data';
+import { useEvent } from '@/lib/db';
 import { useResponsiveLayout } from '@/lib/layout';
+import { EventCountdown } from '@/components/EventCountdown';
 
-const eventImages: Record<string, any> = {
-  Conference: require('@/assets/images/event-conference.png'),
-  Youth: require('@/assets/images/event-youth.png'),
-  Fellowship: require('@/assets/images/event-fellowship.png'),
-  Service: require('@/assets/images/event-easter.png'),
+const fallbackImages: Record<string, any> = {
+  Conference: require('@/assets/new/sunday-service-poster.jpeg'),
+  Youth: require('@/assets/new/church youth.jpeg'),
+  Fellowship: require('@/assets/new/worship team.jpeg'),
+  Service: require('@/assets/new/ordination of ministers.jpeg'),
 };
 
 const categoryColors: Record<string, string> = {
@@ -38,17 +40,37 @@ export default function EventDetailScreen() {
   const insets = useSafeAreaInsets();
   const { isDark, colors } = useTheme();
   const layout = useResponsiveLayout();
+  const cardColors: [string, string] = isDark ? ['#1a0f2e', '#0d1a3a'] : [colors.card, colors.surface];
+  const cardText = { color: colors.text };
+  const cardSubText = { color: colors.textSecondary };
+  const cardDivider = { backgroundColor: colors.border };
   const webTopInset = Platform.OS === 'web' ? 67 : 0;
-  const event = EVENTS.find(e => e.id === id);
+
+  const { data: event, isLoading } = useEvent(id ?? '');
+
+  const navBar = (
+    <View style={[styles.navBar, { paddingTop: (Platform.OS === 'web' ? webTopInset : insets.top) + 4 }]}>
+      <Pressable onPress={() => router.back()} style={styles.backButton}>
+        <Ionicons name="chevron-back" size={24} color={colors.text} />
+      </Pressable>
+    </View>
+  );
+
+  if (isLoading) {
+    return (
+      <View style={[styles.container, { backgroundColor: colors.background }]}>
+        {navBar}
+        <View style={styles.emptyState}>
+          <ActivityIndicator size="large" color={Colors.primary} />
+        </View>
+      </View>
+    );
+  }
 
   if (!event) {
     return (
       <View style={[styles.container, { backgroundColor: colors.background }]}>
-        <View style={[styles.navBar, { paddingTop: (Platform.OS === 'web' ? webTopInset : insets.top) + 4 }]}>
-          <Pressable onPress={() => router.back()} style={styles.backButton}>
-            <Ionicons name="chevron-back" size={24} color={colors.text} />
-          </Pressable>
-        </View>
+        {navBar}
         <View style={styles.emptyState}>
           <Ionicons name="alert-circle-outline" size={48} color={colors.textSecondary} />
           <Text style={[styles.emptyText, { color: colors.textSecondary }]}>Event not found</Text>
@@ -59,6 +81,8 @@ export default function EventDetailScreen() {
 
   const catColor = categoryColors[event.category] || Colors.primary;
   const dateObj = new Date(event.date);
+  const ticketTypes = ['General'];
+  const attendanceTypes = event.is_online ? ['In-Person', 'Online'] : ['In-Person'];
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
@@ -74,7 +98,7 @@ export default function EventDetailScreen() {
         <View style={[layout.maxWidthStyle, { width: '100%' }]}>
         <View style={styles.heroContainer}>
           <Image
-            source={eventImages[event.category]}
+            source={event.image_url ? { uri: event.image_url } : fallbackImages[event.category] ?? fallbackImages.Conference}
             style={styles.heroImage}
             contentFit="cover"
           />
@@ -107,53 +131,63 @@ export default function EventDetailScreen() {
         </View>
 
         <View style={[styles.content, { paddingHorizontal: layout.horizontalPadding }]}>
-          <View style={[styles.detailsCard, { backgroundColor: isDark ? Colors.dark.card : '#fff' }]}>
+          <LinearGradient colors={['#1a0f2e', '#0d1a3a']} style={styles.detailsCard}>
             <View style={styles.detailRow}>
-              <View style={[styles.detailIcon, { backgroundColor: catColor + '15' }]}>
+              <View style={[styles.detailIcon, { backgroundColor: catColor + '28' }]}>
                 <Ionicons name="calendar-outline" size={16} color={catColor} />
               </View>
               <View>
-                <Text style={[styles.detailLabel, { color: colors.textSecondary }]}>Date</Text>
-                <Text style={[styles.detailValue, { color: colors.text }]}>
+                <Text style={styles.detailLabel}>Date</Text>
+                <Text style={styles.detailValue}>
                   {dateObj.toLocaleDateString('en-ZA', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
                 </Text>
               </View>
             </View>
+            <View style={styles.detailDivider} />
 
             <View style={styles.detailRow}>
-              <View style={[styles.detailIcon, { backgroundColor: catColor + '15' }]}>
+              <View style={[styles.detailIcon, { backgroundColor: catColor + '28' }]}>
                 <Ionicons name="time-outline" size={16} color={catColor} />
               </View>
               <View>
-                <Text style={[styles.detailLabel, { color: colors.textSecondary }]}>Time</Text>
-                <Text style={[styles.detailValue, { color: colors.text }]}>{event.time}</Text>
+                <Text style={styles.detailLabel}>Time</Text>
+                <Text style={styles.detailValue}>{event.time ?? 'TBA'}</Text>
               </View>
             </View>
+            <View style={styles.detailDivider} />
 
             <View style={styles.detailRow}>
-              <View style={[styles.detailIcon, { backgroundColor: catColor + '15' }]}>
+              <View style={[styles.detailIcon, { backgroundColor: catColor + '28' }]}>
                 <Ionicons name="location-outline" size={16} color={catColor} />
               </View>
               <View style={{ flex: 1 }}>
-                <Text style={[styles.detailLabel, { color: colors.textSecondary }]}>Location</Text>
-                <Text style={[styles.detailValue, { color: colors.text }]}>{event.location}</Text>
+                <Text style={styles.detailLabel}>Location</Text>
+                <Text style={styles.detailValue}>{event.location}</Text>
               </View>
             </View>
-          </View>
+          </LinearGradient>
+
+          <LinearGradient colors={['#1a0f2e', '#0d1a3a']} style={styles.countdownCard}>
+            <View style={styles.countdownCardHeader}>
+              <View style={[styles.countdownDot, { backgroundColor: catColor }]} />
+              <Text style={styles.countdownCardLabel}>Event starts in</Text>
+            </View>
+            <EventCountdown date={event.date} time={event.time} color={catColor} size="lg" />
+          </LinearGradient>
 
           <Text style={[styles.description, { color: colors.text }]}>{event.description}</Text>
 
           <View style={styles.ticketInfo}>
             <Text style={[styles.ticketLabel, { color: colors.textSecondary }]}>Available Options</Text>
             <View style={styles.ticketRow}>
-              {event.ticketTypes.map(t => (
-                <View key={t} style={[styles.ticketBadge, { backgroundColor: isDark ? Colors.dark.card : Colors.gray100 }]}>
+              {ticketTypes.map((t: string) => (
+                <View key={t} style={styles.ticketBadge}>
                   <Ionicons name="ticket-outline" size={13} color={catColor} />
                   <Text style={[styles.ticketText, { color: colors.text }]}>{t}</Text>
                 </View>
               ))}
-              {event.attendanceTypes.map(a => (
-                <View key={a} style={[styles.ticketBadge, { backgroundColor: isDark ? Colors.dark.card : Colors.gray100 }]}>
+              {attendanceTypes.map((a: string) => (
+                <View key={a} style={styles.ticketBadge}>
                   <Ionicons name={a === 'Online' ? 'laptop-outline' : 'walk-outline'} size={13} color={catColor} />
                   <Text style={[styles.ticketText, { color: colors.text }]}>{a}</Text>
                 </View>
@@ -166,10 +200,17 @@ export default function EventDetailScreen() {
               if (Platform.OS !== 'web') Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
               router.push({ pathname: '/register/[id]', params: { id: event.id } });
             }}
-            style={[styles.registerButton, { backgroundColor: catColor }]}
+            style={styles.registerButton}
           >
-            <Ionicons name="checkmark-circle-outline" size={20} color="#fff" />
-            <Text style={styles.registerButtonText}>Register Now</Text>
+            <LinearGradient
+              colors={[Colors.primary, Colors.accentBlue]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={styles.registerGradient}
+            >
+              <Ionicons name="checkmark-circle-outline" size={20} color="#fff" />
+              <Text style={styles.registerButtonText}>Register Now</Text>
+            </LinearGradient>
           </Pressable>
         </View>
         </View>
@@ -252,19 +293,43 @@ const styles = StyleSheet.create({
   detailsCard: {
     borderRadius: 20,
     padding: 16,
-    gap: 14,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.22)',
-    shadowColor: '#000',
+    borderColor: 'rgba(255,255,255,0.07)',
+    shadowColor: '#241063',
     shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.16,
-    shadowRadius: 14,
+    shadowOpacity: 0.18,
+    shadowRadius: 16,
     elevation: 6,
   },
-  detailRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  detailRow: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 8 },
+  detailDivider: { height: 1, backgroundColor: 'rgba(255,255,255,0.07)' },
   detailIcon: { width: 36, height: 36, borderRadius: 10, alignItems: 'center', justifyContent: 'center' },
-  detailLabel: { fontSize: 11, fontFamily: fontFamily.medium },
-  detailValue: { fontSize: 14, fontFamily: fontFamily.semiBold },
+  detailLabel: { fontSize: 11, fontFamily: fontFamily.medium, color: 'rgba(255,255,255,0.5)' },
+  detailValue: { fontSize: 14, fontFamily: fontFamily.semiBold, color: '#fff' },
+  countdownCard: {
+    borderRadius: 20,
+    padding: 20,
+    alignItems: 'center',
+    gap: 14,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.07)',
+  },
+  countdownCardHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 7,
+  },
+  countdownDot: {
+    width: 7,
+    height: 7,
+    borderRadius: 4,
+  },
+  countdownCardLabel: {
+    fontSize: 12,
+    fontFamily: fontFamily.semiBold,
+    color: 'rgba(255,255,255,0.55)',
+    letterSpacing: 0.5,
+  },
   description: { fontSize: 14, fontFamily: fontFamily.regular, lineHeight: 22 },
   ticketInfo: { gap: 8 },
   ticketLabel: { fontSize: 12, fontFamily: fontFamily.bold, letterSpacing: 0.5 },
@@ -277,17 +342,17 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: 'rgba(91,44,142,0.14)',
+    borderColor: 'rgba(91,44,142,0.2)',
+    backgroundColor: 'rgba(91,44,142,0.08)',
   },
   ticketText: { fontSize: 12, fontFamily: fontFamily.medium },
-  registerButton: {
+  registerButton: { borderRadius: 14, overflow: 'hidden', marginTop: 4 },
+  registerGradient: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     gap: 8,
     paddingVertical: 16,
-    borderRadius: 14,
-    marginTop: 4,
   },
   registerButtonText: { color: '#fff', fontSize: 16, fontFamily: fontFamily.bold },
   navBar: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 12, paddingBottom: 8 },

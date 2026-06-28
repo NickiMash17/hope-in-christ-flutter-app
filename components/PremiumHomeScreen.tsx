@@ -17,7 +17,10 @@ import { router } from "expo-router";
 import * as Haptics from "expo-haptics";
 import { useTheme } from "@/lib/useTheme";
 import { fontFamily } from "@/lib/fonts";
-import { MINISTRY_INFO, SCHEDULE, SERMONS } from "@/lib/ministry-data";
+import Colors from "@/constants/colors";
+import { MINISTRY_INFO, SCHEDULE } from "@/lib/ministry-data";
+import { useEvents, useSermons } from "@/lib/db";
+import { useIsLiveNow } from "@/lib/useIsLiveNow";
 import { GlassCard } from "@/components/GlassCard";
 
 import { PremiumStats } from "@/components/PremiumStats";
@@ -40,11 +43,23 @@ function getTodaySchedule() {
 
 export function PremiumHomeScreen() {
   const insets = useSafeAreaInsets();
-  const { colors } = useTheme();
+  const { isDark, colors } = useTheme();
   const layout = useResponsiveLayout();
   const reveal = useRef(new Animated.Value(0)).current;
 
   const todaySchedule = getTodaySchedule();
+  const { data: liveSermons } = useSermons();
+  const { data: events } = useEvents();
+  const isLive = useIsLiveNow();
+  const featuredSermon = liveSermons?.[0];
+  const upcomingEvents = useMemo(() => {
+    if (!events) return [];
+    const now = new Date();
+    return events
+      .filter((e) => new Date(e.date) >= now)
+      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+      .slice(0, 4);
+  }, [events]);
   const webTopInset = Platform.OS === "web" ? 67 : 0;
   const heroHeight = Math.min(
     Math.max(layout.width * 0.72, 360),
@@ -69,32 +84,32 @@ export function PremiumHomeScreen() {
         id: "live",
         icon: "videocam",
         label: "Watch Live",
-        color: "#8B0000", // Deep Ruby Red
-        gradient: ["#8B0000", "#DC143C", "#FF6347"], // Ruby gradient
+        color: Colors.accent,
+        gradient: [Colors.accentDark, Colors.accent, Colors.accentLight],
         action: "live",
       },
       {
         id: "sermon",
         icon: "play-circle",
         label: "Latest Sermon",
-        color: "#4A235A", // Deep Royal Purple
-        gradient: ["#4A235A", "#6B3AA0", "#9B59B6"], // Royal gradient
+        color: Colors.primary,
+        gradient: [Colors.primaryDark, Colors.primary, Colors.primaryLight],
         action: "sermon",
       },
       {
         id: "give",
         icon: "heart",
         label: "Give",
-        color: "#D4AF37", // Premium Gold
-        gradient: ["#D4AF37", "#F7E7CE", "#CD7F32"], // Gold gradient
+        color: Colors.gold,
+        gradient: [Colors.goldDark, Colors.gold],
         action: "give",
       },
       {
         id: "register",
         icon: "calendar",
         label: "Register",
-        color: "#1E3A8A", // Royal Blue
-        gradient: ["#1E3A8A", "#4682B4", "#5F9EA0"], // Blue gradient
+        color: Colors.accentBlue,
+        gradient: [Colors.accentBlueDark, Colors.accentBlue, Colors.accentBlueLight],
         action: "register",
       },
     ],
@@ -112,7 +127,7 @@ export function PremiumHomeScreen() {
       case "sermon":
         router.push({
           pathname: "/sermon/[id]",
-          params: { id: SERMONS[0].id },
+          params: { id: featuredSermon?.id ?? "1" },
         });
         break;
       case "give":
@@ -187,12 +202,12 @@ export function PremiumHomeScreen() {
             />
             <LinearGradient
               colors={[
-                "rgba(74,35,90,0.4)", // Deep Royal Purple
-                "rgba(107,58,160,0.6)", // Majestic Royal Purple
-                "rgba(155,89,182,0.8)", // Amethyst Purple
+                'rgba(61,26,110,0.38)',
+                'rgba(91,44,142,0.68)',
+                'rgba(13,26,58,0.92)',
               ]}
               start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
+              end={{ x: 0.3, y: 1 }}
               style={[
                 styles.heroOverlay,
                 {
@@ -232,8 +247,16 @@ export function PremiumHomeScreen() {
                 <Text style={styles.ministryNameSub}>
                   For All Nations Ministries
                 </Text>
+                <View style={styles.heroDivider} />
                 <Text style={styles.sloganText}>{MINISTRY_INFO.slogan1}</Text>
                 <Text style={styles.sloganText2}>{MINISTRY_INFO.slogan2}</Text>
+                {isLive && (
+                  <View style={styles.heroLiveBadge}>
+                    <View style={styles.heroLiveDot} />
+                    <Text style={styles.heroLiveText}>{"WE'RE LIVE NOW"}</Text>
+                    <Ionicons name="radio" size={11} color="#fff" />
+                  </View>
+                )}
               </View>
 
               <View style={styles.serviceBadge}>
@@ -261,28 +284,28 @@ export function PremiumHomeScreen() {
                   label: "Weekly Services",
                   value: "7",
                   icon: "calendar-outline",
-                  gradient: ["#4A235A", "#6B3AA0"], // Royal Purple
+                  gradient: [Colors.primaryDark, Colors.primary],
                   trend: "up",
                 },
                 {
                   label: "Active Members",
                   value: "2.5K",
                   icon: "people-outline",
-                  gradient: ["#1E3A8A", "#4682B4"], // Royal Blue
+                  gradient: [Colors.accentBlueDark, Colors.accentBlue],
                   trend: "up",
                 },
                 {
                   label: "Sermons This Month",
                   value: "12",
                   icon: "mic-outline",
-                  gradient: ["#D4AF37", "#F7E7CE"], // Premium Gold
+                  gradient: [Colors.goldDark, Colors.gold],
                   trend: "neutral",
                 },
                 {
                   label: "Community Events",
                   value: "24",
                   icon: "star-outline",
-                  gradient: ["#8B0000", "#DC143C"], // Deep Ruby
+                  gradient: [Colors.accentDark, Colors.accent],
                   trend: "up",
                 },
               ]}
@@ -317,21 +340,73 @@ export function PremiumHomeScreen() {
                     end={{ x: 1, y: 1 }}
                     style={styles.quickActionTileGradient}
                   >
+                    <View style={styles.quickActionShine} pointerEvents="none" />
+                    {action.id === 'live' && isLive && (
+                      <View style={styles.liveChip}>
+                        <View style={styles.liveChipDot} />
+                        <Text style={styles.liveChipText}>LIVE</Text>
+                      </View>
+                    )}
                     <View style={styles.quickActionTileIconWrap}>
-                      <Ionicons
-                        name={action.icon as any}
-                        size={26}
-                        color="#fff"
-                      />
+                      <Ionicons name={action.icon as any} size={26} color="#fff" />
                     </View>
-                    <Text style={styles.quickActionTileLabel}>
-                      {action.label}
-                    </Text>
+                    <Text style={styles.quickActionTileLabel}>{action.label}</Text>
                   </LinearGradient>
                 </Pressable>
               ))}
             </View>
           </View>
+
+          {upcomingEvents.length > 0 && (
+            <View style={styles.sectionContainer}>
+              <View style={styles.sectionHeader}>
+                <View style={[styles.sectionAccent, { backgroundColor: colors.tint }]} />
+                <Text style={[styles.sectionTitle, { color: colors.text }]}>Upcoming Events</Text>
+              </View>
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={{ gap: 10, paddingRight: 4 }}
+              >
+                {upcomingEvents.map((ev) => {
+                  const d = new Date(ev.date);
+                  const catColor = ({
+                    Conference: Colors.primary,
+                    Youth: Colors.accentBlue,
+                    Fellowship: Colors.accent,
+                    Service: Colors.gold,
+                  } as Record<string, string>)[ev.category] ?? Colors.primary;
+                  return (
+                    <Pressable
+                      key={ev.id}
+                      onPress={() => router.push({ pathname: '/event/[id]', params: { id: ev.id } })}
+                      style={({ pressed }) => ({
+                        opacity: pressed ? 0.88 : 1,
+                        transform: [{ scale: pressed ? 0.97 : 1 }],
+                      })}
+                    >
+                      <LinearGradient colors={['#1a0f2e', '#0d1a3a']} style={styles.eventMiniCard}>
+                        <View style={[styles.eventMiniAccent, { backgroundColor: catColor }]} />
+                        <View style={[styles.eventMiniDateBubble, { backgroundColor: catColor + '22', borderColor: catColor + '55', borderWidth: 1 }]}>
+                          <Text style={[styles.eventMiniDay, { color: catColor }]}>{d.getDate()}</Text>
+                          <Text style={[styles.eventMiniMonth, { color: catColor + 'cc' }]}>
+                            {d.toLocaleDateString('en-ZA', { month: 'short' }).toUpperCase()}
+                          </Text>
+                        </View>
+                        <View style={styles.eventMiniContent}>
+                          <Text style={styles.eventMiniName} numberOfLines={2}>{ev.title}</Text>
+                          <View style={styles.eventMiniMeta}>
+                            <Ionicons name="location-outline" size={10} color="rgba(255,255,255,0.4)" />
+                            <Text style={styles.eventMiniLocation} numberOfLines={1}>{ev.location}</Text>
+                          </View>
+                        </View>
+                      </LinearGradient>
+                    </Pressable>
+                  );
+                })}
+              </ScrollView>
+            </View>
+          )}
 
           <View style={styles.sectionContainer}>
             <View style={styles.sectionHeader}>
@@ -350,24 +425,37 @@ export function PremiumHomeScreen() {
             >
               <GlassCard style={styles.sermonCard}>
                 <Image
-                  source={require("@/assets/new/pastor teaching congregants.jpeg")}
+                  source={
+                    featuredSermon?.thumbnail_url
+                      ? { uri: featuredSermon.thumbnail_url }
+                      : require("@/assets/new/pastor teaching congregants.jpeg")
+                  }
                   style={styles.sermonImage}
                   contentFit="cover"
                 />
                 <LinearGradient
-                  colors={["transparent", "rgba(0,0,0,0.9)"]}
+                  colors={["transparent", "rgba(0,0,0,0.92)"]}
                   style={styles.sermonOverlay}
                 >
+                  {/* centre play button */}
+                  <View style={styles.sermonPlayBtn} pointerEvents="none">
+                    <LinearGradient colors={["rgba(91,44,142,0.9)", "rgba(36,113,163,0.9)"]} style={styles.sermonPlayGradient}>
+                      <Ionicons name="play" size={22} color="#fff" />
+                    </LinearGradient>
+                  </View>
                   <View style={styles.sermonBadge}>
-                    <Ionicons name="play-circle" size={14} color="#fff" />
+                    <Ionicons name="mic" size={13} color="#fff" />
                     <Text style={styles.sermonBadgeText}>Latest Sermon</Text>
                   </View>
                   <Text style={styles.sermonTitle}>
-                    {SERMONS[0]?.title || "Powerful Teaching from the Word"}
+                    {featuredSermon?.title ?? "Powerful Teaching from the Word"}
                   </Text>
-                  <Text style={styles.sermonSpeaker}>
-                    {SERMONS[0]?.speaker || "Senior Pastor"}
-                  </Text>
+                  <View style={styles.sermonSpeakerRow}>
+                    <Ionicons name="person-circle-outline" size={15} color="rgba(255,255,255,0.7)" />
+                    <Text style={styles.sermonSpeaker}>
+                      {featuredSermon?.speaker ?? "Senior Pastor"}
+                    </Text>
+                  </View>
                 </LinearGradient>
               </GlassCard>
             </Pressable>
@@ -376,79 +464,64 @@ export function PremiumHomeScreen() {
           {todaySchedule && (
             <View style={styles.sectionContainer}>
               <View style={styles.sectionHeader}>
-                <View
-                  style={[
-                    styles.sectionAccent,
-                    { backgroundColor: colors.tint },
-                  ]}
-                />
-                <Text style={[styles.sectionTitle, { color: colors.text }]}>
-                  Today&apos;s Schedule
-                </Text>
+                <View style={[styles.sectionAccent, { backgroundColor: colors.tint }]} />
+                <Text style={[styles.sectionTitle, { color: colors.text }]}>Today&apos;s Schedule</Text>
               </View>
-              <GlassCard style={styles.scheduleCard}>
+              <LinearGradient colors={["#1a0f2e", "#0d1a3a"]} style={styles.scheduleCard}>
+                {/* card header */}
                 <View style={styles.scheduleHeader}>
-                  <Text style={[styles.scheduleTitle, { color: colors.text }]}>
-                    {todaySchedule.day}
-                  </Text>
-                  <Pressable onPress={() => handlePress("schedule")}>
+                  <View style={styles.scheduleDayRow}>
+                    <LinearGradient colors={["#5B2C8E", "#2471A3"]} style={styles.scheduleDayBadge}>
+                      <Ionicons name="today" size={13} color="#fff" />
+                      <Text style={styles.scheduleDayText}>{todaySchedule.day}</Text>
+                    </LinearGradient>
+                  </View>
+                  <Pressable onPress={() => handlePress("schedule")} style={styles.scheduleViewAll}>
                     <Text style={styles.moreText}>View all</Text>
+                    <Ionicons name="chevron-forward" size={12} color="#5B2C8E" />
                   </Pressable>
                 </View>
+                {/* time rows */}
                 <View style={styles.scheduleItems}>
                   {todaySchedule.items.slice(0, 3).map((item, idx) => (
-                    <View key={idx} style={styles.scheduleItem}>
-                      <Text style={styles.scheduleTimeText}>{item.time}</Text>
-                      <Text
-                        style={[
-                          styles.scheduleItemTitle,
-                          { color: colors.text },
-                        ]}
-                      >
-                        {item.title}
-                      </Text>
+                    <View key={idx} style={[styles.scheduleItem, idx > 0 && { borderTopWidth: 0.5, borderTopColor: "rgba(255,255,255,0.06)" }]}>
+                      <View style={styles.scheduleTimePill}>
+                        <Text style={styles.scheduleTimeText}>{item.time}</Text>
+                      </View>
+                      <View style={styles.scheduleTimeDot} />
+                      <Text style={styles.scheduleItemTitle}>{item.title}</Text>
                     </View>
                   ))}
                 </View>
-              </GlassCard>
+              </LinearGradient>
             </View>
           )}
 
           <View style={styles.sectionContainer}>
             <View style={styles.sectionHeader}>
-              <View
-                style={[styles.sectionAccent, { backgroundColor: colors.tint }]}
-              />
-              <Text style={[styles.sectionTitle, { color: colors.text }]}>
-                Visit Us
-              </Text>
+              <View style={[styles.sectionAccent, { backgroundColor: colors.tint }]} />
+              <Text style={[styles.sectionTitle, { color: colors.text }]}>Visit Us</Text>
             </View>
-            <Pressable onPress={() => handlePress("maps")}>
-              <GlassCard style={styles.locationCard}>
+            <Pressable onPress={() => handlePress("maps")} style={({ pressed }) => ({ opacity: pressed ? 0.88 : 1, transform: [{ scale: pressed ? 0.985 : 1 }] })}>
+              <LinearGradient colors={["#0d1a2e", "#0a1220"]} style={styles.locationCard}>
+                <LinearGradient colors={["#2471A3", "#5B2C8E"]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={styles.locationTopBar} />
                 <View style={styles.locationHeader}>
-                  <Ionicons name="location-outline" size={22} color="#2471A3" />
+                  <LinearGradient colors={[Colors.accentBlue, Colors.primary]} style={styles.locationIconWrap}>
+                    <Ionicons name="location" size={20} color="#fff" />
+                  </LinearGradient>
                   <View style={styles.locationTextContainer}>
-                    <Text
-                      style={[styles.locationTitle, { color: colors.text }]}
-                    >
-                      Our Location
-                    </Text>
-                    <Text
-                      style={[
-                        styles.locationAddress,
-                        { color: colors.textSecondary },
-                      ]}
-                    >
-                      {MINISTRY_INFO.address}
-                    </Text>
+                    <Text style={styles.locationTitle}>Our Location</Text>
+                    <Text style={styles.locationAddress}>{MINISTRY_INFO.address}</Text>
                   </View>
-                  <Ionicons
-                    name="open-outline"
-                    size={20}
-                    color={colors.textSecondary}
-                  />
+                  <View style={styles.locationArrow}>
+                    <Ionicons name="navigate" size={16} color="#fff" />
+                  </View>
                 </View>
-              </GlassCard>
+                <View style={styles.locationFooter}>
+                  <Ionicons name="map-outline" size={13} color="rgba(255,255,255,0.4)" />
+                  <Text style={styles.locationFooterText}>Tap to open in Maps</Text>
+                </View>
+              </LinearGradient>
             </Pressable>
           </View>
 
@@ -544,7 +617,7 @@ const styles = StyleSheet.create({
   ministryNameSub: {
     fontSize: 17,
     fontFamily: fontFamily.semiBold,
-    color: "#F0D060",
+    color: Colors.gold,
     textAlign: "center",
   },
   sloganText: {
@@ -613,6 +686,11 @@ const styles = StyleSheet.create({
     padding: 16,
     justifyContent: "space-between",
   },
+  quickActionShine: {
+    position: "absolute", top: 0, left: 0, right: 0, height: "48%",
+    backgroundColor: "rgba(255,255,255,0.13)",
+    borderTopLeftRadius: 22, borderTopRightRadius: 22,
+  },
   quickActionTileIconWrap: {
     width: 46,
     height: 46,
@@ -668,36 +746,44 @@ const styles = StyleSheet.create({
     fontFamily: fontFamily.medium,
   },
   scheduleCard: {
-    padding: 18,
+    borderRadius: 20,
+    overflow: "hidden",
+    shadowColor: "#5B2C8E",
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.22,
+    shadowRadius: 14,
+    elevation: 7,
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.06)",
   },
   scheduleHeader: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    marginBottom: 12,
-  },
-  scheduleTitle: {
-    fontSize: 17,
-    fontFamily: fontFamily.bold,
+    padding: 16,
+    paddingBottom: 12,
   },
   scheduleItems: {
-    gap: 10,
+    paddingHorizontal: 14,
+    paddingBottom: 14,
+    gap: 0,
   },
   scheduleItem: {
     flexDirection: "row",
     alignItems: "center",
     gap: 10,
+    paddingVertical: 10,
   },
   scheduleTimeText: {
-    color: "#5B2C8E",
-    fontSize: 12,
+    color: "rgba(255,255,255,0.75)",
+    fontSize: 11,
     fontFamily: fontFamily.semiBold,
-    minWidth: 88,
   },
   scheduleItemTitle: {
     flex: 1,
-    fontSize: 14,
+    fontSize: 13,
     fontFamily: fontFamily.medium,
+    color: "#fff",
   },
   moreText: {
     color: "#5B2C8E",
@@ -705,25 +791,36 @@ const styles = StyleSheet.create({
     fontFamily: fontFamily.semiBold,
   },
   locationCard: {
-    padding: 18,
+    borderRadius: 20,
+    overflow: "hidden",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 5 },
+    shadowOpacity: 0.22,
+    shadowRadius: 12,
+    elevation: 7,
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.07)",
   },
   locationHeader: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 12,
+    gap: 14,
+    padding: 16,
   },
   locationTextContainer: {
     flex: 1,
     gap: 3,
   },
   locationTitle: {
-    fontSize: 16,
+    fontSize: 15,
     fontFamily: fontFamily.bold,
+    color: "#fff",
   },
   locationAddress: {
-    fontSize: 13,
+    fontSize: 12,
     fontFamily: fontFamily.regular,
-    lineHeight: 18,
+    lineHeight: 17,
+    color: "rgba(255,255,255,0.6)",
   },
   footer: {
     alignItems: "center",
@@ -738,5 +835,178 @@ const styles = StyleSheet.create({
   footerSubtext: {
     fontSize: 10,
     fontFamily: fontFamily.regular,
+  },
+
+  // ── sermon play overlay ──
+  sermonPlayBtn: {
+    position: "absolute",
+    top: 0, left: 0, right: 0, bottom: 0,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  sermonPlayGradient: {
+    width: 52, height: 52, borderRadius: 26,
+    alignItems: "center", justifyContent: "center",
+    shadowColor: "#000", shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.4, shadowRadius: 8, elevation: 8,
+  },
+  sermonSpeakerRow: {
+    flexDirection: "row", alignItems: "center", gap: 5,
+  },
+
+  // ── schedule card ──
+  scheduleDayRow: { flexDirection: "row", alignItems: "center" },
+  scheduleDayBadge: {
+    flexDirection: "row", alignItems: "center", gap: 5,
+    paddingHorizontal: 12, paddingVertical: 5, borderRadius: 16,
+  },
+  scheduleDayText: { fontSize: 12, fontFamily: fontFamily.bold, color: "#fff" },
+  scheduleViewAll: { flexDirection: "row", alignItems: "center", gap: 2 },
+  scheduleTimePill: {
+    backgroundColor: "rgba(91,44,142,0.35)",
+    paddingHorizontal: 8, paddingVertical: 3, borderRadius: 8,
+    minWidth: 96,
+  },
+  scheduleTimeDot: {
+    width: 6, height: 6, borderRadius: 3,
+    backgroundColor: "#5B2C8E",
+  },
+
+  // ── location card ──
+  locationTopBar: { height: 3 },
+  locationIconWrap: {
+    width: 42, height: 42, borderRadius: 14,
+    alignItems: "center", justifyContent: "center",
+    shadowColor: "#00897B", shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.4, shadowRadius: 6, elevation: 6,
+  },
+  locationArrow: {
+    width: 34, height: 34, borderRadius: 17,
+    backgroundColor: "rgba(255,255,255,0.12)",
+    alignItems: "center", justifyContent: "center",
+  },
+  locationFooter: {
+    flexDirection: "row", alignItems: "center", gap: 5,
+    paddingHorizontal: 18, paddingBottom: 14,
+  },
+  locationFooterText: {
+    fontSize: 11, fontFamily: fontFamily.regular,
+    color: "rgba(255,255,255,0.38)",
+  },
+
+  // ── hero divider ──
+  heroDivider: {
+    width: 36,
+    height: 1.5,
+    backgroundColor: 'rgba(212,160,23,0.5)',
+    borderRadius: 1,
+    marginVertical: 4,
+  },
+
+  // ── live badge in hero ──
+  heroLiveBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    backgroundColor: 'rgba(192,57,43,0.78)',
+    paddingHorizontal: 12,
+    paddingVertical: 5,
+    borderRadius: 16,
+    marginTop: 8,
+  },
+  heroLiveDot: {
+    width: 6, height: 6, borderRadius: 3,
+    backgroundColor: '#FF8080',
+  },
+  heroLiveText: {
+    color: '#fff',
+    fontSize: 11,
+    fontFamily: fontFamily.bold,
+    letterSpacing: 1.2,
+  },
+
+  // ── live chip on quick action tile ──
+  liveChip: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255,255,255,0.22)',
+    paddingHorizontal: 7,
+    paddingVertical: 3,
+    borderRadius: 8,
+    gap: 4,
+    zIndex: 1,
+  },
+  liveChipDot: {
+    width: 5, height: 5, borderRadius: 3,
+    backgroundColor: '#FF8080',
+  },
+  liveChipText: {
+    color: '#fff',
+    fontSize: 9,
+    fontFamily: fontFamily.bold,
+    letterSpacing: 0.8,
+  },
+
+  // ── upcoming events mini cards ──
+  eventMiniCard: {
+    width: 172,
+    borderRadius: 16,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.07)',
+    padding: 14,
+    gap: 8,
+    shadowColor: '#241063',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 5,
+  },
+  eventMiniAccent: {
+    position: 'absolute',
+    top: 0, left: 0, bottom: 0,
+    width: 3,
+  },
+  eventMiniDateBubble: {
+    alignSelf: 'flex-start',
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    alignItems: 'center',
+    minWidth: 44,
+  },
+  eventMiniDay: {
+    fontSize: 18,
+    fontFamily: fontFamily.extraBold,
+    lineHeight: 22,
+  },
+  eventMiniMonth: {
+    fontSize: 9,
+    fontFamily: fontFamily.bold,
+    letterSpacing: 0.8,
+  },
+  eventMiniContent: {
+    flex: 1,
+    gap: 4,
+  },
+  eventMiniName: {
+    fontSize: 12,
+    fontFamily: fontFamily.semiBold,
+    color: '#fff',
+    lineHeight: 16,
+  },
+  eventMiniMeta: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 3,
+  },
+  eventMiniLocation: {
+    fontSize: 10,
+    fontFamily: fontFamily.regular,
+    color: 'rgba(255,255,255,0.4)',
+    flex: 1,
   },
 });

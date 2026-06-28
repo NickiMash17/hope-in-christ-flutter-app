@@ -60,7 +60,11 @@ const STREAM_SCHEDULE: StreamSchedule[] = [
 ];
 
 export default function LiveStreamScreen() {
-  const { colors, isDark } = useTheme();
+  const { isDark, colors } = useTheme();
+  const cardColors: [string, string] = isDark ? ['#1a0f2e', '#0d1a3a'] : [colors.card, colors.surface];
+  const cardText = { color: colors.text };
+  const cardSubText = { color: colors.textSecondary };
+  const cardDivider = { backgroundColor: colors.border };
   const layout = useResponsiveLayout();
   const insets = useSafeAreaInsets();
   const [isCurrentlyLive, setIsCurrentlyLive] = useState(false);
@@ -91,14 +95,7 @@ export default function LiveStreamScreen() {
   const openYouTubeLive = () => {
     if (Platform.OS !== "web")
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    Alert.alert(
-      "YouTube Channel Coming Soon",
-      "Our YouTube channel will launch soon with live streaming capabilities!",
-      [
-        { text: "Watch on Facebook", onPress: openFacebookLive },
-        { text: "OK", style: "cancel" },
-      ],
-    );
+    Linking.openURL("https://www.youtube.com/@thaboboshomane9827");
   };
 
   const enableNotifications = () => {
@@ -174,7 +171,7 @@ export default function LiveStreamScreen() {
             </Pressable>
           ) : (
             <LinearGradient
-              colors={isDark ? ["#4A235A", "#1a1a2e"] : ["#6B3AA0", "#4A235A"]}
+              colors={["#1a0f2e", "#0d1a3a"]}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 1 }}
               style={styles.offlineBanner}
@@ -193,111 +190,34 @@ export default function LiveStreamScreen() {
 
           {/* Quick Access Buttons */}
           <View style={styles.quickActions}>
-            <Pressable
-              onPress={openFacebookLive}
-              style={({ pressed }) => [
-                styles.quickActionButton,
-                {
-                  backgroundColor: isDark ? Colors.dark.card : "#fff",
-                  opacity: pressed ? 0.85 : 1,
-                  borderColor: isDark
-                    ? "rgba(255,255,255,0.08)"
-                    : "rgba(91,44,142,0.1)",
-                },
-              ]}
-            >
-              <View
-                style={[
-                  styles.quickActionIcon,
-                  { backgroundColor: "#1877F218" },
-                ]}
-              >
-                <Ionicons name="logo-facebook" size={24} color="#1877F2" />
-              </View>
-              <Text
-                style={[
-                  styles.quickActionText,
-                  { color: colors.textSecondary },
-                ]}
-              >
-                Watch on
-              </Text>
-              <Text style={[styles.quickActionLabel, { color: colors.text }]}>
-                Facebook
-              </Text>
+            <Pressable onPress={openFacebookLive} style={({ pressed }) => [styles.quickActionButton, { opacity: pressed ? 0.85 : 1 }]}>
+              <LinearGradient colors={["#1a0f2e", "#0d1a3a"]} style={styles.quickActionGradient}>
+                <View style={[styles.quickActionIcon, { backgroundColor: "#1877F218" }]}>
+                  <Ionicons name="logo-facebook" size={24} color="#1877F2" />
+                </View>
+                <Text style={styles.quickActionText}>Watch on</Text>
+                <Text style={styles.quickActionLabel}>Facebook</Text>
+              </LinearGradient>
             </Pressable>
 
-            <Pressable
-              onPress={openYouTubeLive}
-              style={({ pressed }) => [
-                styles.quickActionButton,
-                {
-                  backgroundColor: isDark ? Colors.dark.card : "#fff",
-                  opacity: pressed ? 0.85 : 1,
-                  borderColor: isDark
-                    ? "rgba(255,255,255,0.08)"
-                    : "rgba(91,44,142,0.1)",
-                },
-              ]}
-            >
-              <View
-                style={[
-                  styles.quickActionIcon,
-                  { backgroundColor: "#FF000018" },
-                ]}
-              >
-                <Ionicons name="logo-youtube" size={24} color="#FF0000" />
-              </View>
-              <Text
-                style={[
-                  styles.quickActionText,
-                  { color: colors.textSecondary },
-                ]}
-              >
-                YouTube
-              </Text>
-              <Text
-                style={[
-                  styles.quickActionLabel,
-                  { color: colors.textSecondary, fontSize: 11 },
-                ]}
-              >
-                Coming Soon
-              </Text>
+            <Pressable onPress={openYouTubeLive} style={({ pressed }) => [styles.quickActionButton, { opacity: pressed ? 0.85 : 1 }]}>
+              <LinearGradient colors={["#1a0f2e", "#0d1a3a"]} style={styles.quickActionGradient}>
+                <View style={[styles.quickActionIcon, { backgroundColor: "#FF000018" }]}>
+                  <Ionicons name="logo-youtube" size={24} color="#FF0000" />
+                </View>
+                <Text style={styles.quickActionText}>YouTube</Text>
+                <Text style={styles.quickActionLabel}>Watch Now</Text>
+              </LinearGradient>
             </Pressable>
 
-            <Pressable
-              onPress={enableNotifications}
-              style={({ pressed }) => [
-                styles.quickActionButton,
-                {
-                  backgroundColor: isDark ? Colors.dark.card : "#fff",
-                  opacity: pressed ? 0.85 : 1,
-                  borderColor: isDark
-                    ? "rgba(255,255,255,0.08)"
-                    : "rgba(91,44,142,0.1)",
-                },
-              ]}
-            >
-              <View
-                style={[
-                  styles.quickActionIcon,
-                  { backgroundColor: Colors.gold + "18" },
-                ]}
-              >
-                <Ionicons name="notifications" size={24} color={Colors.gold} />
-              </View>
-              <Text
-                style={[
-                  styles.quickActionText,
-                  { color: colors.textSecondary },
-                ]}
-              >
-                Get
-              </Text>
-              <Text style={[styles.quickActionLabel, { color: colors.text }]}>
-                Notified
-              </Text>
+            <Pressable onPress={enableNotifications} style={({ pressed }) => [styles.quickActionButton, { opacity: pressed ? 0.85 : 1 }]}>
+              <LinearGradient colors={["#1a0f2e", "#0d1a3a"]} style={styles.quickActionGradient}>
+                <View style={[styles.quickActionIcon, { backgroundColor: Colors.gold + "18" }]}>
+                  <Ionicons name="notifications" size={24} color={Colors.gold} />
+                </View>
+                <Text style={styles.quickActionText}>Get</Text>
+                <Text style={styles.quickActionLabel}>Notified</Text>
+              </LinearGradient>
             </Pressable>
           </View>
 
@@ -316,56 +236,20 @@ export default function LiveStreamScreen() {
             </View>
 
             {STREAM_SCHEDULE.map((schedule) => (
-              <View
-                key={schedule.id}
-                style={[
-                  styles.scheduleCard,
-                  {
-                    backgroundColor: isDark ? Colors.dark.card : "#fff",
-                    borderColor: isDark
-                      ? "rgba(255,255,255,0.08)"
-                      : "rgba(91,44,142,0.1)",
-                  },
-                ]}
-              >
+              <LinearGradient key={schedule.id} colors={["#1a0f2e", "#0d1a3a"]} style={styles.scheduleCard}>
                 <View style={styles.scheduleHeader}>
                   <View style={styles.scheduleDay}>
-                    <Text
-                      style={[
-                        styles.scheduleDayText,
-                        { color: Colors.primary },
-                      ]}
-                    >
-                      {schedule.day}
-                    </Text>
-                    <Text style={[styles.scheduleTime, { color: colors.text }]}>
-                      {schedule.time}
-                    </Text>
+                    <Text style={styles.scheduleDayText}>{schedule.day}</Text>
+                    <Text style={styles.scheduleTime}>{schedule.time}</Text>
                   </View>
-                  <View
-                    style={[
-                      styles.platformBadge,
-                      { backgroundColor: "#1877F218" },
-                    ]}
-                  >
+                  <View style={[styles.platformBadge, { backgroundColor: "#1877F218" }]}>
                     <Ionicons name="logo-facebook" size={14} color="#1877F2" />
-                    <Text style={[styles.platformText, { color: "#1877F2" }]}>
-                      {schedule.platform}
-                    </Text>
+                    <Text style={[styles.platformText, { color: "#1877F2" }]}>{schedule.platform}</Text>
                   </View>
                 </View>
-                <Text style={[styles.scheduleTitle, { color: colors.text }]}>
-                  {schedule.title}
-                </Text>
-                <Text
-                  style={[
-                    styles.scheduleDescription,
-                    { color: colors.textSecondary },
-                  ]}
-                >
-                  {schedule.description}
-                </Text>
-              </View>
+                <Text style={styles.scheduleTitle}>{schedule.title}</Text>
+                <Text style={styles.scheduleDescription}>{schedule.description}</Text>
+              </LinearGradient>
             ))}
           </View>
 
@@ -385,81 +269,39 @@ export default function LiveStreamScreen() {
 
             {[
               {
-                icon: <MaterialIcons name="hd" size={24} color="#6B3AA0" />,
-                iconBg: "#6B3AA018",
+                icon: <MaterialIcons name="hd" size={24} color={Colors.primary} />,
+                iconBg: Colors.primary + "18",
                 title: "HD Quality",
-                description:
-                  "High-definition video streaming for the best viewing experience",
+                description: "High-definition video streaming for the best viewing experience",
               },
               {
-                icon: (
-                  <Ionicons name="chatbubbles" size={24} color={Colors.gold} />
-                ),
+                icon: <Ionicons name="chatbubbles" size={24} color={Colors.gold} />,
                 iconBg: Colors.gold + "18",
                 title: "Live Chat",
                 description: "Interact with other viewers during the service",
               },
               {
-                icon: <MaterialIcons name="replay" size={24} color="#25D366" />,
-                iconBg: "#25D36618",
+                icon: <MaterialIcons name="replay" size={24} color={Colors.accentBlue} />,
+                iconBg: Colors.accentBlue + "18",
                 title: "Watch Replay",
-                description:
-                  "Missed it live? Watch the replay anytime after the service",
+                description: "Missed it live? Watch the replay anytime after the service",
               },
             ].map((feature, idx) => (
-              <View
-                key={idx}
-                style={[
-                  styles.featureCard,
-                  {
-                    backgroundColor: isDark ? Colors.dark.card : "#fff",
-                    borderColor: isDark
-                      ? "rgba(255,255,255,0.08)"
-                      : "rgba(91,44,142,0.1)",
-                  },
-                ]}
-              >
-                <View
-                  style={[
-                    styles.featureIcon,
-                    { backgroundColor: feature.iconBg },
-                  ]}
-                >
+              <LinearGradient key={idx} colors={["#1a0f2e", "#0d1a3a"]} style={styles.featureCard}>
+                <View style={[styles.featureIcon, { backgroundColor: feature.iconBg }]}>
                   {feature.icon}
                 </View>
                 <View style={styles.featureContent}>
-                  <Text style={[styles.featureTitle, { color: colors.text }]}>
-                    {feature.title}
-                  </Text>
-                  <Text
-                    style={[
-                      styles.featureDescription,
-                      { color: colors.textSecondary },
-                    ]}
-                  >
-                    {feature.description}
-                  </Text>
+                  <Text style={styles.featureTitle}>{feature.title}</Text>
+                  <Text style={styles.featureDescription}>{feature.description}</Text>
                 </View>
-              </View>
+              </LinearGradient>
             ))}
           </View>
 
           {/* How to Watch */}
-          <View
-            style={[
-              styles.howToCard,
-              {
-                backgroundColor: isDark ? Colors.dark.card : "#fff",
-                borderColor: isDark
-                  ? "rgba(255,255,255,0.08)"
-                  : "rgba(91,44,142,0.1)",
-              },
-            ]}
-          >
-            <Text style={[styles.howToTitle, { color: colors.text }]}>
-              How to Watch Live
-            </Text>
-
+          <LinearGradient colors={["#1a0f2e", "#0d1a3a"]} style={styles.howToCard}>
+            <Text style={styles.howToTitle}>How to Watch Live</Text>
             {[
               "Follow us on Facebook or subscribe on YouTube (when available)",
               "Check the schedule above for service times",
@@ -467,31 +309,23 @@ export default function LiveStreamScreen() {
               "Enable notifications to never miss a service",
             ].map((step, idx) => (
               <View key={idx} style={styles.step}>
-                <View
-                  style={[
-                    styles.stepNumber,
-                    { backgroundColor: Colors.primary },
-                  ]}
+                <LinearGradient
+                  colors={[Colors.primary, Colors.accentBlue]}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 0 }}
+                  style={styles.stepNumber}
                 >
                   <Text style={styles.stepNumberText}>{idx + 1}</Text>
-                </View>
-                <Text style={[styles.stepText, { color: colors.text }]}>
-                  {step}
-                </Text>
+                </LinearGradient>
+                <Text style={styles.stepText}>{step}</Text>
               </View>
             ))}
-          </View>
+          </LinearGradient>
 
           {/* CTA */}
-          <Pressable
-            onPress={openFacebookLive}
-            style={({ pressed }) => [
-              styles.ctaButton,
-              { opacity: pressed ? 0.85 : 1 },
-            ]}
-          >
+          <Pressable onPress={openFacebookLive} style={({ pressed }) => [styles.ctaButton, { opacity: pressed ? 0.85 : 1 }]}>
             <LinearGradient
-              colors={["#6B3AA0", "#4A235A"]}
+              colors={[Colors.primary, Colors.accentBlue]}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 0 }}
               style={styles.ctaGradient}
@@ -602,6 +436,8 @@ const styles = StyleSheet.create({
     padding: 32,
     alignItems: "center",
     marginBottom: 20,
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.07)",
   },
   offlineTitle: {
     fontSize: 20,
@@ -613,7 +449,7 @@ const styles = StyleSheet.create({
   offlineSubtitle: {
     fontSize: 14,
     fontFamily: fontFamily.regular,
-    color: "rgba(255,255,255,0.8)",
+    color: "rgba(255,255,255,0.65)",
     textAlign: "center",
   },
   quickActions: {
@@ -623,15 +459,14 @@ const styles = StyleSheet.create({
   },
   quickActionButton: {
     flex: 1,
-    padding: 16,
     borderRadius: 18,
-    alignItems: "center",
+    overflow: "hidden",
     borderWidth: 1,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.08,
-    shadowRadius: 10,
-    elevation: 4,
+    borderColor: "rgba(255,255,255,0.07)",
+  },
+  quickActionGradient: {
+    padding: 16,
+    alignItems: "center",
   },
   quickActionIcon: {
     width: 48,
@@ -644,11 +479,13 @@ const styles = StyleSheet.create({
   quickActionText: {
     fontSize: 11,
     fontFamily: fontFamily.regular,
+    color: "rgba(255,255,255,0.5)",
     marginBottom: 2,
   },
   quickActionLabel: {
     fontSize: 13,
     fontFamily: fontFamily.bold,
+    color: "#fff",
   },
   section: {
     marginBottom: 24,
@@ -673,11 +510,7 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     marginBottom: 12,
     borderWidth: 1,
-    shadowColor: "#241063",
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.1,
-    shadowRadius: 14,
-    elevation: 5,
+    borderColor: "rgba(255,255,255,0.07)",
   },
   scheduleHeader: {
     flexDirection: "row",
@@ -685,17 +518,17 @@ const styles = StyleSheet.create({
     alignItems: "flex-start",
     marginBottom: 10,
   },
-  scheduleDay: {
-    flex: 1,
-  },
+  scheduleDay: { flex: 1 },
   scheduleDayText: {
     fontSize: 15,
     fontFamily: fontFamily.bold,
+    color: Colors.primary,
     marginBottom: 2,
   },
   scheduleTime: {
     fontSize: 13,
     fontFamily: fontFamily.semiBold,
+    color: "rgba(255,255,255,0.75)",
   },
   platformBadge: {
     flexDirection: "row",
@@ -705,19 +538,18 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     gap: 4,
   },
-  platformText: {
-    fontSize: 12,
-    fontFamily: fontFamily.semiBold,
-  },
+  platformText: { fontSize: 12, fontFamily: fontFamily.semiBold },
   scheduleTitle: {
     fontSize: 15,
     fontFamily: fontFamily.bold,
+    color: "#fff",
     marginBottom: 6,
   },
   scheduleDescription: {
     fontSize: 13,
     fontFamily: fontFamily.regular,
     lineHeight: 19,
+    color: "rgba(255,255,255,0.55)",
   },
   featureCard: {
     flexDirection: "row",
@@ -726,11 +558,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     alignItems: "center",
     borderWidth: 1,
-    shadowColor: "#241063",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.08,
-    shadowRadius: 10,
-    elevation: 4,
+    borderColor: "rgba(255,255,255,0.07)",
   },
   featureIcon: {
     width: 50,
@@ -740,33 +568,30 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginRight: 16,
   },
-  featureContent: {
-    flex: 1,
-  },
+  featureContent: { flex: 1 },
   featureTitle: {
     fontSize: 15,
     fontFamily: fontFamily.bold,
+    color: "#fff",
     marginBottom: 4,
   },
   featureDescription: {
     fontSize: 13,
     fontFamily: fontFamily.regular,
     lineHeight: 19,
+    color: "rgba(255,255,255,0.55)",
   },
   howToCard: {
     padding: 20,
     borderRadius: 18,
     marginBottom: 20,
     borderWidth: 1,
-    shadowColor: "#241063",
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.1,
-    shadowRadius: 14,
-    elevation: 5,
+    borderColor: "rgba(255,255,255,0.07)",
   },
   howToTitle: {
     fontSize: 18,
     fontFamily: fontFamily.bold,
+    color: "#fff",
     marginBottom: 20,
   },
   step: {
@@ -794,6 +619,7 @@ const styles = StyleSheet.create({
     fontFamily: fontFamily.regular,
     lineHeight: 21,
     paddingTop: 3,
+    color: "rgba(255,255,255,0.7)",
   },
   ctaButton: {
     borderRadius: 18,
