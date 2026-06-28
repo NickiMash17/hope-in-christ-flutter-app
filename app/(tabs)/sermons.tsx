@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useCallback } from "react";
 import {
   StyleSheet,
   Text,
@@ -6,14 +6,13 @@ import {
   FlatList,
   Pressable,
   TextInput,
-  ActivityIndicator,
   Platform,
   Linking,
+  RefreshControl,
 } from "react-native";
 import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
-import { Ionicons } from "@expo/vector-icons";
-import { FontAwesome6 } from "@expo/vector-icons";
+import { Ionicons, FontAwesome6 } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { router } from "expo-router";
 import * as Haptics from "expo-haptics";
@@ -22,6 +21,7 @@ import Colors from "@/constants/colors";
 import { fontFamily } from "@/lib/fonts";
 import { useTheme } from "@/lib/useTheme";
 import { useResponsiveLayout } from "@/lib/layout";
+import { SermonCardSkeleton, SermonRowSkeleton } from "@/components/SkeletonLoader";
 
 const CATEGORIES = ["All", "Word", "Teaching", "Prayer"] as const;
 
@@ -267,7 +267,14 @@ export default function SermonsScreen() {
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
   const webTopInset = Platform.OS === "web" ? 67 : 0;
 
-  const { data: sermons = [], isLoading, error } = useSermons();
+  const { data: sermons = [], isLoading, error, refetch } = useSermons();
+  const [refreshing, setRefreshing] = useState(false);
+
+  const handleRefresh = useCallback(async () => {
+    setRefreshing(true);
+    await refetch();
+    setRefreshing(false);
+  }, [refetch]);
 
   const filteredSermons = useMemo(() => {
     return sermons.filter((s) => {
@@ -396,7 +403,7 @@ export default function SermonsScreen() {
       {/* ── X recordings banner ── */}
       {selectedCategory === "All" && !search && (
         <View style={{ marginBottom: 16 }}>
-          <RecordingsBanner isDark={isDark} />
+          <RecordingsBanner isDark={isDark} colors={colors} />
         </View>
       )}
 
@@ -428,18 +435,40 @@ export default function SermonsScreen() {
       <View style={styles.orbSecondary} />
 
       <View style={[layout.maxWidthStyle, { flex: 1, width: "100%" }]}>
-        {isLoading && (
-          <View style={styles.loadingState}>
-            <ActivityIndicator size="large" color={Colors.primary} />
+        {isLoading ? (
+          <View style={[styles.skeletonPad, { paddingHorizontal: layout.horizontalPadding }]}>
+            <SermonCardSkeleton />
+            <SermonRowSkeleton />
+            <SermonRowSkeleton />
+            <SermonRowSkeleton />
           </View>
-        )}
-        {!!error && (
+        ) : !!error ? (
           <View style={styles.loadingState}>
+            <View style={[styles.emptyIconWrap, { backgroundColor: isDark ? Colors.dark.card : Colors.primary + "10" }]}>
+              <Ionicons name="cloud-offline-outline" size={32} color={Colors.primary} />
+            </View>
             <Text style={[styles.emptyTitle, { color: colors.text }]}>
               Could not load sermons
             </Text>
+            <Text style={[styles.emptySubtitle, { color: colors.textSecondary }]}>
+              Check your connection and try again
+            </Text>
+            <Pressable
+              onPress={() => refetch()}
+              style={({ pressed }) => [styles.retryBtn, { opacity: pressed ? 0.8 : 1 }]}
+            >
+              <LinearGradient
+                colors={[Colors.primary, Colors.accentBlue]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                style={styles.retryGradient}
+              >
+                <Ionicons name="refresh" size={16} color="#fff" />
+                <Text style={styles.retryText}>Try Again</Text>
+              </LinearGradient>
+            </Pressable>
           </View>
-        )}
+        ) : (
         <FlatList
           data={filteredSermons}
           keyExtractor={(item) => item.id}
@@ -452,6 +481,14 @@ export default function SermonsScreen() {
             { paddingBottom: 100, paddingHorizontal: layout.horizontalPadding },
           ]}
           showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={handleRefresh}
+              tintColor={Colors.primary}
+              colors={[Colors.primary]}
+            />
+          }
           ListEmptyComponent={
             <View style={styles.emptyState}>
               <View
@@ -481,6 +518,7 @@ export default function SermonsScreen() {
             </View>
           }
         />
+        )}
       </View>
     </View>
   );
@@ -489,6 +527,7 @@ export default function SermonsScreen() {
 // ─── Styles ──────────────────────────────────────────────────────────────────
 const styles = StyleSheet.create({
   container: { flex: 1 },
+  skeletonPad: { paddingTop: 24, gap: 12 },
 
   atmosphere: { ...StyleSheet.absoluteFillObject },
 
@@ -811,7 +850,17 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     paddingTop: 80,
+    gap: 12,
   },
+  retryBtn: { borderRadius: 12, overflow: "hidden", marginTop: 4 },
+  retryGradient: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    paddingHorizontal: 28,
+    paddingVertical: 13,
+  },
+  retryText: { color: "#fff", fontSize: 15, fontFamily: fontFamily.bold },
 
   // ── X recordings banner ──
   recordingsBanner: {

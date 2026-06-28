@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useCallback } from "react";
 import {
   StyleSheet,
   Text,
@@ -6,6 +6,7 @@ import {
   FlatList,
   Pressable,
   Platform,
+  RefreshControl,
 } from "react-native";
 import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
@@ -19,12 +20,13 @@ import { useTheme } from "@/lib/useTheme";
 import { useEvents } from "@/lib/db";
 import { useResponsiveLayout } from "@/lib/layout";
 import { EventCountdown } from "@/components/EventCountdown";
+import { SkeletonLoader } from "@/components/SkeletonLoader";
 
-const eventImages: Record<string, any> = {
-  "1": require("@/assets/new/sunday-service-poster.jpeg"),
-  "2": require("@/assets/new/church youth.jpeg"),
-  "3": require("@/assets/new/ordination of ministers.jpeg"),
-  "4": require("@/assets/new/worship team.jpeg"),
+const categoryImages: Record<string, any> = {
+  Service:     require("@/assets/new/sunday-service-poster.jpeg"),
+  Youth:       require("@/assets/new/church youth.jpeg"),
+  Conference:  require("@/assets/new/ordination of ministers.jpeg"),
+  Fellowship:  require("@/assets/new/worship team.jpeg"),
 };
 
 const categoryColors: Record<string, string> = {
@@ -65,7 +67,7 @@ function FeaturedEventCard({
       ]}
     >
       <Image
-        source={eventImages[event.id] || eventImages["1"]}
+        source={event.image_url ? { uri: event.image_url } : categoryImages[event.category] ?? categoryImages.Service}
         style={styles.featuredImage}
         contentFit="cover"
       />
@@ -175,7 +177,7 @@ function EventCard({
       ]}
     >
       <Image
-        source={eventImages[event.id] || eventImages["1"]}
+        source={event.image_url ? { uri: event.image_url } : categoryImages[event.category] ?? categoryImages.Service}
         style={styles.eventImage}
         contentFit="cover"
       />
@@ -227,7 +229,14 @@ export default function EventsScreen() {
   const layout = useResponsiveLayout();
   const webTopInset = Platform.OS === "web" ? 67 : 0;
 
-  const { data: events = [] } = useEvents();
+  const { data: events = [], isLoading, error, refetch } = useEvents();
+  const [refreshing, setRefreshing] = useState(false);
+
+  const handleRefresh = useCallback(async () => {
+    setRefreshing(true);
+    await refetch();
+    setRefreshing(false);
+  }, [refetch]);
 
   // Events come pre-sorted ascending from Supabase; split featured + rest
   const [featuredEvent, ...remainingEvents] = events;
@@ -315,35 +324,78 @@ export default function EventsScreen() {
       <View style={styles.orbSecondary} />
 
       <View style={[layout.maxWidthStyle, { flex: 1, width: "100%" }]}>
-        <FlatList
-          data={remainingEvents}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <EventCard event={item} isDark={isDark} colors={colors} />
-          )}
-          ListHeaderComponent={ListHeader}
-          contentContainerStyle={[
-            styles.list,
-            { paddingBottom: 100, paddingHorizontal: layout.horizontalPadding },
-          ]}
-          showsVerticalScrollIndicator={false}
-          ListEmptyComponent={
-            !featuredEvent ? (
-              <View style={styles.emptyState}>
-                <Ionicons
-                  name="calendar-outline"
-                  size={48}
-                  color={colors.textSecondary}
-                />
-                <Text
-                  style={[styles.emptyText, { color: colors.textSecondary }]}
-                >
-                  No upcoming events
-                </Text>
-              </View>
-            ) : null
-          }
-        />
+        {isLoading ? (
+          <View style={[styles.skeletonPad, { paddingHorizontal: layout.horizontalPadding }]}>
+            <SkeletonLoader height={28} width="45%" style={{ marginBottom: 20, marginTop: 16 }} />
+            <SkeletonLoader height={280} borderRadius={24} style={{ marginBottom: 24 }} />
+            <SkeletonLoader height={24} width="35%" style={{ marginBottom: 16 }} />
+            {[1, 2, 3].map((i) => (
+              <SkeletonLoader key={i} height={140} borderRadius={18} style={{ marginBottom: 12 }} />
+            ))}
+          </View>
+        ) : !!error ? (
+          <View style={styles.errorState}>
+            <View style={[styles.errorIconWrap, { backgroundColor: Colors.primary + "10" }]}>
+              <Ionicons name="cloud-offline-outline" size={34} color={Colors.primary} />
+            </View>
+            <Text style={[styles.errorTitle, { color: colors.text }]}>Could not load events</Text>
+            <Text style={[styles.errorSub, { color: colors.textSecondary }]}>
+              Check your connection and try again
+            </Text>
+            <Pressable
+              onPress={() => refetch()}
+              style={({ pressed }) => [styles.retryBtn, { opacity: pressed ? 0.8 : 1 }]}
+            >
+              <LinearGradient
+                colors={[Colors.primary, Colors.accentBlue]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                style={styles.retryGradient}
+              >
+                <Ionicons name="refresh" size={16} color="#fff" />
+                <Text style={styles.retryText}>Try Again</Text>
+              </LinearGradient>
+            </Pressable>
+          </View>
+        ) : (
+          <FlatList
+            data={remainingEvents}
+            keyExtractor={(item) => item.id}
+            renderItem={({ item }) => (
+              <EventCard event={item} isDark={isDark} colors={colors} />
+            )}
+            ListHeaderComponent={ListHeader}
+            contentContainerStyle={[
+              styles.list,
+              { paddingBottom: 100, paddingHorizontal: layout.horizontalPadding },
+            ]}
+            showsVerticalScrollIndicator={false}
+            refreshControl={
+              <RefreshControl
+                refreshing={refreshing}
+                onRefresh={handleRefresh}
+                tintColor={Colors.primary}
+                colors={[Colors.primary]}
+              />
+            }
+            ListEmptyComponent={
+              !featuredEvent ? (
+                <View style={styles.emptyState}>
+                  <Ionicons
+                    name="calendar-outline"
+                    size={48}
+                    color={colors.textSecondary}
+                  />
+                  <Text
+                    style={[styles.emptyText, { color: colors.textSecondary }]}
+                  >
+                    No upcoming events
+                  </Text>
+                </View>
+              ) : null
+            }
+          />
+        )}
       </View>
     </View>
   );
@@ -352,6 +404,34 @@ export default function EventsScreen() {
 // ─── Styles ───────────────────────────────────────────────────────────────────
 const styles = StyleSheet.create({
   container: { flex: 1 },
+  skeletonPad: { flex: 1 },
+  errorState: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingTop: 80,
+    gap: 12,
+    paddingHorizontal: 32,
+  },
+  errorIconWrap: {
+    width: 68,
+    height: 68,
+    borderRadius: 20,
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 4,
+  },
+  errorTitle: { fontSize: 18, fontFamily: fontFamily.bold, textAlign: "center" },
+  errorSub: { fontSize: 13, fontFamily: fontFamily.regular, textAlign: "center" },
+  retryBtn: { borderRadius: 12, overflow: "hidden", marginTop: 4 },
+  retryGradient: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    paddingHorizontal: 28,
+    paddingVertical: 13,
+  },
+  retryText: { color: "#fff", fontSize: 15, fontFamily: fontFamily.bold },
 
   atmosphere: { ...StyleSheet.absoluteFillObject },
 

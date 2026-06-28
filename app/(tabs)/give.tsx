@@ -17,7 +17,7 @@ import * as Haptics from "expo-haptics";
 import Colors from "@/constants/colors";
 import { fontFamily } from "@/lib/fonts";
 import { useTheme } from "@/lib/useTheme";
-import { DONATION_INFO } from "@/lib/ministry-data";
+import { DONATION_INFO, MINISTRY_INFO } from "@/lib/ministry-data";
 import { useResponsiveLayout } from "@/lib/layout";
 
 const giveHero = require("@/assets/new/pastor and wife 3.jpeg");
@@ -42,7 +42,6 @@ export default function GiveScreen() {
   const cardColors: [string, string] = isDark ? ['#1a0f2e', '#0d1a3a'] : [colors.card, colors.surface];
   const cardText = { color: colors.text };
   const cardSubText = { color: colors.textSecondary };
-  const cardDivider = { backgroundColor: colors.border };
   const layout = useResponsiveLayout();
   const webTopInset = Platform.OS === "web" ? 67 : 0;
 
@@ -57,7 +56,7 @@ export default function GiveScreen() {
         router.push("/eft-details");
         break;
       case "contact":
-        Linking.openURL(`tel:+27825302000`);
+        Linking.openURL(MINISTRY_INFO.socialMedia.whatsapp);
         break;
     }
   };
@@ -130,7 +129,7 @@ export default function GiveScreen() {
             style={({ pressed }) => [{ opacity: pressed ? 0.93 : 1 }]}
           >
             <LinearGradient
-              colors={["#1a1a2e", "#16213e", "#0f3460"]}
+              colors={cardColors}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 1 }}
               style={styles.campaignCard}
@@ -139,21 +138,21 @@ export default function GiveScreen() {
                 <View style={styles.campaignBadge}>
                   <Text style={styles.campaignBadgeText}>ACTIVE CAMPAIGN</Text>
                 </View>
-                <Ionicons name="chevron-forward" size={16} color="rgba(255,255,255,0.4)" />
+                <Ionicons name="chevron-forward" size={16} color={isDark ? "rgba(255,255,255,0.4)" : colors.textSecondary} />
               </View>
               <View style={styles.campaignBody}>
                 <View style={styles.campaignIcon}>
                   <MaterialCommunityIcons name="church" size={26} color={Colors.gold} />
                 </View>
                 <View style={{ flex: 1 }}>
-                  <Text style={styles.campaignTitle}>HICFANM Building Fund</Text>
-                  <Text style={styles.campaignSub}>Help us buy the church land!</Text>
+                  <Text style={[styles.campaignTitle, cardText]}>HICFANM Building Fund</Text>
+                  <Text style={[styles.campaignSub, cardSubText]}>Help us buy the church land!</Text>
                 </View>
                 <View style={styles.goalPill}>
                   <Text style={styles.goalText}>R75,000</Text>
                 </View>
               </View>
-              <Text style={styles.campaignCta}>Donate via EFT · Tap to view banking details →</Text>
+              <Text style={[styles.campaignCta, cardSubText]}>Donate via EFT · Tap to view banking details →</Text>
             </LinearGradient>
           </Pressable>
 
@@ -339,12 +338,12 @@ export default function GiveScreen() {
           </View>
 
           {/* ── Scripture ── */}
-          <LinearGradient colors={["#1a0f2e", "#0d1a3a"]} style={styles.scriptureCard}>
+          <LinearGradient colors={cardColors} style={[styles.scriptureCard, { borderColor: isDark ? 'rgba(255,255,255,0.07)' : colors.border }]}>
             <View style={styles.scriptureIconWrap}>
               <Ionicons name="book" size={18} color={Colors.gold} />
             </View>
-            <Text style={styles.scriptureText}>
-              "Each of you should give what you have decided in your heart to give, not reluctantly or under compulsion, for God loves a cheerful giver."
+            <Text style={[styles.scriptureText, cardSubText]}>
+              &ldquo;Each of you should give what you have decided in your heart to give, not reluctantly or under compulsion, for God loves a cheerful giver.&rdquo;
             </Text>
             <Text style={styles.scriptureRef}>— 2 Corinthians 9:7</Text>
           </LinearGradient>

@@ -30,7 +30,10 @@ import Colors from "@/constants/colors";
 
 export default function SettingsScreen() {
   const insets = useSafeAreaInsets();
-  const { colors } = useTheme();
+  const { isDark, colors } = useTheme();
+  const cardColors: [string, string] = isDark ? ['#1a0f2e', '#0d1a3a'] : [colors.card, colors.surface];
+  const cardText = { color: colors.text };
+  const cardSubText = { color: colors.textSecondary };
   const layout = useResponsiveLayout();
   const router = useRouter();
   const webTopInset = Platform.OS === "web" ? 67 : 0;
@@ -390,7 +393,7 @@ export default function SettingsScreen() {
 
           {/* App Info */}
           <LinearGradient
-            colors={["#1a0f2e", "#0d1a3a"]}
+            colors={cardColors}
             style={styles.infoCard}
           >
             <View style={styles.appInfo}>
@@ -402,13 +405,13 @@ export default function SettingsScreen() {
               >
                 <Ionicons name="globe-outline" size={28} color="#fff" />
               </LinearGradient>
-              <Text style={styles.appName}>
+              <Text style={[styles.appName, cardText]}>
                 Hope In Christ Ministries
               </Text>
               <Text style={styles.appVersion}>
-                Version 1.0.0
+                Version 2.0.0
               </Text>
-              <Text style={styles.appDescription}>
+              <Text style={[styles.appDescription, cardSubText]}>
                 Empowering lives through faith and bringing hope to communities
                 across the nations.
               </Text>

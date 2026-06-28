@@ -229,7 +229,7 @@ export default function AboutScreen() {
             >
               <View style={styles.quoteAccent} />
               <Text style={[styles.quoteText, { color: isDark ? '#E1BEE7' : '#4A235A' }]}>
-                "{MINISTRY_INFO.slogan1}"
+                &ldquo;{MINISTRY_INFO.slogan1}&rdquo;
               </Text>
             </LinearGradient>
             <LinearGradient
@@ -238,7 +238,7 @@ export default function AboutScreen() {
             >
               <View style={[styles.quoteAccent, { backgroundColor: Colors.accentBlue }]} />
               <Text style={[styles.quoteText, { color: isDark ? '#BBDEFB' : '#1565C0' }]}>
-                "{MINISTRY_INFO.slogan2}"
+                &ldquo;{MINISTRY_INFO.slogan2}&rdquo;
               </Text>
             </LinearGradient>
           </View>
