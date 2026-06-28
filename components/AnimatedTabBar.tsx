@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { View, Pressable, StyleSheet, Platform, Dimensions, Text } from 'react-native';
+import { View, Pressable, StyleSheet, Platform, Dimensions } from 'react-native';
 import { BlurView } from 'expo-blur';
 import { Ionicons } from '@expo/vector-icons';
 import Animated, {
@@ -61,7 +61,7 @@ function TabButton({
     iconY.value     = withSpring(focused ? -2 : 0, spring);
     labelOpacity.value = withTiming(focused ? 1 : 0.5,  { duration: 160 });
     labelScale.value   = withTiming(focused ? 1 : 0.82, { duration: 160 });
-  }, [focused]);
+  }, [focused, iconScale, iconY, labelOpacity, labelScale]);
 
   const iconStyle = useAnimatedStyle(() => ({
     transform: [{ scale: iconScale.value }, { translateY: iconY.value }],
@@ -113,7 +113,7 @@ export function AnimatedTabBar({ state, navigation }: BottomTabBarProps) {
       stiffness: 200,
       mass: 0.9,
     });
-  }, [state.index, tabWidth]);
+  }, [state.index, tabWidth, pillX]);
 
   const pillStyle = useAnimatedStyle(() => ({
     transform: [{ translateX: pillX.value }],

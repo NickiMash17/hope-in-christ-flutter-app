@@ -1,3 +1,4 @@
+
 import React, { useEffect, useMemo, useRef } from "react";
 import {
   Animated,
@@ -44,6 +45,9 @@ function getTodaySchedule() {
 export function PremiumHomeScreen() {
   const insets = useSafeAreaInsets();
   const { isDark, colors } = useTheme();
+  const cardColors: [string, string] = isDark ? ['#1a0f2e', '#0d1a3a'] : [colors.card, colors.surface];
+  const cardText = { color: colors.text };
+  const cardSubText = { color: colors.textSecondary };
   const layout = useResponsiveLayout();
   const reveal = useRef(new Animated.Value(0)).current;
 
@@ -59,6 +63,21 @@ export function PremiumHomeScreen() {
       .filter((e) => new Date(e.date) >= now)
       .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
       .slice(0, 4);
+  }, [events]);
+
+  const sermonsThisMonth = useMemo(() => {
+    if (!liveSermons) return null;
+    const now = new Date();
+    const count = liveSermons.filter((s) => {
+      const d = new Date(s.date);
+      return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+    }).length;
+    return count > 0 ? count.toString() : liveSermons.length > 0 ? liveSermons.length.toString() : null;
+  }, [liveSermons]);
+
+  const totalEvents = useMemo(() => {
+    if (!events || events.length === 0) return null;
+    return events.length.toString();
   }, [events]);
   const webTopInset = Platform.OS === "web" ? 67 : 0;
   const heroHeight = Math.min(
@@ -296,14 +315,14 @@ export function PremiumHomeScreen() {
                 },
                 {
                   label: "Sermons This Month",
-                  value: "12",
+                  value: sermonsThisMonth ?? "–",
                   icon: "mic-outline",
                   gradient: [Colors.goldDark, Colors.gold],
                   trend: "neutral",
                 },
                 {
                   label: "Community Events",
-                  value: "24",
+                  value: totalEvents ?? "–",
                   icon: "star-outline",
                   gradient: [Colors.accentDark, Colors.accent],
                   trend: "up",
@@ -385,7 +404,7 @@ export function PremiumHomeScreen() {
                         transform: [{ scale: pressed ? 0.97 : 1 }],
                       })}
                     >
-                      <LinearGradient colors={['#1a0f2e', '#0d1a3a']} style={styles.eventMiniCard}>
+                      <LinearGradient colors={cardColors} style={styles.eventMiniCard}>
                         <View style={[styles.eventMiniAccent, { backgroundColor: catColor }]} />
                         <View style={[styles.eventMiniDateBubble, { backgroundColor: catColor + '22', borderColor: catColor + '55', borderWidth: 1 }]}>
                           <Text style={[styles.eventMiniDay, { color: catColor }]}>{d.getDate()}</Text>
@@ -394,10 +413,10 @@ export function PremiumHomeScreen() {
                           </Text>
                         </View>
                         <View style={styles.eventMiniContent}>
-                          <Text style={styles.eventMiniName} numberOfLines={2}>{ev.title}</Text>
+                          <Text style={[styles.eventMiniName, cardText]} numberOfLines={2}>{ev.title}</Text>
                           <View style={styles.eventMiniMeta}>
-                            <Ionicons name="location-outline" size={10} color="rgba(255,255,255,0.4)" />
-                            <Text style={styles.eventMiniLocation} numberOfLines={1}>{ev.location}</Text>
+                            <Ionicons name="location-outline" size={10} color={isDark ? "rgba(255,255,255,0.4)" : colors.textSecondary} />
+                            <Text style={[styles.eventMiniLocation, cardSubText]} numberOfLines={1}>{ev.location}</Text>
                           </View>
                         </View>
                       </LinearGradient>
@@ -467,7 +486,7 @@ export function PremiumHomeScreen() {
                 <View style={[styles.sectionAccent, { backgroundColor: colors.tint }]} />
                 <Text style={[styles.sectionTitle, { color: colors.text }]}>Today&apos;s Schedule</Text>
               </View>
-              <LinearGradient colors={["#1a0f2e", "#0d1a3a"]} style={styles.scheduleCard}>
+              <LinearGradient colors={cardColors} style={[styles.scheduleCard, { borderColor: isDark ? 'rgba(255,255,255,0.06)' : colors.border }]}>
                 {/* card header */}
                 <View style={styles.scheduleHeader}>
                   <View style={styles.scheduleDayRow}>
@@ -484,12 +503,12 @@ export function PremiumHomeScreen() {
                 {/* time rows */}
                 <View style={styles.scheduleItems}>
                   {todaySchedule.items.slice(0, 3).map((item, idx) => (
-                    <View key={idx} style={[styles.scheduleItem, idx > 0 && { borderTopWidth: 0.5, borderTopColor: "rgba(255,255,255,0.06)" }]}>
+                    <View key={idx} style={[styles.scheduleItem, idx > 0 && { borderTopWidth: 0.5, borderTopColor: isDark ? "rgba(255,255,255,0.06)" : colors.border }]}>
                       <View style={styles.scheduleTimePill}>
-                        <Text style={styles.scheduleTimeText}>{item.time}</Text>
+                        <Text style={[styles.scheduleTimeText, cardSubText]}>{item.time}</Text>
                       </View>
                       <View style={styles.scheduleTimeDot} />
-                      <Text style={styles.scheduleItemTitle}>{item.title}</Text>
+                      <Text style={[styles.scheduleItemTitle, cardText]}>{item.title}</Text>
                     </View>
                   ))}
                 </View>
@@ -503,23 +522,23 @@ export function PremiumHomeScreen() {
               <Text style={[styles.sectionTitle, { color: colors.text }]}>Visit Us</Text>
             </View>
             <Pressable onPress={() => handlePress("maps")} style={({ pressed }) => ({ opacity: pressed ? 0.88 : 1, transform: [{ scale: pressed ? 0.985 : 1 }] })}>
-              <LinearGradient colors={["#0d1a2e", "#0a1220"]} style={styles.locationCard}>
+              <LinearGradient colors={cardColors} style={[styles.locationCard, { borderColor: isDark ? 'rgba(255,255,255,0.07)' : colors.border }]}>
                 <LinearGradient colors={["#2471A3", "#5B2C8E"]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={styles.locationTopBar} />
                 <View style={styles.locationHeader}>
                   <LinearGradient colors={[Colors.accentBlue, Colors.primary]} style={styles.locationIconWrap}>
                     <Ionicons name="location" size={20} color="#fff" />
                   </LinearGradient>
                   <View style={styles.locationTextContainer}>
-                    <Text style={styles.locationTitle}>Our Location</Text>
-                    <Text style={styles.locationAddress}>{MINISTRY_INFO.address}</Text>
+                    <Text style={[styles.locationTitle, cardText]}>Our Location</Text>
+                    <Text style={[styles.locationAddress, cardSubText]}>{MINISTRY_INFO.address}</Text>
                   </View>
-                  <View style={styles.locationArrow}>
-                    <Ionicons name="navigate" size={16} color="#fff" />
+                  <View style={[styles.locationArrow, { backgroundColor: isDark ? "rgba(255,255,255,0.12)" : colors.border }]}>
+                    <Ionicons name="navigate" size={16} color={isDark ? "#fff" : colors.text} />
                   </View>
                 </View>
                 <View style={styles.locationFooter}>
-                  <Ionicons name="map-outline" size={13} color="rgba(255,255,255,0.4)" />
-                  <Text style={styles.locationFooterText}>Tap to open in Maps</Text>
+                  <Ionicons name="map-outline" size={13} color={isDark ? "rgba(255,255,255,0.4)" : colors.textSecondary} />
+                  <Text style={[styles.locationFooterText, cardSubText]}>Tap to open in Maps</Text>
                 </View>
               </LinearGradient>
             </Pressable>
