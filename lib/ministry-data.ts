@@ -8,14 +8,16 @@ export const MINISTRY_INFO = {
   officeHours: "07:30-17:00",
   serviceStyle: "Services characterized by Word-Worship Prayer-Praise",
   established: "2015",
+  website: "https://www.hicfanm.org.za/",
+  email: "Pastorthabo@hicfanm.org",
   pastorBio: "Pastor Thabo Boshomane was ordained and released from Hope Restoration Ministry in Kempton Park. He established Hope In Christ on October 18, 2015, after accepting God's call in 2009 to preach the gospel to all nations. He is a life coach and NLP practitioner who believes everyone must be saved and discipled to become the best of who God intended for them.",
   adminHR: "Pastor Thoko Mahlangu",
   socialMedia: {
     facebook: "https://www.facebook.com/hicfanm/",
     twitter: "https://x.com/HicfanMin",
     tiktok: "https://www.tiktok.com/@hopeinchristforal",
-    whatsapp: "https://wa.me/27XXXXXXXXXX",
-    youtube: "", // Coming soon
+    whatsapp: "https://wa.me/27825302000",
+    youtube: "https://www.youtube.com/@thaboboshomane9827",
   },
   streaming: {
     platform: "Facebook Live",
@@ -302,8 +304,8 @@ export const DONATION_INFO = {
     accountType: "Cheque Account"
   },
   onlineGiving: {
-    url: "https://www.hopeinchrist.org/give",
-    platforms: ["PayPal", "PayFast", "SnapScan"]
+    url: "https://www.facebook.com/hicfanm/",
+    platforms: ["EFT", "Cash Deposit"]
   },
   givingOptions: [
     {
@@ -344,8 +346,8 @@ export const SOCIAL_LINKS = {
   facebook: "https://www.facebook.com/hicfanm/",
   twitter: "https://x.com/HicfanMin",
   tiktok: "https://www.tiktok.com/@hopeinchristforal",
-  whatsapp: "https://wa.me/27XXXXXXXXXX",
-  youtube: "" // Coming soon
+  whatsapp: "https://wa.me/27825302000",
+  youtube: "https://www.youtube.com/@thaboboshomane9827"
 };
 
 export const CHAT_CHANNELS = [
