@@ -350,6 +350,128 @@ export const SOCIAL_LINKS = {
   youtube: "https://www.youtube.com/@thaboboshomane9827"
 };
 
+export type CalendarEventType = "primary" | "blue" | "gold" | "red";
+
+export interface CalendarEvent {
+  dates: string;
+  name: string;
+  type: CalendarEventType;
+}
+
+export interface CalendarMonth {
+  month: string;
+  events: CalendarEvent[];
+}
+
+export const CALENDAR_2026: CalendarMonth[] = [
+  {
+    month: "January",
+    events: [
+      { dates: "05–09", name: "Fasting Week", type: "gold" },
+      { dates: "10", name: "Church Council", type: "primary" },
+      { dates: "23", name: "Youth Service", type: "primary" },
+    ],
+  },
+  {
+    month: "February",
+    events: [
+      { dates: "07", name: "Men's & Women's Fellowship", type: "blue" },
+      { dates: "15", name: "Baby Dedication", type: "primary" },
+      { dates: "20", name: "Youth Service", type: "primary" },
+      { dates: "28", name: "Baptism", type: "blue" },
+    ],
+  },
+  {
+    month: "March",
+    events: [
+      { dates: "07", name: "Wellness Day", type: "blue" },
+      { dates: "13", name: "Youth Service", type: "primary" },
+      { dates: "14", name: "Membership Service", type: "primary" },
+      { dates: "20", name: "1st Night Prayer", type: "red" },
+      { dates: "28", name: "Young Women's Conference", type: "primary" },
+    ],
+  },
+  {
+    month: "April",
+    events: [
+      { dates: "03–05", name: "Good Friday", type: "red" },
+      { dates: "10", name: "Men's & Women's Fellowship", type: "blue" },
+      { dates: "24", name: "Market Day", type: "gold" },
+    ],
+  },
+  {
+    month: "May",
+    events: [
+      { dates: "01", name: "Youth Service", type: "primary" },
+      { dates: "15", name: "Membership Service", type: "primary" },
+      { dates: "16", name: "Business Day", type: "gold" },
+      { dates: "29", name: "Marriage Real Talk", type: "blue" },
+    ],
+  },
+  {
+    month: "June",
+    events: [
+      { dates: "05", name: "2nd Night Prayer", type: "red" },
+      { dates: "16", name: "Youth Seminar", type: "primary" },
+      { dates: "26", name: "Men's & Women's Fellowship", type: "blue" },
+    ],
+  },
+  {
+    month: "July",
+    events: [
+      { dates: "03", name: "Youth Service", type: "primary" },
+      { dates: "10", name: "Men's & Women's Fellowship", type: "blue" },
+      { dates: "17", name: "Youth Service", type: "primary" },
+      { dates: "27–31", name: "Fasting Week", type: "gold" },
+    ],
+  },
+  {
+    month: "August",
+    events: [
+      { dates: "14", name: "Youth Service", type: "primary" },
+      { dates: "21", name: "Young Women's Conference", type: "primary" },
+      { dates: "24", name: "Membership Class", type: "primary" },
+      { dates: "28", name: "Men's & Women's Fellowship", type: "blue" },
+    ],
+  },
+  {
+    month: "September",
+    events: [
+      { dates: "05", name: "Market Day", type: "gold" },
+      { dates: "18", name: "3rd Night Prayer", type: "red" },
+      { dates: "25", name: "Men's & Women's Fellowship", type: "blue" },
+    ],
+  },
+  {
+    month: "October",
+    events: [
+      { dates: "02", name: "Baptism", type: "blue" },
+      { dates: "10", name: "Couple's Breakfast", type: "gold" },
+      { dates: "16", name: "Youth Service", type: "primary" },
+      { dates: "24", name: "Men's & Women's Fellowship", type: "blue" },
+      { dates: "30 Oct–01 Nov", name: "HICFANM 11th Anniversary", type: "gold" },
+    ],
+  },
+  {
+    month: "November",
+    events: [
+      { dates: "07", name: "Wellness Day", type: "blue" },
+      { dates: "13", name: "Youth Service", type: "primary" },
+      { dates: "14", name: "Men's & Women's Fellowship", type: "blue" },
+      { dates: "21", name: "Membership Class", type: "primary" },
+    ],
+  },
+  {
+    month: "December",
+    events: [
+      { dates: "04", name: "4th Night Prayer", type: "red" },
+      { dates: "14–18", name: "Revival", type: "gold" },
+      { dates: "25", name: "Christmas Service", type: "red" },
+      { dates: "31", name: "Cross Over Service", type: "gold" },
+    ],
+  },
+];
+
 export const CHAT_CHANNELS = [
   {
     id: "general",

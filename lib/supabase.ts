@@ -49,3 +49,32 @@ export interface PodcastAppearance {
   thumbnail_url: string | null;
   created_at: string;
 }
+
+export interface ChatMessage {
+  id: string;
+  channel: string;
+  nickname: string;
+  text: string;
+  created_at: string;
+}
+
+export interface PrayerRequest {
+  id: string;
+  name: string;
+  request: string;
+  is_anonymous: boolean;
+  prayer_count: number;
+  created_at: string;
+}
+
+export interface EventRegistration {
+  id: string;
+  event_id: string;
+  name: string;
+  surname: string;
+  phone: string;
+  email: string;
+  ticket_type: string;
+  attendance_type: string;
+  created_at: string;
+}

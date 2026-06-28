@@ -3,6 +3,7 @@
     "name": "Hope in Christ",
     "slug": "hope-in-christ",
     "version": "2.0.0",
+    "runtimeVersion": "2.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "hopeinchrist",
@@ -18,12 +19,11 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.hopeinchrist.ministries",
-      "buildNumber": "2.0.0"
+      "buildNumber": "2"
     },
     "android": {
       "package": "com.hopeinchrist.ministries",
       "versionCode": 2,
-      "permissions": ["CAMERA", "READ_EXTERNAL_STORAGE", "WRITE_EXTERNAL_STORAGE"],
       "adaptiveIcon": {
         "backgroundColor": "#5B2C8E",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
@@ -35,12 +35,7 @@
       "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
-      [
-        "expo-router",
-        {
-          "origin": "https://replit.com/"
-        }
-      ],
+      "expo-router",
       [
         "expo-splash-screen",
         {
@@ -51,7 +46,15 @@
         }
       ],
       "expo-font",
-      "expo-web-browser"
+      "expo-web-browser",
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/images/icon.png",
+          "color": "#5B2C8E",
+          "sounds": []
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,
