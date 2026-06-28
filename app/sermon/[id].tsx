@@ -20,6 +20,7 @@ import { fontFamily } from "@/lib/fonts";
 import { useTheme } from "@/lib/useTheme";
 import { useSermon } from "@/lib/db";
 import { useResponsiveLayout } from "@/lib/layout";
+import { useAudioPlayer } from "@/contexts/AudioContext";
 
 const FALLBACK_IMAGES: Record<string, any> = {
   Word: require("@/assets/new/pastor.jpeg"),
@@ -27,29 +28,32 @@ const FALLBACK_IMAGES: Record<string, any> = {
   Prayer: require("@/assets/new/new purple.png"),
 };
 
-function xRecordingUrl(date: string): string {
-  const d = new Date(date);
-  const since = d.toISOString().split("T")[0];
-  const next = new Date(d);
-  next.setDate(next.getDate() + 1);
-  const until = next.toISOString().split("T")[0];
-  return `https://x.com/search?q=from%3AHicfanMin+since%3A${since}+until%3A${until}&f=live&src=typed_query`;
-}
 
 export default function SermonDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const insets = useSafeAreaInsets();
   const { isDark, colors } = useTheme();
+  const cardColors: [string, string] = isDark ? ['#1a0f2e', '#0d1a3a'] : [colors.card, colors.surface];
+  const cardText = { color: colors.text };
+  const cardSubText = { color: colors.textSecondary };
+  const cardDivider = { backgroundColor: colors.border };
   const layout = useResponsiveLayout();
   const webTopInset = Platform.OS === "web" ? 67 : 0;
 
   const { data: sermon, isLoading } = useSermon(id ?? "");
+  const audioPlayer = useAudioPlayer();
 
-  const handleFindRecording = () => {
+  const handleListenOnX = () => {
+    if (!sermon?.audio_url) return;
     if (Platform.OS !== "web")
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    const url = sermon?.audio_url ?? xRecordingUrl(sermon?.date ?? "");
-    Linking.openURL(url);
+    audioPlayer.play({
+      id: sermon.id,
+      title: sermon.title,
+      speaker: sermon.speaker,
+      url: sermon.audio_url,
+    });
+    Linking.openURL(sermon.audio_url);
   };
 
   if (isLoading) {
@@ -136,7 +140,7 @@ export default function SermonDetailScreen() {
                 <View style={[styles.categoryBadge, { backgroundColor: catColor }]}>
                   <Text style={styles.categoryText}>{sermon.category}</Text>
                 </View>
-                <Pressable onPress={handleFindRecording} style={styles.playButton}>
+                <Pressable onPress={handleListenOnX} style={[styles.playButton, !sermon.audio_url && { opacity: 0.4 }]}>
                   <LinearGradient
                     colors={[Colors.primary, Colors.accentBlue]}
                     start={{ x: 0.15, y: 0 }}
@@ -163,19 +167,19 @@ export default function SermonDetailScreen() {
             </View>
 
             {/* Meta card */}
-            <LinearGradient colors={["#1a0f2e", "#0d1a3a"]} style={styles.metaCard}>
+            <LinearGradient colors={cardColors} style={[styles.metaCard, { borderColor: isDark ? 'rgba(255,255,255,0.07)' : colors.border }]}>
               <View style={styles.metaRow}>
-                <View style={styles.metaIconWrap}>
+                <View style={[styles.metaIconWrap, { backgroundColor: isDark ? 'rgba(255,255,255,0.08)' : colors.border }]}>
                   <Ionicons name="person-outline" size={14} color={Colors.primary} />
                 </View>
-                <Text style={styles.metaText}>{sermon.speaker}</Text>
+                <Text style={[styles.metaText, cardSubText]}>{sermon.speaker}</Text>
               </View>
-              <View style={styles.metaDivider} />
+              <View style={[styles.metaDivider, cardDivider]} />
               <View style={styles.metaRow}>
-                <View style={styles.metaIconWrap}>
+                <View style={[styles.metaIconWrap, { backgroundColor: isDark ? 'rgba(255,255,255,0.08)' : colors.border }]}>
                   <Ionicons name="calendar-outline" size={14} color={Colors.accentBlue} />
                 </View>
-                <Text style={styles.metaText}>
+                <Text style={[styles.metaText, cardSubText]}>
                   {new Date(sermon.date).toLocaleDateString("en-ZA", {
                     weekday: "long",
                     day: "numeric",
@@ -186,12 +190,12 @@ export default function SermonDetailScreen() {
               </View>
               {sermon.duration && (
                 <>
-                  <View style={styles.metaDivider} />
+                  <View style={[styles.metaDivider, cardDivider]} />
                   <View style={styles.metaRow}>
-                    <View style={styles.metaIconWrap}>
+                    <View style={[styles.metaIconWrap, { backgroundColor: isDark ? 'rgba(255,255,255,0.08)' : colors.border }]}>
                       <Ionicons name="time-outline" size={14} color={Colors.gold} />
                     </View>
-                    <Text style={styles.metaText}>{sermon.duration}</Text>
+                    <Text style={[styles.metaText, cardSubText]}>{sermon.duration}</Text>
                   </View>
                 </>
               )}
@@ -203,27 +207,44 @@ export default function SermonDetailScreen() {
               </Text>
             )}
 
-            {/* ── Find Recording CTA ── */}
-            <Pressable onPress={handleFindRecording} style={styles.ctaButton}>
-              <LinearGradient
-                colors={[Colors.primary, Colors.accentBlue]}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 0 }}
-                style={styles.ctaGradient}
+            {/* ── Recording CTA ── */}
+            {sermon.audio_url ? (
+              <Pressable onPress={handleListenOnX} style={styles.ctaButton}>
+                <LinearGradient
+                  colors={[Colors.primary, Colors.accentBlue]}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 0 }}
+                  style={styles.ctaGradient}
+                >
+                  <FontAwesome6 name="x-twitter" size={18} color="#fff" />
+                  <Text style={styles.ctaText}>Listen to Sermon on X</Text>
+                  <Ionicons name="open-outline" size={16} color="rgba(255,255,255,0.7)" />
+                </LinearGradient>
+              </Pressable>
+            ) : (
+              <View
+                style={[
+                  styles.noAudioCard,
+                  {
+                    backgroundColor: isDark ? Colors.dark.card : Colors.gray100,
+                    borderColor: isDark ? "rgba(255,255,255,0.07)" : colors.border,
+                  },
+                ]}
               >
-                <FontAwesome6 name="x-twitter" size={18} color="#fff" />
-                <Text style={styles.ctaText}>Find Recording on X</Text>
-                <Ionicons name="open-outline" size={16} color="rgba(255,255,255,0.7)" />
-              </LinearGradient>
-            </Pressable>
+                <Ionicons name="mic-off-outline" size={20} color={colors.textSecondary} />
+                <Text style={[styles.noAudioText, { color: colors.textSecondary }]}>
+                  Recording not yet available for this sermon
+                </Text>
+              </View>
+            )}
 
             {sermon.notes && (
-              <LinearGradient colors={["#1a0f2e", "#0d1a3a"]} style={styles.notesCard}>
+              <LinearGradient colors={cardColors} style={[styles.notesCard, { borderColor: isDark ? 'rgba(255,255,255,0.07)' : colors.border }]}>
                 <View style={styles.notesHeader}>
                   <Ionicons name="document-text-outline" size={16} color={Colors.gold} />
-                  <Text style={styles.notesTitle}>Sermon Notes</Text>
+                  <Text style={[styles.notesTitle, cardText]}>Sermon Notes</Text>
                 </View>
-                <Text style={styles.notesText}>{sermon.notes}</Text>
+                <Text style={[styles.notesText, cardSubText]}>{sermon.notes}</Text>
               </LinearGradient>
             )}
           </View>
@@ -301,6 +322,16 @@ const styles = StyleSheet.create({
     fontSize: 15, fontFamily: fontFamily.regular, lineHeight: 23,
     marginTop: 4, marginBottom: 4,
   },
+  noAudioCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+    padding: 14,
+    borderRadius: 14,
+    borderWidth: 1,
+    marginTop: 4,
+  },
+  noAudioText: { fontSize: 13, fontFamily: fontFamily.regular, flex: 1 },
   ctaButton: { marginTop: 4, borderRadius: 16, overflow: "hidden" },
   ctaGradient: {
     flexDirection: "row", alignItems: "center", justifyContent: "center",

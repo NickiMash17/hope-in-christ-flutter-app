@@ -48,7 +48,6 @@ export default function EFTDetailsScreen() {
   const cardColors: [string, string] = isDark ? ['#1a0f2e', '#0d1a3a'] : [colors.card, colors.surface];
   const cardText = { color: colors.text };
   const cardSubText = { color: colors.textSecondary };
-  const cardDivider = { backgroundColor: colors.border };
 
   const haptic = () => {
     if (Platform.OS !== "web")
@@ -84,7 +83,7 @@ export default function EFTDetailsScreen() {
         >
           {/* ── Building Fund Banner ── */}
           <LinearGradient
-            colors={["#1a1a2e", "#16213e", "#0f3460"]}
+            colors={cardColors}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
             style={styles.campaignBanner}
@@ -97,14 +96,14 @@ export default function EFTDetailsScreen() {
                 <MaterialCommunityIcons name="church" size={28} color={Colors.gold} />
               </View>
               <View style={styles.campaignText}>
-                <Text style={styles.campaignTitle}>HICFANM Building Fund</Text>
-                <Text style={styles.campaignSub}>
+                <Text style={[styles.campaignTitle, cardText]}>HICFANM Building Fund</Text>
+                <Text style={[styles.campaignSub, cardSubText]}>
                   Help us buy the church land!
                 </Text>
               </View>
             </View>
-            <View style={styles.goalRow}>
-              <Text style={styles.goalLabel}>Fundraising Goal</Text>
+            <View style={[styles.goalRow, { backgroundColor: isDark ? 'rgba(255,255,255,0.07)' : colors.background }]}>
+              <Text style={[styles.goalLabel, cardSubText]}>Fundraising Goal</Text>
               <Text style={styles.goalAmount}>R75,000</Text>
             </View>
             <Pressable
@@ -114,8 +113,8 @@ export default function EFTDetailsScreen() {
               }}
               style={styles.campaignContact}
             >
-              <Ionicons name="call-outline" size={14} color="rgba(255,255,255,0.7)" />
-              <Text style={styles.campaignContactText}>
+              <Ionicons name="call-outline" size={14} color={isDark ? "rgba(255,255,255,0.7)" : colors.textSecondary} />
+              <Text style={[styles.campaignContactText, cardSubText]}>
                 Contact Pastor Thoko · +27 60 686-0952
               </Text>
             </Pressable>
@@ -218,7 +217,7 @@ export default function EFTDetailsScreen() {
             ]}
           >
             <Ionicons name="checkmark-circle" size={20} color="#fff" />
-            <Text style={styles.doneButtonText}>I've Made a Transfer</Text>
+            <Text style={styles.doneButtonText}>I&apos;ve Made a Transfer</Text>
           </Pressable>
         </View>
       </ScrollView>

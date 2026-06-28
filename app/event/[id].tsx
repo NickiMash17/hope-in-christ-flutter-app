@@ -131,46 +131,46 @@ export default function EventDetailScreen() {
         </View>
 
         <View style={[styles.content, { paddingHorizontal: layout.horizontalPadding }]}>
-          <LinearGradient colors={['#1a0f2e', '#0d1a3a']} style={styles.detailsCard}>
+          <LinearGradient colors={cardColors} style={[styles.detailsCard, { borderColor: isDark ? 'rgba(255,255,255,0.07)' : colors.border }]}>
             <View style={styles.detailRow}>
               <View style={[styles.detailIcon, { backgroundColor: catColor + '28' }]}>
                 <Ionicons name="calendar-outline" size={16} color={catColor} />
               </View>
               <View>
-                <Text style={styles.detailLabel}>Date</Text>
-                <Text style={styles.detailValue}>
+                <Text style={[styles.detailLabel, cardSubText]}>Date</Text>
+                <Text style={[styles.detailValue, cardText]}>
                   {dateObj.toLocaleDateString('en-ZA', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
                 </Text>
               </View>
             </View>
-            <View style={styles.detailDivider} />
+            <View style={[styles.detailDivider, cardDivider]} />
 
             <View style={styles.detailRow}>
               <View style={[styles.detailIcon, { backgroundColor: catColor + '28' }]}>
                 <Ionicons name="time-outline" size={16} color={catColor} />
               </View>
               <View>
-                <Text style={styles.detailLabel}>Time</Text>
-                <Text style={styles.detailValue}>{event.time ?? 'TBA'}</Text>
+                <Text style={[styles.detailLabel, cardSubText]}>Time</Text>
+                <Text style={[styles.detailValue, cardText]}>{event.time ?? 'TBA'}</Text>
               </View>
             </View>
-            <View style={styles.detailDivider} />
+            <View style={[styles.detailDivider, cardDivider]} />
 
             <View style={styles.detailRow}>
               <View style={[styles.detailIcon, { backgroundColor: catColor + '28' }]}>
                 <Ionicons name="location-outline" size={16} color={catColor} />
               </View>
               <View style={{ flex: 1 }}>
-                <Text style={styles.detailLabel}>Location</Text>
-                <Text style={styles.detailValue}>{event.location}</Text>
+                <Text style={[styles.detailLabel, cardSubText]}>Location</Text>
+                <Text style={[styles.detailValue, cardText]}>{event.location}</Text>
               </View>
             </View>
           </LinearGradient>
 
-          <LinearGradient colors={['#1a0f2e', '#0d1a3a']} style={styles.countdownCard}>
+          <LinearGradient colors={cardColors} style={[styles.countdownCard, { borderColor: isDark ? 'rgba(255,255,255,0.07)' : colors.border }]}>
             <View style={styles.countdownCardHeader}>
               <View style={[styles.countdownDot, { backgroundColor: catColor }]} />
-              <Text style={styles.countdownCardLabel}>Event starts in</Text>
+              <Text style={[styles.countdownCardLabel, cardSubText]}>Event starts in</Text>
             </View>
             <EventCountdown date={event.date} time={event.time} color={catColor} size="lg" />
           </LinearGradient>

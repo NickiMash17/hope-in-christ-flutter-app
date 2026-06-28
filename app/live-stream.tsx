@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import {
   View,
   Text,
@@ -9,6 +9,10 @@ import {
   Linking,
   Alert,
 } from "react-native";
+import {
+  requestNotificationPermission,
+  scheduleServiceReminders,
+} from "@/lib/notifications";
 import { router } from "expo-router";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
@@ -16,6 +20,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import * as Haptics from "expo-haptics";
 import { useTheme } from "@/lib/useTheme";
 import { useResponsiveLayout } from "@/lib/layout";
+import { useIsLiveNow } from "@/lib/useIsLiveNow";
 import { fontFamily } from "@/lib/fonts";
 import Colors from "@/constants/colors";
 
@@ -43,7 +48,7 @@ const STREAM_SCHEDULE: StreamSchedule[] = [
     id: "2",
     title: "Wednesday Bible Study",
     day: "Wednesday",
-    time: "18:00 PM",
+    time: "18:00",
     platform: "Facebook",
     description: "Deep dive into biblical teachings and practical applications",
     isLive: false,
@@ -52,7 +57,7 @@ const STREAM_SCHEDULE: StreamSchedule[] = [
     id: "3",
     title: "Friday Youth Service",
     day: "Friday",
-    time: "18:30 PM",
+    time: "18:30",
     platform: "Facebook",
     description: "Dynamic youth service with relevant teaching and worship",
     isLive: false,
@@ -64,27 +69,9 @@ export default function LiveStreamScreen() {
   const cardColors: [string, string] = isDark ? ['#1a0f2e', '#0d1a3a'] : [colors.card, colors.surface];
   const cardText = { color: colors.text };
   const cardSubText = { color: colors.textSecondary };
-  const cardDivider = { backgroundColor: colors.border };
   const layout = useResponsiveLayout();
   const insets = useSafeAreaInsets();
-  const [isCurrentlyLive, setIsCurrentlyLive] = useState(false);
-
-  useEffect(() => {
-    checkLiveStatus();
-  }, []);
-
-  const checkLiveStatus = () => {
-    const now = new Date();
-    const day = now.getDay();
-    const hour = now.getHours();
-
-    const isLive =
-      (day === 0 && hour >= 9 && hour < 12) ||
-      (day === 3 && hour >= 18 && hour < 20) ||
-      (day === 5 && hour >= 18 && hour < 21);
-
-    setIsCurrentlyLive(isLive);
-  };
+  const isCurrentlyLive = useIsLiveNow();
 
   const openFacebookLive = () => {
     if (Platform.OS !== "web")
@@ -98,13 +85,27 @@ export default function LiveStreamScreen() {
     Linking.openURL("https://www.youtube.com/@thaboboshomane9827");
   };
 
-  const enableNotifications = () => {
+  const enableNotifications = async () => {
+    if (Platform.OS === "web") {
+      Alert.alert("Not Available", "Notifications are not supported on web.");
+      return;
+    }
     if (Platform.OS !== "web")
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    const granted = await requestNotificationPermission();
+    if (!granted) {
+      Alert.alert(
+        "Permission Required",
+        "Enable notifications in your device settings to get live service alerts.",
+        [{ text: "OK" }],
+      );
+      return;
+    }
+    await scheduleServiceReminders();
     Alert.alert(
-      "Enable Notifications",
-      "Get notified when we go live! This feature will be available in the next update.",
-      [{ text: "OK" }],
+      "You're all set!",
+      "You'll be reminded before Sunday, Wednesday, and Friday services.",
+      [{ text: "Great!" }],
     );
   };
 
@@ -171,18 +172,18 @@ export default function LiveStreamScreen() {
             </Pressable>
           ) : (
             <LinearGradient
-              colors={["#1a0f2e", "#0d1a3a"]}
+              colors={cardColors}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 1 }}
-              style={styles.offlineBanner}
+              style={[styles.offlineBanner, { borderColor: isDark ? 'rgba(255,255,255,0.07)' : colors.border }]}
             >
               <Ionicons
                 name="videocam-outline"
                 size={48}
-                color="rgba(255,255,255,0.7)"
+                color={isDark ? "rgba(255,255,255,0.7)" : colors.textSecondary}
               />
-              <Text style={styles.offlineTitle}>No Live Stream Right Now</Text>
-              <Text style={styles.offlineSubtitle}>
+              <Text style={[styles.offlineTitle, cardText]}>No Live Stream Right Now</Text>
+              <Text style={[styles.offlineSubtitle, cardSubText]}>
                 Check the schedule below for upcoming services
               </Text>
             </LinearGradient>
@@ -190,33 +191,33 @@ export default function LiveStreamScreen() {
 
           {/* Quick Access Buttons */}
           <View style={styles.quickActions}>
-            <Pressable onPress={openFacebookLive} style={({ pressed }) => [styles.quickActionButton, { opacity: pressed ? 0.85 : 1 }]}>
-              <LinearGradient colors={["#1a0f2e", "#0d1a3a"]} style={styles.quickActionGradient}>
+            <Pressable onPress={openFacebookLive} style={({ pressed }) => [styles.quickActionButton, { borderColor: isDark ? 'rgba(255,255,255,0.07)' : colors.border, opacity: pressed ? 0.85 : 1 }]}>
+              <LinearGradient colors={cardColors} style={styles.quickActionGradient}>
                 <View style={[styles.quickActionIcon, { backgroundColor: "#1877F218" }]}>
                   <Ionicons name="logo-facebook" size={24} color="#1877F2" />
                 </View>
-                <Text style={styles.quickActionText}>Watch on</Text>
-                <Text style={styles.quickActionLabel}>Facebook</Text>
+                <Text style={[styles.quickActionText, cardSubText]}>Watch on</Text>
+                <Text style={[styles.quickActionLabel, cardText]}>Facebook</Text>
               </LinearGradient>
             </Pressable>
 
-            <Pressable onPress={openYouTubeLive} style={({ pressed }) => [styles.quickActionButton, { opacity: pressed ? 0.85 : 1 }]}>
-              <LinearGradient colors={["#1a0f2e", "#0d1a3a"]} style={styles.quickActionGradient}>
+            <Pressable onPress={openYouTubeLive} style={({ pressed }) => [styles.quickActionButton, { borderColor: isDark ? 'rgba(255,255,255,0.07)' : colors.border, opacity: pressed ? 0.85 : 1 }]}>
+              <LinearGradient colors={cardColors} style={styles.quickActionGradient}>
                 <View style={[styles.quickActionIcon, { backgroundColor: "#FF000018" }]}>
                   <Ionicons name="logo-youtube" size={24} color="#FF0000" />
                 </View>
-                <Text style={styles.quickActionText}>YouTube</Text>
-                <Text style={styles.quickActionLabel}>Watch Now</Text>
+                <Text style={[styles.quickActionText, cardSubText]}>YouTube</Text>
+                <Text style={[styles.quickActionLabel, cardText]}>Watch Now</Text>
               </LinearGradient>
             </Pressable>
 
-            <Pressable onPress={enableNotifications} style={({ pressed }) => [styles.quickActionButton, { opacity: pressed ? 0.85 : 1 }]}>
-              <LinearGradient colors={["#1a0f2e", "#0d1a3a"]} style={styles.quickActionGradient}>
+            <Pressable onPress={enableNotifications} style={({ pressed }) => [styles.quickActionButton, { borderColor: isDark ? 'rgba(255,255,255,0.07)' : colors.border, opacity: pressed ? 0.85 : 1 }]}>
+              <LinearGradient colors={cardColors} style={styles.quickActionGradient}>
                 <View style={[styles.quickActionIcon, { backgroundColor: Colors.gold + "18" }]}>
                   <Ionicons name="notifications" size={24} color={Colors.gold} />
                 </View>
-                <Text style={styles.quickActionText}>Get</Text>
-                <Text style={styles.quickActionLabel}>Notified</Text>
+                <Text style={[styles.quickActionText, cardSubText]}>Get</Text>
+                <Text style={[styles.quickActionLabel, cardText]}>Notified</Text>
               </LinearGradient>
             </Pressable>
           </View>
@@ -236,19 +237,19 @@ export default function LiveStreamScreen() {
             </View>
 
             {STREAM_SCHEDULE.map((schedule) => (
-              <LinearGradient key={schedule.id} colors={["#1a0f2e", "#0d1a3a"]} style={styles.scheduleCard}>
+              <LinearGradient key={schedule.id} colors={cardColors} style={[styles.scheduleCard, { borderColor: isDark ? 'rgba(255,255,255,0.07)' : colors.border }]}>
                 <View style={styles.scheduleHeader}>
                   <View style={styles.scheduleDay}>
                     <Text style={styles.scheduleDayText}>{schedule.day}</Text>
-                    <Text style={styles.scheduleTime}>{schedule.time}</Text>
+                    <Text style={[styles.scheduleTime, cardSubText]}>{schedule.time}</Text>
                   </View>
                   <View style={[styles.platformBadge, { backgroundColor: "#1877F218" }]}>
                     <Ionicons name="logo-facebook" size={14} color="#1877F2" />
                     <Text style={[styles.platformText, { color: "#1877F2" }]}>{schedule.platform}</Text>
                   </View>
                 </View>
-                <Text style={styles.scheduleTitle}>{schedule.title}</Text>
-                <Text style={styles.scheduleDescription}>{schedule.description}</Text>
+                <Text style={[styles.scheduleTitle, cardText]}>{schedule.title}</Text>
+                <Text style={[styles.scheduleDescription, cardSubText]}>{schedule.description}</Text>
               </LinearGradient>
             ))}
           </View>
@@ -287,21 +288,21 @@ export default function LiveStreamScreen() {
                 description: "Missed it live? Watch the replay anytime after the service",
               },
             ].map((feature, idx) => (
-              <LinearGradient key={idx} colors={["#1a0f2e", "#0d1a3a"]} style={styles.featureCard}>
+              <LinearGradient key={idx} colors={cardColors} style={[styles.featureCard, { borderColor: isDark ? 'rgba(255,255,255,0.07)' : colors.border }]}>
                 <View style={[styles.featureIcon, { backgroundColor: feature.iconBg }]}>
                   {feature.icon}
                 </View>
                 <View style={styles.featureContent}>
-                  <Text style={styles.featureTitle}>{feature.title}</Text>
-                  <Text style={styles.featureDescription}>{feature.description}</Text>
+                  <Text style={[styles.featureTitle, cardText]}>{feature.title}</Text>
+                  <Text style={[styles.featureDescription, cardSubText]}>{feature.description}</Text>
                 </View>
               </LinearGradient>
             ))}
           </View>
 
           {/* How to Watch */}
-          <LinearGradient colors={["#1a0f2e", "#0d1a3a"]} style={styles.howToCard}>
-            <Text style={styles.howToTitle}>How to Watch Live</Text>
+          <LinearGradient colors={cardColors} style={[styles.howToCard, { borderColor: isDark ? 'rgba(255,255,255,0.07)' : colors.border }]}>
+            <Text style={[styles.howToTitle, cardText]}>How to Watch Live</Text>
             {[
               "Follow us on Facebook or subscribe on YouTube (when available)",
               "Check the schedule above for service times",
@@ -317,7 +318,7 @@ export default function LiveStreamScreen() {
                 >
                   <Text style={styles.stepNumberText}>{idx + 1}</Text>
                 </LinearGradient>
-                <Text style={styles.stepText}>{step}</Text>
+                <Text style={[styles.stepText, cardSubText]}>{step}</Text>
               </View>
             ))}
           </LinearGradient>

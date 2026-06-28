@@ -11,7 +11,6 @@ import {
   KeyboardAvoidingView,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useLocalSearchParams, router } from 'expo-router';
@@ -19,8 +18,9 @@ import * as Haptics from 'expo-haptics';
 import Colors from '@/constants/colors';
 import { fontFamily } from '@/lib/fonts';
 import { useTheme } from '@/lib/useTheme';
-import { useEvent } from '@/lib/db';
+import { useEvent, submitEventRegistration } from '@/lib/db';
 import { useResponsiveLayout } from '@/lib/layout';
+import { SkeletonLoader } from '@/components/SkeletonLoader';
 
 export default function RegisterScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -29,7 +29,6 @@ export default function RegisterScreen() {
   const cardColors: [string, string] = isDark ? ['#1a0f2e', '#0d1a3a'] : [colors.card, colors.surface];
   const cardText = { color: colors.text };
   const cardSubText = { color: colors.textSecondary };
-  const cardDivider = { backgroundColor: colors.border };
   const layout = useResponsiveLayout();
   const webTopInset = Platform.OS === 'web' ? 67 : 0;
 
@@ -61,8 +60,9 @@ export default function RegisterScreen() {
     return (
       <View style={[styles.container, { backgroundColor: colors.background }]}>
         {navBar}
-        <View style={styles.emptyState}>
-          <Ionicons name="refresh" size={32} color={Colors.primary} />
+        <View style={[styles.skeletonPad, { paddingHorizontal: layout.horizontalPadding }]}>
+          <SkeletonLoader height={90} borderRadius={18} style={{ marginBottom: 12 }} />
+          <SkeletonLoader height={320} borderRadius={18} />
         </View>
       </View>
     );
@@ -89,21 +89,15 @@ export default function RegisterScreen() {
     if (Platform.OS !== 'web') Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
 
     try {
-      const registration = {
-        id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
-        eventId: event.id,
+      await submitEventRegistration({
+        event_id: event.id,
         name: name.trim(),
         surname: surname.trim(),
         phone: phone.trim(),
         email: email.trim(),
-        ticketType,
-        attendanceType,
-        timestamp: Date.now(),
-      };
-      const existing = await AsyncStorage.getItem('registrations');
-      const registrations = existing ? JSON.parse(existing) : [];
-      registrations.push(registration);
-      await AsyncStorage.setItem('registrations', JSON.stringify(registrations));
+        ticket_type: ticketType,
+        attendance_type: attendanceType,
+      });
       setIsSuccess(true);
     } catch {
       Alert.alert('Error', 'Something went wrong. Please try again.');
@@ -116,48 +110,121 @@ export default function RegisterScreen() {
     return (
       <View style={[styles.container, { backgroundColor: colors.background }]}>
         <LinearGradient
-          colors={['rgba(74,35,90,0.14)', 'rgba(36,113,163,0.08)', 'transparent']}
+          colors={['rgba(74,35,90,0.18)', 'rgba(36,113,163,0.1)', 'transparent']}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
           style={styles.atmosphere}
         />
         <View style={styles.orbPrimary} />
-        <View
-          style={[
-            styles.successContainer,
-            layout.narrowWidthStyle,
-            { paddingHorizontal: layout.horizontalPadding },
-          ]}
+        <View style={styles.orbSecondary} />
+        <ScrollView
+          contentContainerStyle={{ flexGrow: 1, paddingBottom: 48, paddingTop: 40 }}
+          showsVerticalScrollIndicator={false}
         >
-          <LinearGradient
-            colors={[Colors.primary, Colors.accentBlue]}
-            start={{ x: 0.15, y: 0 }}
-            end={{ x: 0.85, y: 1 }}
-            style={styles.successIcon}
-          >
-            <Ionicons name="checkmark" size={52} color="#fff" />
-          </LinearGradient>
-          <Text style={[styles.successTitle, { color: colors.text }]}>Registration Complete!</Text>
-          <Text style={[styles.successSubtitle, { color: colors.textSecondary }]}>
-            You have been registered for {event.title}. We look forward to seeing you there!
-          </Text>
-          <LinearGradient colors={['#1a0f2e', '#0d1a3a']} style={styles.successDetailCard}>
-            <Ionicons name="calendar-outline" size={15} color={Colors.gold} />
-            <Text style={styles.successDetail}>
-              {new Date(event.date).toLocaleDateString('en-ZA', { weekday: 'long', day: 'numeric', month: 'long' })} at {event.time ?? 'TBA'}
-            </Text>
-          </LinearGradient>
-          <Pressable onPress={() => router.back()} style={styles.doneButton}>
+          <View style={[layout.narrowWidthStyle, { paddingHorizontal: layout.horizontalPadding, alignItems: 'center' }]}>
+
+            {/* Checkmark badge */}
             <LinearGradient
               colors={[Colors.primary, Colors.accentBlue]}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 0 }}
-              style={styles.doneGradient}
+              start={{ x: 0.15, y: 0 }}
+              end={{ x: 0.85, y: 1 }}
+              style={styles.successBadge}
             >
-              <Text style={styles.doneButtonText}>Done</Text>
+              <View style={styles.successBadgeRing} />
+              <Ionicons name="checkmark" size={52} color="#fff" />
             </LinearGradient>
-          </Pressable>
-        </View>
+
+            <Text style={[styles.successHeadline, { color: colors.text }]}>{"You're Registered!"}</Text>
+            <Text style={[styles.successGreeting, { color: colors.textSecondary }]}>
+              {"Well done, "}{name}{"! Your spot is confirmed.\nWe can't wait to see you there."}
+            </Text>
+
+            {/* Event summary card */}
+            <LinearGradient
+              colors={cardColors}
+              style={[styles.successCard, { borderColor: isDark ? 'rgba(255,255,255,0.08)' : colors.border, width: '100%' }]}
+            >
+              <LinearGradient
+                colors={[Colors.primary, Colors.accentBlue]}
+                start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
+                style={styles.successCardTopBar}
+              />
+              <View style={styles.successCardBody}>
+                <Text style={[styles.successCardTitle, cardText]}>{event.title}</Text>
+                <View style={styles.successRow}>
+                  <View style={[styles.successRowIcon, { backgroundColor: Colors.gold + '22' }]}>
+                    <Ionicons name="calendar-outline" size={14} color={Colors.gold} />
+                  </View>
+                  <Text style={[styles.successRowText, cardSubText]}>
+                    {new Date(event.date).toLocaleDateString('en-ZA', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
+                  </Text>
+                </View>
+                <View style={styles.successRow}>
+                  <View style={[styles.successRowIcon, { backgroundColor: Colors.primary + '22' }]}>
+                    <Ionicons name="time-outline" size={14} color={Colors.primary} />
+                  </View>
+                  <Text style={[styles.successRowText, cardSubText]}>{event.time ?? 'TBA'}</Text>
+                </View>
+                <View style={styles.successRow}>
+                  <View style={[styles.successRowIcon, { backgroundColor: Colors.accentBlue + '22' }]}>
+                    <Ionicons name="location-outline" size={14} color={Colors.accentBlue} />
+                  </View>
+                  <Text style={[styles.successRowText, cardSubText]}>{event.location}</Text>
+                </View>
+              </View>
+            </LinearGradient>
+
+            {/* Registration details card */}
+            <LinearGradient
+              colors={cardColors}
+              style={[styles.successCard, { borderColor: isDark ? 'rgba(255,255,255,0.08)' : colors.border, width: '100%' }]}
+            >
+              <View style={styles.successCardBody}>
+                <Text style={[styles.successCardSectionLabel, { color: Colors.gold }]}>YOUR DETAILS</Text>
+                {[
+                  { label: 'Name', value: `${name} ${surname}` },
+                  { label: 'Email', value: email },
+                  { label: 'Ticket', value: ticketType },
+                  { label: 'Attendance', value: attendanceType },
+                ].map((row, i, arr) => (
+                  <React.Fragment key={row.label}>
+                    <View style={styles.successDetailRow}>
+                      <Text style={[styles.successDetailLabel, cardSubText]}>{row.label}</Text>
+                      <Text style={[styles.successDetailValue, cardText]} numberOfLines={1}>{row.value}</Text>
+                    </View>
+                    {i < arr.length - 1 && (
+                      <View style={[styles.successDetailDivider, { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : colors.border }]} />
+                    )}
+                  </React.Fragment>
+                ))}
+              </View>
+            </LinearGradient>
+
+            {/* Action buttons */}
+            <View style={{ width: '100%', gap: 10, marginTop: 4 }}>
+              <Pressable
+                onPress={() => router.replace({ pathname: '/event/[id]', params: { id: event.id } })}
+                style={styles.primaryActionButton}
+              >
+                <LinearGradient
+                  colors={[Colors.primary, Colors.accentBlue]}
+                  start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
+                  style={styles.primaryActionGradient}
+                >
+                  <Ionicons name="calendar" size={18} color="#fff" />
+                  <Text style={styles.primaryActionText}>View Event Details</Text>
+                </LinearGradient>
+              </Pressable>
+              <Pressable
+                onPress={() => router.back()}
+                style={[styles.secondaryActionButton, { borderColor: isDark ? 'rgba(255,255,255,0.15)' : colors.border }]}
+              >
+                <Text style={[styles.secondaryActionText, { color: colors.textSecondary }]}>Back to Events</Text>
+              </Pressable>
+            </View>
+
+          </View>
+        </ScrollView>
       </View>
     );
   }
@@ -185,7 +252,7 @@ export default function RegisterScreen() {
           keyboardShouldPersistTaps="handled"
         >
           <View style={[layout.narrowWidthStyle, { paddingHorizontal: layout.horizontalPadding }]}>
-          <LinearGradient colors={['#1a0f2e', '#0d1a3a']} style={styles.eventSummary}>
+          <LinearGradient colors={cardColors} style={[styles.eventSummary, { borderColor: isDark ? 'rgba(255,255,255,0.07)' : colors.border }]}>
             <View style={styles.eventSummaryInner}>
               <LinearGradient
                 colors={[Colors.primary, Colors.accentBlue]}
@@ -194,61 +261,61 @@ export default function RegisterScreen() {
                 style={styles.eventSummaryBar}
               />
               <View style={{ flex: 1 }}>
-                <Text style={styles.eventName}>{event.title}</Text>
-                <Text style={styles.eventDate}>
+                <Text style={[styles.eventName, cardText]}>{event.title}</Text>
+                <Text style={[styles.eventDate, cardSubText]}>
                   {new Date(event.date).toLocaleDateString('en-ZA', { day: 'numeric', month: 'long', year: 'numeric' })} · {event.time}
                 </Text>
               </View>
             </View>
           </LinearGradient>
 
-          <LinearGradient colors={['#1a0f2e', '#0d1a3a']} style={styles.form}>
+          <LinearGradient colors={cardColors} style={[styles.form, { borderColor: isDark ? 'rgba(255,255,255,0.07)' : colors.border }]}>
             <View style={[styles.formRow, !layout.isTablet && styles.formRowStack]}>
               <View style={styles.formField}>
-                <Text style={styles.label}>First Name *</Text>
+                <Text style={[styles.label, cardSubText]}>First Name *</Text>
                 <TextInput
-                  style={styles.input}
+                  style={[styles.input, { color: colors.text, backgroundColor: isDark ? 'rgba(255,255,255,0.07)' : colors.background, borderColor: isDark ? 'rgba(255,255,255,0.1)' : colors.border }]}
                   value={name}
                   onChangeText={setName}
                   placeholder="Enter first name"
-                  placeholderTextColor="rgba(255,255,255,0.3)"
+                  placeholderTextColor={isDark ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.3)'}
                   selectionColor={Colors.primary}
                 />
               </View>
               <View style={styles.formField}>
-                <Text style={styles.label}>Surname *</Text>
+                <Text style={[styles.label, cardSubText]}>Surname *</Text>
                 <TextInput
-                  style={styles.input}
+                  style={[styles.input, { color: colors.text, backgroundColor: isDark ? 'rgba(255,255,255,0.07)' : colors.background, borderColor: isDark ? 'rgba(255,255,255,0.1)' : colors.border }]}
                   value={surname}
                   onChangeText={setSurname}
                   placeholder="Enter surname"
-                  placeholderTextColor="rgba(255,255,255,0.3)"
+                  placeholderTextColor={isDark ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.3)'}
                   selectionColor={Colors.primary}
                 />
               </View>
             </View>
 
             <View style={styles.formField}>
-              <Text style={styles.label}>Phone Number *</Text>
+              <Text style={[styles.label, cardSubText]}>Phone Number *</Text>
               <TextInput
-                style={styles.input}
+                style={[styles.input, { color: colors.text, backgroundColor: isDark ? 'rgba(255,255,255,0.07)' : colors.background, borderColor: isDark ? 'rgba(255,255,255,0.1)' : colors.border }]}
                 value={phone}
                 onChangeText={setPhone}
                 placeholder="Enter phone number"
-                placeholderTextColor="rgba(255,255,255,0.3)"
+                placeholderTextColor={isDark ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.3)'}
                 keyboardType="phone-pad"
                 selectionColor={Colors.primary}
               />
             </View>
 
             <View style={styles.formField}>
-              <Text style={styles.label}>Email Address *</Text>
+              <Text style={[styles.label, cardSubText]}>Email Address *</Text>
               <TextInput
-                style={styles.input}
+                style={[styles.input, { color: colors.text, backgroundColor: isDark ? 'rgba(255,255,255,0.07)' : colors.background, borderColor: isDark ? 'rgba(255,255,255,0.1)' : colors.border }]}
                 value={email}
                 onChangeText={setEmail}
                 placeholder="Enter email address"
-                placeholderTextColor="rgba(255,255,255,0.3)"
+                placeholderTextColor={isDark ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.3)'}
                 keyboardType="email-address"
                 autoCapitalize="none"
                 selectionColor={Colors.primary}
@@ -257,7 +324,7 @@ export default function RegisterScreen() {
 
             {ticketTypes.length > 1 && (
               <View style={styles.formField}>
-                <Text style={styles.label}>Ticket Type</Text>
+                <Text style={[styles.label, cardSubText]}>Ticket Type</Text>
                 <View style={styles.optionRow}>
                   {ticketTypes.map((t: string) => (
                     <Pressable
@@ -268,10 +335,11 @@ export default function RegisterScreen() {
                       }}
                       style={[
                         styles.optionChip,
+                        { backgroundColor: isDark ? 'rgba(255,255,255,0.07)' : colors.background, borderColor: isDark ? 'rgba(255,255,255,0.1)' : colors.border },
                         ticketType === t && styles.optionChipActive,
                       ]}
                     >
-                      <Text style={[styles.optionText, { color: ticketType === t ? '#fff' : 'rgba(255,255,255,0.55)' }]}>{t}</Text>
+                      <Text style={[styles.optionText, { color: ticketType === t ? '#fff' : (isDark ? 'rgba(255,255,255,0.55)' : colors.textSecondary) }]}>{t}</Text>
                     </Pressable>
                   ))}
                 </View>
@@ -280,7 +348,7 @@ export default function RegisterScreen() {
 
             {attendanceTypes.length > 1 && (
               <View style={styles.formField}>
-                <Text style={styles.label}>Attendance</Text>
+                <Text style={[styles.label, cardSubText]}>Attendance</Text>
                 <View style={styles.optionRow}>
                   {attendanceTypes.map((a: string) => (
                     <Pressable
@@ -291,10 +359,11 @@ export default function RegisterScreen() {
                       }}
                       style={[
                         styles.optionChip,
+                        { backgroundColor: isDark ? 'rgba(255,255,255,0.07)' : colors.background, borderColor: isDark ? 'rgba(255,255,255,0.1)' : colors.border },
                         attendanceType === a && styles.optionChipActiveBlue,
                       ]}
                     >
-                      <Text style={[styles.optionText, { color: attendanceType === a ? '#fff' : 'rgba(255,255,255,0.55)' }]}>{a}</Text>
+                      <Text style={[styles.optionText, { color: attendanceType === a ? '#fff' : (isDark ? 'rgba(255,255,255,0.55)' : colors.textSecondary) }]}>{a}</Text>
                     </Pressable>
                   ))}
                 </View>
@@ -394,19 +463,42 @@ const styles = StyleSheet.create({
   submitButton: { borderRadius: 14, overflow: 'hidden', marginTop: 8 },
   submitGradient: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, paddingVertical: 16 },
   submitText: { color: '#fff', fontSize: 16, fontFamily: fontFamily.bold },
-  successContainer: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 32, gap: 16 },
-  successIcon: { width: 100, height: 100, borderRadius: 30, alignItems: 'center', justifyContent: 'center', marginBottom: 8 },
-  successTitle: { fontSize: 24, fontFamily: fontFamily.extraBold },
-  successSubtitle: { fontSize: 14, fontFamily: fontFamily.regular, textAlign: 'center', lineHeight: 20 },
-  successDetailCard: {
-    flexDirection: 'row', alignItems: 'center', gap: 8,
-    paddingHorizontal: 16, paddingVertical: 12, borderRadius: 14,
-    borderWidth: 1, borderColor: 'rgba(255,255,255,0.07)',
+  successBadge: {
+    width: 110, height: 110, borderRadius: 34,
+    alignItems: 'center', justifyContent: 'center',
+    marginBottom: 20,
+    shadowColor: '#5B2C8E', shadowOffset: { width: 0, height: 14 },
+    shadowOpacity: 0.42, shadowRadius: 22, elevation: 14,
   },
-  successDetail: { fontSize: 13, fontFamily: fontFamily.medium, color: 'rgba(255,255,255,0.75)' },
-  doneButton: { borderRadius: 14, overflow: 'hidden', marginTop: 8, alignSelf: 'stretch' },
-  doneGradient: { paddingHorizontal: 40, paddingVertical: 14, alignItems: 'center' },
-  doneButtonText: { color: '#fff', fontSize: 16, fontFamily: fontFamily.bold },
+  successBadgeRing: {
+    position: 'absolute', width: 134, height: 134, borderRadius: 67,
+    borderWidth: 1.5, borderColor: 'rgba(91,44,142,0.28)',
+    top: -12, left: -12,
+  },
+  successHeadline: { fontSize: 28, fontFamily: fontFamily.extraBold, textAlign: 'center', marginBottom: 8 },
+  successGreeting: { fontSize: 14, fontFamily: fontFamily.regular, textAlign: 'center', lineHeight: 22, marginBottom: 24 },
+  successCard: {
+    borderRadius: 20, borderWidth: 1, overflow: 'hidden', marginBottom: 12,
+    shadowColor: '#241063', shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.16, shadowRadius: 14, elevation: 6,
+  },
+  successCardTopBar: { height: 3 },
+  successCardBody: { padding: 16, gap: 12 },
+  successCardTitle: { fontSize: 17, fontFamily: fontFamily.bold, marginBottom: 2 },
+  successRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
+  successRowIcon: { width: 28, height: 28, borderRadius: 8, alignItems: 'center', justifyContent: 'center', flexShrink: 0 },
+  successRowText: { fontSize: 13, fontFamily: fontFamily.regular, flex: 1, lineHeight: 18 },
+  successCardSectionLabel: { fontSize: 10, fontFamily: fontFamily.bold, letterSpacing: 1.2 },
+  successDetailRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 4 },
+  successDetailDivider: { height: 1 },
+  successDetailLabel: { fontSize: 12, fontFamily: fontFamily.regular },
+  successDetailValue: { fontSize: 13, fontFamily: fontFamily.semiBold, flex: 1, textAlign: 'right', marginLeft: 16 },
+  primaryActionButton: { borderRadius: 14, overflow: 'hidden' },
+  primaryActionGradient: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, paddingVertical: 16 },
+  primaryActionText: { color: '#fff', fontSize: 16, fontFamily: fontFamily.bold },
+  secondaryActionButton: { paddingVertical: 14, borderRadius: 14, alignItems: 'center', borderWidth: 1 },
+  secondaryActionText: { fontSize: 15, fontFamily: fontFamily.semiBold },
   emptyState: { flex: 1, alignItems: 'center', justifyContent: 'center' },
   emptyText: { fontSize: 15, fontFamily: fontFamily.medium },
+  skeletonPad: { paddingTop: 24, gap: 0 },
 });
